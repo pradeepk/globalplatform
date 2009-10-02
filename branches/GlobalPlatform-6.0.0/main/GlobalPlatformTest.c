@@ -16,27 +16,28 @@
  */
 #include <check.h>
 #include <stdlib.h>
-#include <GlobalPlatform/GlobalPlatform.h>
+#include "GlobalPlatform/GlobalPlatform.h"
+#include <string.h>
 
 /**
 * Maximum length of the reader name.
-*/ 
+*/
 #define READERNAMELEN 256
 
 /**
-* Reader number to conenct to.
-*/ 
+* Reader number to connect to.
+*/
 #define READERNUM 3
 
 /**
 * Maximum buffer size for reader names.
-*/ 
+*/
 #define BUFLEN 2048
 
 /**
 * Global card context for the test.
 */
-static OPGP_CARDCONTEXT cardContext;
+static OPGP_CARD_CONTEXT cardContext;
 
 /**
 * Global card info for the test.
@@ -48,33 +49,51 @@ static OPGP_CARD_INFO cardInfo;
 */
 static TCHAR readerName[READERNAMELEN + 1];
 
+static void internal_disconnect_card() {
+	OPGP_ERROR_STATUS status;
+	status = OPGP_card_disconnect(cardContext, cardInfo);
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not connect to card: %s", status.errorMessage);
+	}
+	_tprintf(_T("Connected to reader %s\n"), readerName);
+}
+
+static void internal_release_context() {
+	OPGP_ERROR_STATUS status;
+	status = OPGP_release_context(cardContext);
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not connect to card: %s", status.errorMessage);
+	}
+	_tprintf(_T("Connected to reader %s\n"), readerName);
+}
+
 static void internal_connect_card() {
-	LONG rv;
-	rv = card_connect (cardContext, readerName,
+	OPGP_ERROR_STATUS status;
+	status = OPGP_card_connect (cardContext, readerName,
 		&cardInfo, (OPGP_CARD_PROTOCOL_T0|OPGP_CARD_PROTOCOL_T1));
-	if (rv != OPGP_ERROR_SUCCESS) {
-		fail("Could not connect to card: %s", stringify_error(rv));
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not connect to card: %s", status.errorMessage);
 	}
 	_tprintf(_T("Connected to reader %s\n"), readerName);
 }
 
 static void internal_establish_context() {
-	LONG rv;
-	rv = establish_context(&cardContext);
-	if (rv != OPGP_ERROR_SUCCESS) {
-		fail("Could not establish context: %s", stringify_error(rv));
+	OPGP_ERROR_STATUS status;
+	_tcsncpy(cardContext.libraryName, _T("pcscconnectionplugin"), sizeof(cardContext.libraryName));
+	status = OPGP_establish_context(&cardContext);
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not establish context: %s", status.errorMessage);
 	}
-	_tprintf(_T("Using card context %08X\n"), cardContext);
 }
 
 static void internal_list_readers() {
-	LONG rv;
+	OPGP_ERROR_STATUS status;
 	TCHAR buf[BUFLEN + 1];
 	int j,k;
 	DWORD readerStrLen = BUFLEN;
-	rv = list_readers (cardContext, buf, &readerStrLen);
-	if (rv != OPGP_ERROR_SUCCESS) {
-		fail("Could not list readers: %s", stringify_error(rv));
+	status = OPGP_list_readers (cardContext, buf, &readerStrLen);
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not list readers: %s", status.errorMessage);
 	}
 	// we choose the READERNUM reader
 	for (j=0; j<(int)readerStrLen;) {
@@ -101,14 +120,21 @@ static void internal_connect() {
 	internal_connect_card();
 }
 
+static void internal_disconnect() {
+	internal_disconnect_card();
+	internal_release_context();
+}
+
 /**
 * Tests the connection to the card.
 */
-START_TEST(test_connect_card) 
+START_TEST(test_connect_card)
 {
 	internal_establish_context();
 	internal_list_readers();
 	internal_connect_card();
+	internal_disconnect_card();
+	internal_release_context();
 }
 END_TEST
 
@@ -119,6 +145,7 @@ START_TEST (test_list_readers)
 {
 	internal_establish_context();
 	internal_list_readers();
+	internal_release_context();
 }
 END_TEST
 
@@ -134,17 +161,17 @@ END_TEST
 /**
 * Tests the key derivation according to gemXpresso scheme.
 */
-START_TEST (test_GemXpressoPro_create_daughter_keys)
+START_TEST (test_OPGP_VISA2_derive_keys)
 {
 	internal_connect();
-	LONG rv;
+	OPGP_ERROR_STATUS status;
 	BYTE motherKey[] = {0x4D, 0xA5, 0xFC, 0x18, 0xA4, 0x6F, 0x8A, 0x02, 0x05, 0xC7, 0x7C, 0x37, 0x3B, 0x58, 0x2A, 0x1F};
 	BYTE S_ENC[16], S_MAC[16], DEK[16];
 	int i;
-	rv = GemXpressoPro_create_daughter_keys(cardInfo, (PBYTE)GP211_CARD_MANAGER_AID_ALT1, sizeof(GP211_CARD_MANAGER_AID_ALT1), motherKey,
+	status = OPGP_VISA2_derive_keys(cardContext, cardInfo, (PBYTE)GP211_CARD_MANAGER_AID_ALT1, sizeof(GP211_CARD_MANAGER_AID_ALT1), motherKey,
 		S_ENC, S_MAC, DEK);
-	if (rv != OPGP_ERROR_SUCCESS) {
-		fail("Derivation of keys failed:", stringify_error(rv));
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Derivation of keys failed:", status.errorMessage);
 	}
 	for (i = 0; i<16; i++) {
 		printf("%02X", S_ENC[i]);
@@ -158,7 +185,7 @@ START_TEST (test_GemXpressoPro_create_daughter_keys)
 		printf("%02X", DEK[i]);
 	}
 	printf("\n");
-
+	internal_disconnect();
 }
 END_TEST
 
@@ -174,7 +201,7 @@ Suite * GlobalPlatform_suite (void)
 	tcase_add_test (tc_core, test_establish_context);
 	tcase_add_test (tc_core, test_list_readers);
 	tcase_add_test (tc_core, test_connect_card);
-	tcase_add_test (tc_core, test_GemXpressoPro_create_daughter_keys);
+	tcase_add_test (tc_core, test_OPGP_VISA2_derive_keys);
 	suite_add_tcase (s, tc_core);
 
 	return s;

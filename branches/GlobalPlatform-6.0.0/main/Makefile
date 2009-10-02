@@ -73,8 +73,8 @@ am_GlobalPlatformTest_OBJECTS =  \
 	GlobalPlatformTest-GlobalPlatformTest.$(OBJEXT)
 GlobalPlatformTest_OBJECTS = $(am_GlobalPlatformTest_OBJECTS)
 am__DEPENDENCIES_1 =
-GlobalPlatformTest_DEPENDENCIES =  \
-	$(top_builddir)/libGlobalPlatform.la $(am__DEPENDENCIES_1)
+GlobalPlatformTest_DEPENDENCIES = libGlobalPlatform.la \
+	$(am__DEPENDENCIES_1)
 GlobalPlatformTest_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(GlobalPlatformTest_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
@@ -238,9 +238,9 @@ dyn_generic.h dyn_unix.c connection.c stringify.c crypto.h debug.c util.c util.h
 
 libGlobalPlatform_la_LDFLAGS = -version-info 6:0:0 $(PCSCLITE_LIBS)
 libGlobalPlatform_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
-GlobalPlatformTest_SOURCES = GlobalPlatformTest.c $(top_builddir)/GlobalPlatform/GlobalPlatform.h
+GlobalPlatformTest_SOURCES = GlobalPlatformTest.c GlobalPlatform/GlobalPlatform.h
 GlobalPlatformTest_CFLAGS =  $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
-GlobalPlatformTest_LDADD = -lcheck $(top_builddir)/libGlobalPlatform.la $(PCSCLITE_LIBS)
+GlobalPlatformTest_LDADD = -lcheck libGlobalPlatform.la $(PCSCLITE_LIBS)
 MAINTAINERCLEANFILES = \
 	Makefile.in
 

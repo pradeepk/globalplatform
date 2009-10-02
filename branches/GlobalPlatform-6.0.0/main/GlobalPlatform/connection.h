@@ -64,7 +64,7 @@ typedef struct
  */
 typedef struct {
 	PVOID librarySpecific; //!< Library specific data.
-	OPGP_STRING libraryName; //!< The name of the connection library to use. If not given defaults to PC/SC connection.
+	TCHAR libraryName[32]; //!< The name of the connection library to use.
 	PVOID libraryHandle; //!< The handle to the library.
 	OPGP_CONNECTION_FUNCTIONS *connectionFunctions; //!< Connection functions of the connection library. Is automatically filled in if the connection library can be loaded correctly.
 } OPGP_CARD_CONTEXT;

@@ -20,8 +20,9 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unzip/zip.h>
-#include <unzip/unzip.h>
+#include "GlobalPlatform/debug.h"
+#include "unzip/zip.h"
+#include "unzip/unzip.h"
 
 #define MAX_PATH 256 //!< Max path length
 
@@ -310,7 +311,7 @@ next:
 		totalSize+=descriptorbufsz;
 	}
 #ifdef DEBUG
-	log_Log(_T("extract_cap_file: Buffer copied."));
+	OPGP_log_Log(_T("extract_cap_file: Buffer copied."));
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
@@ -354,12 +355,13 @@ end:
 /**
  * Returns 1 if the file is a CAP file 0 otherwise.
  * \param fileName IN The name of the file.
- * \return OPGP_ERROR_SUCCESS if no error, error code else.
+ * \return 1 if CAP file, 0 otherwise.
  */
 int detect_cap_file(OPGP_CSTRING fileName) {
 	int rv = 0;
 	FILE *loadFile = NULL;
 	BYTE magic[2];
+	OPGP_ERROR_STATUS status;
 	OPGP_LOG_START(_T("detect_cap_file"));
 	loadFile = _tfopen(fileName, _T("rb"));
 	if (loadFile == NULL) {
@@ -371,24 +373,25 @@ int detect_cap_file(OPGP_CSTRING fileName) {
 		goto end;
 	}
 #ifdef DEBUG
-	log_Log(_T("Magic: 0x%02x 0x%02x"), magic[0], magic[1]);
+	OPGP_log_Log(_T("Magic: 0x%02x 0x%02x"), magic[0], magic[1]);
 #endif
 	// starts with PK -> is CAP file
 	if (magic[0] == 0x50 && magic[1] == 0x4B) {
 #ifdef DEBUG
-	log_Log(_T("File is a CAP file."));
+	OPGP_log_Log(_T("File is a CAP file."));
 #endif
 		rv = 1;
 		goto end;
 	}
 #ifdef DEBUG
-	log_Log(_T("File is not a CAP file."));
+	OPGP_log_Log(_T("File is not a CAP file."));
 #endif
 end:
+	OPGP_ERROR_CREATE_NO_ERROR(status);
 	if (loadFile != NULL) {
 		fclose(loadFile);
 	}
-	OPGP_LOG_END(_T("detect_cap_file"), rv);
+	OPGP_LOG_END(_T("detect_cap_file"), status);
 	return rv;
 }
 
@@ -538,7 +541,7 @@ OPGP_ERROR_STATUS read_executable_load_file_parameters_from_buffer(PBYTE loadFil
 	packageAIDLength = loadFileBuf[offset];
 	offset++;
 #ifdef DEBUG
-	log_Log(_T("Package AID Length: %d"), packageAIDLength);
+	OPGP_log_Log(_T("Package AID Length: %d"), packageAIDLength);
 #endif
 	if (packageAIDLength < 5 || packageAIDLength > 16) {
 		OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_INVALID_LOAD_FILE, OPGP_stringify_error(OPGP_ERROR_INVALID_LOAD_FILE));
@@ -552,9 +555,9 @@ OPGP_ERROR_STATUS read_executable_load_file_parameters_from_buffer(PBYTE loadFil
 	memcpy(packageAID, loadFileBuf+offset, packageAIDLength);
 	offset+=packageAIDLength;
 #ifdef DEBUG
-	log_Log(_T("Package AID:"));
+	OPGP_log_Log(_T("Package AID:"));
 	for (i=0; i<packageAIDLength; i++) {
-		log_Log(_T("0x%02x"), packageAID[i]);
+		OPGP_log_Log(_T("0x%02x"), packageAID[i]);
 	}
 #endif
 	/* directory component */
@@ -604,7 +607,7 @@ OPGP_ERROR_STATUS read_executable_load_file_parameters_from_buffer(PBYTE loadFil
 	appletCount = loadFileBuf[offset];
 	offset++;
 #ifdef DEBUG
-	log_Log(_T("Applet count: %d"), appletCount);
+	OPGP_log_Log(_T("Applet count: %d"), appletCount);
 #endif
 	/* applets */
 	for (i=0; i<appletCount; i++) {
@@ -627,9 +630,9 @@ OPGP_ERROR_STATUS read_executable_load_file_parameters_from_buffer(PBYTE loadFil
 		memcpy(appletAIDs[i].AID, loadFileBuf+offset, appletAIDs[i].AIDLength);
 		offset+=appletAIDs[i].AIDLength;
 #ifdef DEBUG
-		log_Log(_T("Applet AID:"));
+		OPGP_log_Log(_T("Applet AID:"));
 		for (i=0; i<appletAIDs[i].AIDLength; i++) {
-			log_Log(_T("0x%02x"), appletAIDs[i].AID[i]);
+			OPGP_log_Log(_T("0x%02x"), appletAIDs[i].AID[i]);
 		}
 #endif
 		/* install_method_offset */
@@ -744,9 +747,9 @@ OPGP_ERROR_STATUS get_load_data(PBYTE executableLoadFileAID, DWORD executableLoa
 	memcpy(loadData, buf, i);
 	*loadDataLength = i;
 #ifdef DEBUG
-	log_Log(_T("get_load_data: Gathered data : "));
+	OPGP_log_Log(_T("get_load_data: Gathered data : "));
 	for (i=0; i<*loadDataLength; i++) {
-		log_Log(_T(" 0x%02x"), loadData[i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadData[i]);
 	}
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }

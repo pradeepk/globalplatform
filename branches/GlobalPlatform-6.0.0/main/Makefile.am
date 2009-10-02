@@ -23,9 +23,9 @@ libGlobalPlatform_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
 
 TESTS = GlobalPlatformTest
 check_PROGRAMS = GlobalPlatformTest
-GlobalPlatformTest_SOURCES = GlobalPlatformTest.c $(top_builddir)/GlobalPlatform/GlobalPlatform.h
+GlobalPlatformTest_SOURCES = GlobalPlatformTest.c GlobalPlatform/GlobalPlatform.h
 GlobalPlatformTest_CFLAGS = @CHECK_CFLAGS@ $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
-GlobalPlatformTest_LDADD = @CHECK_LIBS@ $(top_builddir)/libGlobalPlatform.la $(PCSCLITE_LIBS)
+GlobalPlatformTest_LDADD = @CHECK_LIBS@ libGlobalPlatform.la $(PCSCLITE_LIBS)
 
 doc : GlobalPlatform.c GlobalPlatform/GlobalPlatform.h GlobalPlatform/unicode.h
 	doxygen Doxyfile.cfg

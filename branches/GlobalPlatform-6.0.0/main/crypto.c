@@ -20,6 +20,7 @@
 #include "GlobalPlatform/errorcodes.h"
 #include "GlobalPlatform/error.h"
 #include "GlobalPlatform/debug.h"
+#include "util.h"
 
 #include <string.h>
 
@@ -44,7 +45,7 @@ OPGP_ERROR_STATUS calculate_enc_cbc_SCP02(unsigned char key[16], unsigned char *
 	int result;
 	int i,outl;
 	EVP_CIPHER_CTX ctx;
-	OPGP_OPGP_LOG_START(_T("calculate_enc_cbc_SCP02"));
+	OPGP_LOG_START(_T("calculate_enc_cbc_SCP02"));
 	EVP_CIPHER_CTX_init(&ctx);
 	*encryptionLength = 0;
 
@@ -871,13 +872,13 @@ OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE
 		le = apduCommand[4];
 	} else {
 		lc = apduCommand[4];
-		if ((convertByte(lc) + 5) == apduCommandLength) {
+		if ((convert_byte(lc) + 5) == apduCommandLength) {
 		// Case 3 short
-			wrappedLength = convertByte(lc) + 5;
+			wrappedLength = convert_byte(lc) + 5;
 			caseAPDU = 3;
-		} else if ((convertByte(lc) + 5 + 1) == apduCommandLength) {
+		} else if ((convert_byte(lc) + 5 + 1) == apduCommandLength) {
 		// Case 4 short
-			wrappedLength = convertByte(lc) + 5;
+			wrappedLength = convert_byte(lc) + 5;
 			caseAPDU = 4;
 
 		le = apduCommand[apduCommandLength - 1];
@@ -988,15 +989,15 @@ OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE
 			}
 		}
 #ifdef DEBUG
-		log_Log(_T("ICV for MAC: "));
+		OPGP_log_Log(_T("ICV for MAC: "));
 		for (i=0; i<8; i++) {
-			log_Log(_T("0x%02x "), C_MAC_ICV[i]);
+			OPGP_log_Log(_T("0x%02x "), C_MAC_ICV[i]);
 		}
 #endif
 #ifdef DEBUG
-		log_Log(_T("Generated MAC: "));
+		OPGP_log_Log(_T("Generated MAC: "));
 		for (i=0; i<8; i++) {
-			log_Log(_T("0x%02x "), mac[i]);
+			OPGP_log_Log(_T("0x%02x "), mac[i]);
 		}
 #endif
 
@@ -1093,9 +1094,9 @@ OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE
 		*wrappedApduCommandLength = wrappedLength;
 	} // if (secInfo->securityLevel != GP211_SCP02_SECURITY_LEVEL_NO_SECURE_MESSAGING && secInfo->securityLevel != GP211_SCP01_SECURITY_LEVEL_NO_SECURE_MESSAGING)
 //#ifdef DEBUG
-//	log_Log(_T("wrap_command: Data to send: "));
+//	OPGP_log_Log(_T("wrap_command: Data to send: "));
 //	for (i=0; i<wrappedLength; i++) {
-//		log_Log(_T(" 0x%02x"), wrappedApduCommand[i]);
+//		OPGP_log_Log(_T(" 0x%02x"), wrappedApduCommand[i]);
 //	}
 //
 //#endif
@@ -1293,10 +1294,10 @@ OPGP_ERROR_STATUS GP211_check_R_MAC(PBYTE apduCommand, DWORD apduCommandLength, 
 		caseAPDU = 2;
 	} else {
 		lc = apduCommand[4];
-		if ((convertByte(lc) + 5) == apduCommandLength) {
+		if ((convert_byte(lc) + 5) == apduCommandLength) {
 		// Case 3 short
 			caseAPDU = 3;
-		} else if ((convertByte(lc) + 5 + 1) == apduCommandLength) {
+		} else if ((convert_byte(lc) + 5 + 1) == apduCommandLength) {
 		// Case 4 short
 			caseAPDU = 4;
 		} else {
@@ -1307,13 +1308,13 @@ OPGP_ERROR_STATUS GP211_check_R_MAC(PBYTE apduCommand, DWORD apduCommandLength, 
 	GP211_calculate_R_MAC(apduCommand, apduCommand, lc, responseData, le,
 			responseData+responseDataLength-2, secInfo, mac);
 #ifdef DEBUG
-	log_Log(_T("check_R_MAC: received R-MAC: "));
+	OPGP_log_Log(_T("check_R_MAC: received R-MAC: "));
 	for (i=0; i<8; i++) {
-		log_Log(_T(" 0x%02x"), responseData[responseDataLength-10+i]);
+		OPGP_log_Log(_T(" 0x%02x"), responseData[responseDataLength-10+i]);
 	}
-	log_Log(_T("check_R_MAC: calculated R-MAC: "));
+	OPGP_log_Log(_T("check_R_MAC: calculated R-MAC: "));
 	for (i=0; i<8; i++) {
-		log_Log(_T(" 0x%02x"), mac[i]);
+		OPGP_log_Log(_T(" 0x%02x"), mac[i]);
 	}
 #endif
 	if (memcmp(mac, responseData+responseDataLength-10, 8)) {
@@ -1375,7 +1376,7 @@ OPGP_ERROR_STATUS calculate_sha1_hash(PBYTE message, DWORD messageLength, BYTE h
 	int result;
 	OPGP_ERROR_STATUS status;
 	EVP_MD_CTX mdctx;
-	LOG_START(_T("calculate_sha1_hash"));
+	OPGP_LOG_START(_T("calculate_sha1_hash"));
 	EVP_MD_CTX_init(&mdctx);
 	result = EVP_DigestInit_ex(&mdctx, EVP_sha1(), NULL);
 	if (result != 1) {

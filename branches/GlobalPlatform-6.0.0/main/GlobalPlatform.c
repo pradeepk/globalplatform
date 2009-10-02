@@ -401,9 +401,9 @@ OPGP_ERROR_STATUS OPGP_select_application(OPGP_CARD_CONTEXT cardContext, OPGP_CA
 	/* Le */
 	sendBuffer[i++] = 0x00;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("select_application: Data to send: "));
+	OPGP_log_Log(_T("select_application: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -425,9 +425,9 @@ OPGP_ERROR_STATUS OPGP_select_application(OPGP_CARD_CONTEXT cardContext, OPGP_CA
 		}
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("select_application: Data: "));
+	OPGP_log_Log(_T("select_application: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -477,7 +477,7 @@ OPGP_ERROR_STATUS put_rsa_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO card
 	DWORD i=0;
 	BYTE rsa_modulus[128];
 	unsigned long rsa_exponent;
-	OPGP_OPGP_LOG_START(_T("put_rsa_key"));
+	OPGP_LOG_START(_T("put_rsa_key"));
 
 	status = read_public_rsa_key(PEMKeyFileName, passPhrase, rsa_modulus, &rsa_exponent);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -525,9 +525,9 @@ OPGP_ERROR_STATUS put_rsa_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO card
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_rsa_key: Data to send: "));
+	OPGP_log_Log(_T("put_rsa_key: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -536,16 +536,16 @@ OPGP_ERROR_STATUS put_rsa_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO card
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_rsa_key: Data: "));
+	OPGP_log_Log(_T("put_rsa_key: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
 	{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_STATUS_SUCCESS, OPGP_stringify_error(OPGP_ERROR_STATUS_SUCCESS)); goto end; }
 end:
 
-	OPGP_OPGP_LOG_END(_T("put_rsa_key"), status);
+	OPGP_LOG_END(_T("put_rsa_key"), status);
 	return status;
 }
 
@@ -587,7 +587,7 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 	DWORD keyDataFieldLength=22;
 	DWORD i=0;
 	BYTE keyType;
-	OPGP_OPGP_LOG_START(_T("put_3des_key"));
+	OPGP_LOG_START(_T("put_3des_key"));
         /*
 	if (keySetVersion > 0x7f)
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_WRONG_KEY_VERSION, OPGP_stringify_error(OPGP_ERROR_WRONG_KEY_VERSION)); goto end; }
@@ -619,9 +619,9 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 
 	sendBuffer[i] = 0x00; // Le
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_3des_key: Data to send: "));
+	OPGP_log_Log(_T("put_3des_key: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -630,9 +630,9 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_3des_key: Data: "));
+	OPGP_log_Log(_T("put_3des_key: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -641,7 +641,7 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 	{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_STATUS_SUCCESS, OPGP_stringify_error(OPGP_ERROR_STATUS_SUCCESS)); goto end; }
 end:
 
-	OPGP_OPGP_LOG_END(_T("put_3des_key"), status);
+	OPGP_LOG_END(_T("put_3des_key"), status);
 	return status;
 }
 
@@ -665,7 +665,7 @@ OPGP_ERROR_STATUS put_delegated_management_keys(OPGP_CARD_CONTEXT cardContext, O
 	unsigned long token_verification_rsa_exponent;
 	BYTE keyType;
 
-	OPGP_OPGP_LOG_START(_T("put_delegated_management_keys"));
+	OPGP_LOG_START(_T("put_delegated_management_keys"));
 	/*
 	if (keySetVersion > 0x7f)
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_WRONG_KEY_VERSION, OPGP_stringify_error(OPGP_ERROR_WRONG_KEY_VERSION)); goto end; }
@@ -732,9 +732,9 @@ OPGP_ERROR_STATUS put_delegated_management_keys(OPGP_CARD_CONTEXT cardContext, O
 	sendBufferLength = i;
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_delegated_management_keys: Data to send: "));
+	OPGP_log_Log(_T("put_delegated_management_keys: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -744,9 +744,9 @@ OPGP_ERROR_STATUS put_delegated_management_keys(OPGP_CARD_CONTEXT cardContext, O
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_delegated_management_keys: Data: "));
+	OPGP_log_Log(_T("put_delegated_management_keys: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -755,7 +755,7 @@ OPGP_ERROR_STATUS put_delegated_management_keys(OPGP_CARD_CONTEXT cardContext, O
 	{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_STATUS_SUCCESS, OPGP_stringify_error(OPGP_ERROR_STATUS_SUCCESS)); goto end; }
 end:
 
-	OPGP_OPGP_LOG_END(_T("put_delegated_management_keys"), status);
+	OPGP_LOG_END(_T("put_delegated_management_keys"), status);
 	return status;
 }
 
@@ -875,9 +875,9 @@ OPGP_ERROR_STATUS put_secure_channel_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CA
 	sendBufferLength = i;
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_secure_channel_keys: Data to send: "));
+	OPGP_log_Log(_T("put_secure_channel_keys: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -886,9 +886,9 @@ OPGP_ERROR_STATUS put_secure_channel_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CA
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_secure_channel_keys: Data: "));
+	OPGP_log_Log(_T("put_secure_channel_keys: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -998,9 +998,9 @@ OPGP_ERROR_STATUS delete_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("delete_key: Data to send: "));
+	OPGP_log_Log(_T("delete_key: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -1009,9 +1009,9 @@ OPGP_ERROR_STATUS delete_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("delete_key: Data: "));
+	OPGP_log_Log(_T("delete_key: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -1074,9 +1074,9 @@ OPGP_ERROR_STATUS delete_application(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_IN
 	sendBuffer[i++] = 0x00;
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("delete_application: Data to send: "));
+	OPGP_log_Log(_T("delete_application: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -1096,9 +1096,9 @@ OPGP_ERROR_STATUS delete_application(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_IN
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("delete_application: Data: "));
+	OPGP_log_Log(_T("delete_application: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -1142,9 +1142,9 @@ OPGP_ERROR_STATUS put_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 	i+=dataObjectLength;
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_data: Data to send: "));
+	OPGP_log_Log(_T("put_data: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -1153,9 +1153,9 @@ OPGP_ERROR_STATUS put_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("put_data: Data: "));
+	OPGP_log_Log(_T("put_data: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
@@ -1221,9 +1221,9 @@ OPGP_ERROR_STATUS GP211_begin_R_MAC(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 	i+=dataLength;
 	sendBufferLength=i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("GP211_begin_R_MAC: Data to send: "));
+	OPGP_log_Log(_T("GP211_begin_R_MAC: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 #endif
 	status = OPGP_send_APDU(cardContext, cardInfo, secInfo, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
@@ -1260,9 +1260,9 @@ OPGP_ERROR_STATUS GP211_end_R_MAC(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO 
 	/* Switch on, if R-MAC is only applied to last command of session. */
 	secInfo->securityLevel |= GP211_SCP02_SECURITY_LEVEL_R_MAC;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("GP211_end_R_MAC: Data to send: "));
+	OPGP_log_Log(_T("GP211_end_R_MAC: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 #endif
 	status = OPGP_send_APDU(cardContext, cardInfo, secInfo, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
@@ -1291,9 +1291,9 @@ OPGP_ERROR_STATUS get_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 	sendBuffer[i++] = identifier[1];
 	sendBuffer[i] = 0x00;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_data: Data to send: "));
+	OPGP_log_Log(_T("get_data: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -1303,9 +1303,9 @@ OPGP_ERROR_STATUS get_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_data: Data: "));
+	OPGP_log_Log(_T("get_data: Data: "));
 	for (i=0; i<cardDataLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), cardData[i]);
+		OPGP_log_Log(_T(" 0x%02x"), cardData[i]);
 	}
 
 #endif
@@ -1349,9 +1349,9 @@ OPGP_ERROR_STATUS GP211_get_data_iso7816_4(OPGP_CARD_CONTEXT cardContext, OPGP_C
 	sendBuffer[i++] = identifier[1];
 	sendBuffer[i] = 0x00;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_data_iso7816-4: Data to send: "));
+	OPGP_log_Log(_T("get_data_iso7816-4: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 #endif
 	status = OPGP_send_APDU(cardContext, cardInfo, NULL, sendBuffer, sendBufferLength, cardData, &cardDataLength);
@@ -1360,9 +1360,9 @@ OPGP_ERROR_STATUS GP211_get_data_iso7816_4(OPGP_CARD_CONTEXT cardContext, OPGP_C
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_data_iso7816-4: Data: "));
+	OPGP_log_Log(_T("get_data_iso7816-4: Data: "));
 	for (i=0; i<cardDataLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), cardData[i]);
+		OPGP_log_Log(_T(" 0x%02x"), cardData[i]);
 	}
 
 #endif
@@ -1444,9 +1444,9 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	memcpy(OIDCardRecognitionData, tlv1.value, tlv1.length);
 	OIDCardRecognitionDataLength = tlv1.length;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("OIDCardRecognitionData: "));
+	OPGP_log_Log(_T("OIDCardRecognitionData: "));
 	for (i=0; i<OIDCardRecognitionDataLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), OIDCardRecognitionData[i]);
+		OPGP_log_Log(_T(" 0x%02x"), OIDCardRecognitionData[i]);
 	}
 #endif
 
@@ -1467,9 +1467,9 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	memcpy(OIDCardManagementTypeAndVersion, tlv2.value, tlv2.length);
 	OIDCardManagementTypeAndVersionLength = tlv2.length;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("OIDCardManagementTypeAndVersion: "));
+	OPGP_log_Log(_T("OIDCardManagementTypeAndVersion: "));
 	for (i=0; i<OIDCardManagementTypeAndVersionLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), OIDCardManagementTypeAndVersion[i]);
+		OPGP_log_Log(_T(" 0x%02x"), OIDCardManagementTypeAndVersion[i]);
 	}
 #endif
 
@@ -1490,9 +1490,9 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	memcpy(OIDCardIdentificationScheme, tlv2.value, tlv2.length);
 	OIDCardIdentificationSchemeLength = tlv2.length;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("OIDCardIdentificationScheme: "));
+	OPGP_log_Log(_T("OIDCardIdentificationScheme: "));
 	for (i=0; i<OIDCardIdentificationSchemeLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), OIDCardIdentificationScheme[i]);
+		OPGP_log_Log(_T(" 0x%02x"), OIDCardIdentificationScheme[i]);
 	}
 #endif
 
@@ -1515,9 +1515,9 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	memcpy(OIDSecureChannelProtocol, tlv2.value, tlv2.length);
 	OIDSecureChannelProtocolLength = tlv2.length;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("OIDSecureChannelProtocol: "));
+	OPGP_log_Log(_T("OIDSecureChannelProtocol: "));
 	for (i=0; i<OIDSecureChannelProtocolLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), OIDSecureChannelProtocol[i]);
+		OPGP_log_Log(_T(" 0x%02x"), OIDSecureChannelProtocol[i]);
 	}
 #endif
 	*secureChannelProtocol = OIDSecureChannelProtocol[OIDSecureChannelProtocolLength-2];
@@ -1537,9 +1537,9 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 		memcpy(CardConfigurationDetails, tlv1.value, tlv1.length);
 		CardConfigurationDetailsLength = tlv1.length;
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("CardConfigurationDetails: "));
+		OPGP_log_Log(_T("CardConfigurationDetails: "));
 		for (i=0; i<CardConfigurationDetailsLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), CardConfigurationDetails[i]);
+			OPGP_log_Log(_T(" 0x%02x"), CardConfigurationDetails[i]);
 		}
 #endif
 	}
@@ -1555,9 +1555,9 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 		memcpy(CardChipDetails, tlv1.value, tlv1.length);
 		CardChipDetailsLength = tlv1.length;
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("CardChipDetails: "));
+		OPGP_log_Log(_T("CardChipDetails: "));
 		for (i=0; i<CardChipDetailsLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), CardChipDetails[i]);
+			OPGP_log_Log(_T(" 0x%02x"), CardChipDetails[i]);
 		}
 #endif
 	}
@@ -1601,9 +1601,9 @@ OPGP_ERROR_STATUS get_key_information_templates(OPGP_CARD_CONTEXT cardContext, O
 	sendBuffer[i++] = 0xE0;
 	sendBuffer[i] = 0x00;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_key_information_templates: Data to send: "));
+	OPGP_log_Log(_T("get_key_information_templates: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -1612,9 +1612,9 @@ OPGP_ERROR_STATUS get_key_information_templates(OPGP_CARD_CONTEXT cardContext, O
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_key_information_templates: Data: "));
+	OPGP_log_Log(_T("get_key_information_templates: Data: "));
 	for (i=0; i<cardDataLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), cardData[i]);
+		OPGP_log_Log(_T(" 0x%02x"), cardData[i]);
 	}
 
 #endif
@@ -1638,10 +1638,10 @@ OPGP_ERROR_STATUS get_key_information_templates(OPGP_CARD_CONTEXT cardContext, O
 	*keyInformationLength = i;
 #ifdef DEBUG
 	for (i=0; i<*keyInformationLength; i++) {
-		OPGP_LOG_Log(_T("Key index: 0x%02x\n"), keyInformation[i].keyIndex);
-		OPGP_LOG_Log(_T("Key set version: 0x%02x\n"), keyInformation[i].keySetVersion);
-		OPGP_LOG_Log(_T("Key type: 0x%02x\n"), keyInformation[i].keyType);
-		OPGP_LOG_Log(_T("Key length: 0x%02x\n"), keyInformation[i].keyLength);
+		OPGP_log_Log(_T("Key index: 0x%02x\n"), keyInformation[i].keyIndex);
+		OPGP_log_Log(_T("Key set version: 0x%02x\n"), keyInformation[i].keySetVersion);
+		OPGP_log_Log(_T("Key type: 0x%02x\n"), keyInformation[i].keyType);
+		OPGP_log_Log(_T("Key length: 0x%02x\n"), keyInformation[i].keyLength);
 	}
 #endif
 
@@ -1681,9 +1681,9 @@ OPGP_ERROR_STATUS set_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 	memcpy(sendBuffer+i, AID, AIDLength);
 	i+=AIDLength;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("set_status: Data to send: "));
+	OPGP_log_Log(_T("set_status: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -1692,9 +1692,9 @@ OPGP_ERROR_STATUS set_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("set_status: Data: "));
+	OPGP_log_Log(_T("set_status: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -1740,9 +1740,9 @@ OPGP_ERROR_STATUS GP211_get_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 	do {
 		recvBufferLength=256;
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("get_status: Data to send: "));
+		OPGP_log_Log(_T("get_status: Data to send: "));
 		for (j=0; j<sendBufferLength; j++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[j]);
+			OPGP_log_Log(_T(" 0x%02x"), sendBuffer[j]);
 		}
 
 #endif
@@ -1751,9 +1751,9 @@ OPGP_ERROR_STATUS GP211_get_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			goto end;
 		}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_status: Data: "));
+	OPGP_log_Log(_T("get_status: Data: "));
 	for (j=0; j<recvBufferLength; j++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[j]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[j]);
 	}
 
 #endif
@@ -1932,9 +1932,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			//sendBufferLength++;
 			//sendBuffer[sendBufferLength-1] = 0x00;
 #ifdef DEBUG
-			OPGP_LOG_Log(_T("load_from_buffer: Data to send: "));
+			OPGP_log_Log(_T("load_from_buffer: Data to send: "));
 			for (g=0; g<sendBufferLength; g++) {
-				OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[g]);
+				OPGP_log_Log(_T(" 0x%02x"), sendBuffer[g]);
 			}
 
 #endif
@@ -1943,9 +1943,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 				goto end;
 			}
 #ifdef DEBUG
-			OPGP_LOG_Log(_T("load_from_buffer: Data: "));
+			OPGP_log_Log(_T("load_from_buffer: Data: "));
 			for (g=0; g<recvBufferLength; g++) {
-				OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[g]);
+				OPGP_log_Log(_T(" 0x%02x"), recvBuffer[g]);
 			}
 
 #endif
@@ -2022,9 +2022,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		recvBufferLength=256;
 
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data to send: "));
+		OPGP_log_Log(_T("load_from_buffer: Data to send: "));
 		for (i=0; i<sendBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 		}
 
 #endif
@@ -2033,9 +2033,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			goto end;
 		}
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data: "));
+		OPGP_log_Log(_T("load_from_buffer: Data: "));
 		for (i=0; i<recvBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 		}
 
 #endif
@@ -2054,9 +2054,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		sendBuffer[4]=(BYTE)j;
 		recvBufferLength=256;
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data to send: "));
+		OPGP_log_Log(_T("load_from_buffer: Data to send: "));
 		for (i=0; i<sendBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 		}
 #endif
 		status = OPGP_send_APDU(cardContext, cardInfo, secInfo, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
@@ -2064,9 +2064,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			goto end;
 		}
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data: "));
+		OPGP_log_Log(_T("load_from_buffer: Data: "));
 		for (i=0; i<recvBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 		}
 
 #endif
@@ -2115,9 +2115,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 
 		recvBufferLength=256;
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data to send: "));
+		OPGP_log_Log(_T("load_from_buffer: Data to send: "));
 		for (i=0; i<sendBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 		}
 
 #endif
@@ -2126,9 +2126,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			goto end;
 		}
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data: "));
+		OPGP_log_Log(_T("load_from_buffer: Data: "));
 		for (i=0; i<recvBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 		}
 
 #endif
@@ -2144,7 +2144,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 	while(!(total == loadFileBufSize)) {
 		j = 0;
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: left: %d"), loadFileBufSize-total);
+		OPGP_log_Log(_T("load_from_buffer: left: %d"), loadFileBufSize-total);
 #endif
 		if (loadFileBufSize-total > MAX_APDU_DATA_SIZE_FOR_SECURE_MESSAGING) {
 			count=MAX_APDU_DATA_SIZE_FOR_SECURE_MESSAGING;
@@ -2172,9 +2172,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			//sendBuffer[sendBufferLength-1] = 0x00;
 		}
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("load_from_buffer: Data to send: "));
+		OPGP_log_Log(_T("load_from_buffer: Data to send: "));
 		for (i=0; i<sendBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 		}
 #endif
 		recvBufferLength=256;
@@ -2184,9 +2184,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		}
 #ifdef DEBUG
 		if (!(total == loadFileBufSize)) {
-			OPGP_LOG_Log(_T("load_from_buffer: Data: "));
+			OPGP_log_Log(_T("load_from_buffer: Data: "));
 			for (i=0; i<recvBufferLength; i++) {
-				OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+				OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 			}
 
 		}
@@ -2202,9 +2202,9 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		*receiptDataAvailable = 1;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("load_from_buffer: Data: "));
+	OPGP_log_Log(_T("load_from_buffer: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
@@ -2336,9 +2336,9 @@ OPGP_ERROR_STATUS install_for_load(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_load: Data to send: "));
+	OPGP_log_Log(_T("install_for_load: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -2347,9 +2347,9 @@ OPGP_ERROR_STATUS install_for_load(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_load: Data: "));
+	OPGP_log_Log(_T("install_for_load: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -2448,9 +2448,9 @@ OPGP_ERROR_STATUS install_for_install(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_install: Data to send: "));
+	OPGP_log_Log(_T("install_for_install: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -2463,9 +2463,9 @@ OPGP_ERROR_STATUS install_for_install(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 		*receiptDataAvailable = 1;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_install: Data: "));
+	OPGP_log_Log(_T("install_for_install: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -2563,9 +2563,9 @@ OPGP_ERROR_STATUS install_for_install_and_make_selectable(OPGP_CARD_CONTEXT card
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_install_and_make_selectable: Data to send: "));
+	OPGP_log_Log(_T("install_for_install_and_make_selectable: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -2578,9 +2578,9 @@ OPGP_ERROR_STATUS install_for_install_and_make_selectable(OPGP_CARD_CONTEXT card
 		*receiptDataAvailable = 1;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_install_and_make_selectable: Data: "));
+	OPGP_log_Log(_T("install_for_install_and_make_selectable: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -2647,9 +2647,9 @@ OPGP_ERROR_STATUS GP211_install_for_extradition(OPGP_CARD_CONTEXT cardContext, O
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_extradition: Data to send: "));
+	OPGP_log_Log(_T("install_for_extradition: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -2662,9 +2662,9 @@ OPGP_ERROR_STATUS GP211_install_for_extradition(OPGP_CARD_CONTEXT cardContext, O
 		*receiptDataAvailable = 1;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_extradition: Data: "));
+	OPGP_log_Log(_T("install_for_extradition: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -2713,9 +2713,9 @@ OPGP_ERROR_STATUS GP211_install_for_personalization(OPGP_CARD_CONTEXT cardContex
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_personalization: Data to send: "));
+	OPGP_log_Log(_T("install_for_personalization: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -2724,9 +2724,9 @@ OPGP_ERROR_STATUS GP211_install_for_personalization(OPGP_CARD_CONTEXT cardContex
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_personalization: Data: "));
+	OPGP_log_Log(_T("install_for_personalization: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -2807,9 +2807,9 @@ OPGP_ERROR_STATUS install_for_make_selectable(OPGP_CARD_CONTEXT cardContext, OPG
 	sendBuffer[i++] = 0x00; // Le
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_make_selectable: Data to send: "));
+	OPGP_log_Log(_T("install_for_make_selectable: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -2822,9 +2822,9 @@ OPGP_ERROR_STATUS install_for_make_selectable(OPGP_CARD_CONTEXT cardContext, OPG
 		*receiptDataAvailable = 1;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("install_for_make_selectable: Data: "));
+	OPGP_log_Log(_T("install_for_make_selectable: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -3147,33 +3147,33 @@ OPGP_ERROR_STATUS GP211_get_load_token_signature_data(PBYTE executableLoadFileAI
 	memcpy(loadTokenSignatureData, buf, i);
 	*loadTokenSignatureDataLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_load_token_signature_data: Gathered data : "));
-	OPGP_LOG_Log(_T("Reference control parameter P1: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Reference control parameter P2: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Length of the following fields: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load file AID length: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load file AID:"));
+	OPGP_log_Log(_T("get_load_token_signature_data: Gathered data : "));
+	OPGP_log_Log(_T("Reference control parameter P1: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Reference control parameter P2: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Length of the following fields: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load file AID length: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load file AID:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
-	OPGP_LOG_Log(_T("Security Domain AID length: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Security Domain AID:"));
+	OPGP_log_Log(_T("Security Domain AID length: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Security Domain AID:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
-	OPGP_LOG_Log(_T("Length of the Load File Data Block Hash: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load File Data Block Hash:"));
+	OPGP_log_Log(_T("Length of the Load File Data Block Hash: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load File Data Block Hash:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
 
-	OPGP_LOG_Log(_T("Load parameters field length: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load parameters field:"));
+	OPGP_log_Log(_T("Load parameters field length: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load parameters field:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
 
@@ -3500,12 +3500,12 @@ OPGP_ERROR_STATUS OPGP_VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
 	BYTE cardmanagerAID[16];
 	DWORD cardmanagerAIDLength = 16;
 
-	OPGP_LOG_START(_T("GemXpressoPro_create_daughter_keys"));
+	OPGP_LOG_START(_T("OPGP_VISA2_derive_keys"));
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Card Manager AID: "));
+	OPGP_log_Log(_T("Card Manager AID: "));
 	for (i=0; i<AIDLength; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), AID[i]);
+		OPGP_log_Log(_T("0x%02x "), AID[i]);
 	}
 #endif
 
@@ -3555,9 +3555,9 @@ OPGP_ERROR_STATUS OPGP_VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
  	keyDiversificationData[15] = 0x01;
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Key Diversification Data: "));
+	OPGP_log_Log(_T("Key Diversification Data: "));
 	for (i=0; i<16; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), keyDiversificationData[i]);
+		OPGP_log_Log(_T("0x%02x "), keyDiversificationData[i]);
 	}
 #endif
 
@@ -3574,9 +3574,9 @@ OPGP_ERROR_STATUS OPGP_VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
 	keyDiversificationData[15] = 0x02;
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Key Diversification Data: "));
+	OPGP_log_Log(_T("Key Diversification Data: "));
 	for (i=0; i<16; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), keyDiversificationData[i]);
+		OPGP_log_Log(_T("0x%02x "), keyDiversificationData[i]);
 	}
 #endif
 
@@ -3595,9 +3595,9 @@ OPGP_ERROR_STATUS OPGP_VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
 	keyDiversificationData[15] = 0x03;
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Key Diversification Data: "));
+	OPGP_log_Log(_T("Key Diversification Data: "));
 	for (i=0; i<16; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), keyDiversificationData[i]);
+		OPGP_log_Log(_T("0x%02x "), keyDiversificationData[i]);
 	}
 #endif
 
@@ -3608,7 +3608,7 @@ OPGP_ERROR_STATUS OPGP_VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
 
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
-	OPGP_LOG_END(_T("GemXpressoPro_create_daughter_keys"), status);
+	OPGP_LOG_END(_T("OPGP_VISA2_derive_keys"), status);
 	return status;
 }
 
@@ -3692,8 +3692,8 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	secInfo->secureChannelProtocolImpl = secureChannelProtocolImpl;
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Secure Channel Protocol: 0x%02X"), secureChannelProtocol);
-	OPGP_LOG_Log(_T("Secure Channel Protocol Implementation: 0x%02X"), secureChannelProtocolImpl);
+	OPGP_log_Log(_T("Secure Channel Protocol: 0x%02X"), secureChannelProtocol);
+	OPGP_log_Log(_T("Secure Channel Protocol Implementation: 0x%02X"), secureChannelProtocolImpl);
 #endif
 
 	status = get_random(hostChallenge, 8);
@@ -3702,9 +3702,9 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	}
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Generated Host Challenge: "));
+	OPGP_log_Log(_T("Generated Host Challenge: "));
 	for (i=0; i<8; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), hostChallenge[i]);
+		OPGP_log_Log(_T("0x%02x "), hostChallenge[i]);
 	}
 #endif
 
@@ -3720,9 +3720,9 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	i+=8;
 	sendBuffer[i] = 0x00;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("mutual_authentication: INITIALIZE UPDATE Data to send: "));
+	OPGP_log_Log(_T("mutual_authentication: INITIALIZE UPDATE Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -3731,9 +3731,9 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("mutual_authentication: INITIALIZE UPDATE Data: "));
+	OPGP_log_Log(_T("mutual_authentication: INITIALIZE UPDATE Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -3777,36 +3777,36 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 		}
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Key Diversification Data: "));
+	OPGP_log_Log(_T("Key Diversification Data: "));
 	for (i=0; i<10; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), key_diversification_data[i]);
+		OPGP_log_Log(_T("0x%02x "), key_diversification_data[i]);
 	}
 
-	OPGP_LOG_Log(_T("Key Information Data: "));
+	OPGP_log_Log(_T("Key Information Data: "));
 	for (i=0; i<2; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), key_information_data[i]);
+		OPGP_log_Log(_T("0x%02x "), key_information_data[i]);
 	}
 
 	if (secInfo->secureChannelProtocol == GP211_SCP02) {
-		OPGP_LOG_Log(_T("Sequence Counter: "));
+		OPGP_log_Log(_T("Sequence Counter: "));
 		for (i=0; i<2; i++) {
-			OPGP_LOG_Log(_T("0x%02x "), sequenceCounter[i]);
+			OPGP_log_Log(_T("0x%02x "), sequenceCounter[i]);
 		}
-		OPGP_LOG_Log(_T("Card Challenge: "));
+		OPGP_log_Log(_T("Card Challenge: "));
 		for (i=0; i<6; i++) {
-			OPGP_LOG_Log(_T("0x%02x "), cardChallengeSCP02[i]);
+			OPGP_log_Log(_T("0x%02x "), cardChallengeSCP02[i]);
 		}
 	}
 	else {
-		OPGP_LOG_Log(_T("Card Challenge: "));
+		OPGP_log_Log(_T("Card Challenge: "));
 		for (i=0; i<8; i++) {
-			OPGP_LOG_Log(_T("0x%02x "), cardChallengeSCP01[i]);
+			OPGP_log_Log(_T("0x%02x "), cardChallengeSCP01[i]);
 		}
 	}
 
-	OPGP_LOG_Log(_T("Retrieved Card Cryptogram: "));
+	OPGP_log_Log(_T("Retrieved Card Cryptogram: "));
 	for (i=0; i<8; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), cardCryptogram[i]);
+		OPGP_log_Log(_T("0x%02x "), cardCryptogram[i]);
 	}
 
 #endif
@@ -3905,42 +3905,42 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	}
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("S-ENC Session Key: "));
+	OPGP_log_Log(_T("S-ENC Session Key: "));
 	for (i=0; i<16; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), secInfo->encryptionSessionKey[i]);
+		OPGP_log_Log(_T("0x%02x "), secInfo->encryptionSessionKey[i]);
 	}
 #endif
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("C-MAC Session Key: "));
+	OPGP_log_Log(_T("C-MAC Session Key: "));
 	for (i=0; i<16; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), secInfo->C_MACSessionKey[i]);
+		OPGP_log_Log(_T("0x%02x "), secInfo->C_MACSessionKey[i]);
 	}
 #endif
 
 #ifdef DEBUG
 	if (secInfo->secureChannelProtocol == GP211_SCP01) {
-		OPGP_LOG_Log(_T("Data Encryption Key: "));
+		OPGP_log_Log(_T("Data Encryption Key: "));
 		for (i=0; i<16; i++) {
-			OPGP_LOG_Log(_T("0x%02x "), secInfo->dataEncryptionSessionKey[i]);
+			OPGP_log_Log(_T("0x%02x "), secInfo->dataEncryptionSessionKey[i]);
 		}
 	}
 #endif
 
 #ifdef DEBUG
 	if (secInfo->secureChannelProtocol == GP211_SCP02) {
-		OPGP_LOG_Log(_T("R-MAC Session Key: "));
+		OPGP_log_Log(_T("R-MAC Session Key: "));
 		for (i=0; i<16; i++) {
-			OPGP_LOG_Log(_T("0x%02x "), secInfo->R_MACSessionKey[i]);
+			OPGP_log_Log(_T("0x%02x "), secInfo->R_MACSessionKey[i]);
 		}
 	}
 #endif
 
 #ifdef DEBUG
 	if (secInfo->secureChannelProtocol == GP211_SCP02) {
-		OPGP_LOG_Log(_T("DEK Session Key: "));
+		OPGP_log_Log(_T("DEK Session Key: "));
 		for (i=0; i<16; i++) {
-			OPGP_LOG_Log(_T("0x%02x "), secInfo->dataEncryptionSessionKey[i]);
+			OPGP_log_Log(_T("0x%02x "), secInfo->dataEncryptionSessionKey[i]);
 		}
 	}
 #endif
@@ -3962,9 +3962,9 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	}
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Card Cryptogram to compare: "));
+	OPGP_log_Log(_T("Card Cryptogram to compare: "));
 	for (i=0; i<8; i++) {
-		OPGP_LOG_Log(_T("0x%02x "), card_cryptogram_ver[i]);
+		OPGP_log_Log(_T("0x%02x "), card_cryptogram_ver[i]);
 	}
 
 #endif
@@ -4010,9 +4010,9 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	memcpy(sendBuffer+i, mac, 8);
 	i+=8;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("mutual_authentication: EXTERNAL AUTHENTICATE Data to send: "));
+	OPGP_log_Log(_T("mutual_authentication: EXTERNAL AUTHENTICATE Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -4027,9 +4027,9 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	}
 
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("mutual_authentication: EXTERNAL AUTHENTICATE Data: "));
+	OPGP_log_Log(_T("mutual_authentication: EXTERNAL AUTHENTICATE Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 #endif
 
@@ -4236,9 +4236,9 @@ OPGP_ERROR_STATUS pin_change(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 	}
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("pin_change: Data to send: "));
+	OPGP_log_Log(_T("pin_change: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -4251,9 +4251,9 @@ OPGP_ERROR_STATUS pin_change(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("pin_change: Data: "));
+	OPGP_log_Log(_T("pin_change: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 
 #endif
@@ -4308,9 +4308,9 @@ OPGP_ERROR_STATUS GP211_store_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		sendBuffer[3] = blockNumber++;
 
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("store_data: Data to send: "));
+		OPGP_log_Log(_T("store_data: Data to send: "));
 		for (i=0; i<sendBufferLength; i++) {
-			OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+			OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 		}
 
 #endif
@@ -4321,17 +4321,17 @@ OPGP_ERROR_STATUS GP211_store_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		}
 #ifdef DEBUG
 		if (sendBuffer[2] != 0x80) {
-			OPGP_LOG_Log(_T("store_data: Data: "));
+			OPGP_log_Log(_T("store_data: Data: "));
 			for (i=0; i<recvBufferLength; i++) {
-				OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+				OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 			}
 		}
 #endif
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("store_data: Data: "));
+	OPGP_log_Log(_T("store_data: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
@@ -4392,9 +4392,9 @@ OPGP_ERROR_STATUS OPGP_manage_channel(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 	}
 	sendBufferLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("manage_channel: Data to send: "));
+	OPGP_log_Log(_T("manage_channel: Data to send: "));
 	for (i=0; i<sendBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[i]);
 	}
 
 #endif
@@ -4403,23 +4403,23 @@ OPGP_ERROR_STATUS OPGP_manage_channel(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("manage_channel: Data: "));
+	OPGP_log_Log(_T("manage_channel: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[i]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[i]);
 	}
 #endif
 	if (openClose == GP211_MANAGE_CHANNEL_OPEN) {
 		*channelNumberOpened = recvBuffer[0];
 		cardInfo->logicalChannel = recvBuffer[0];
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Logical Channel number openend: %d"), *channelNumberOpened);
+	OPGP_log_Log(_T("Logical Channel number openend: %d"), *channelNumberOpened);
 #endif
 	}
 	else {
 		*channelNumberOpened = 0;
 		cardInfo->logicalChannel = 0;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("Logical Channel closed: %d"), channelNumberToClose);
+	OPGP_log_Log(_T("Logical Channel closed: %d"), channelNumberToClose);
 #endif
 	}
 
@@ -4768,9 +4768,9 @@ OPGP_ERROR_STATUS OP201_get_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 	do {
 		recvBufferLength=256;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_status: Data to send: "));
+	OPGP_log_Log(_T("get_status: Data to send: "));
 	for (j=0; j<sendBufferLength; j++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), sendBuffer[j]);
+		OPGP_log_Log(_T(" 0x%02x"), sendBuffer[j]);
 	}
 
 #endif
@@ -4779,9 +4779,9 @@ OPGP_ERROR_STATUS OP201_get_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			goto end;
 		}
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_status: Data: "));
+	OPGP_log_Log(_T("get_status: Data: "));
 	for (j=0; j<recvBufferLength; j++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), recvBuffer[j]);
+		OPGP_log_Log(_T(" 0x%02x"), recvBuffer[j]);
 	}
 
 #endif
@@ -5254,31 +5254,31 @@ OPGP_ERROR_STATUS OP201_get_load_token_signature_data(PBYTE executableLoadFileAI
 	memcpy(loadTokenSignatureData, buf, i);
 	*loadTokenSignatureDataLength = i;
 #ifdef DEBUG
-	OPGP_LOG_Log(_T("get_load_token_signature_data: Gathered data : "));
-	OPGP_LOG_Log(_T("P1: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("P2: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Lc: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load file AID length indicator: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load file AID:"));
+	OPGP_log_Log(_T("get_load_token_signature_data: Gathered data : "));
+	OPGP_log_Log(_T("P1: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("P2: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Lc: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load file AID length indicator: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load file AID:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
-	OPGP_LOG_Log(_T("Security Domain AID length indicator: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Security Domain AID:"));
+	OPGP_log_Log(_T("Security Domain AID length indicator: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Security Domain AID:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
-	OPGP_LOG_Log(_T("Load parameters length indicator: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_LOG_Log(_T("Load parameters:"));
+	OPGP_log_Log(_T("Load parameters length indicator: 0x%02x"), loadTokenSignatureData[j++]);
+	OPGP_log_Log(_T("Load parameters:"));
 	for (i=0; i<loadTokenSignatureData[j-1]; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
-	OPGP_LOG_Log(_T("Hash of Load File:"));
+	OPGP_log_Log(_T("Hash of Load File:"));
 	for (i=0; i<20; i++) {
-		OPGP_LOG_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
+		OPGP_log_Log(_T(" 0x%02x"), loadTokenSignatureData[j+i]);
 	}
 	j+=loadTokenSignatureData[j-1];
 #endif
@@ -5366,7 +5366,7 @@ OPGP_ERROR_STATUS OP201_calculate_load_file_DAP(OP201_DAP_BLOCK *dapBlock, DWORD
 
 	for (i=0; i<dapBlockLength; i++) {
 #ifdef DEBUG
-		OPGP_LOG_Log(_T("Hashing DAP block %lu."), i);
+		OPGP_log_Log(_T("Hashing DAP block %lu."), i);
 #endif
 		j=0;
 		k = dapBufSize;
