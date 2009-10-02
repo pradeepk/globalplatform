@@ -1,4 +1,4 @@
-/*  Copyright (c) 2007, Karsten Ohme
+/*  Copyright (c) 2009, Karsten Ohme
  *  This file is part of GlobalPlatform.
  *
  *  GlobalPlatform is free software: you can redistribute it and/or modify
@@ -14,27 +14,34 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with GlobalPlatform.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-/*! @file
- * Contains mappings for Unicode functions.
- */
- 
-#ifndef WIN32
-#define _tmain main
-#define _TCHAR char
-#define TCHAR char
-#define LPTSTR char *
-#define LPCTSTR const char *
-#define _T(arg) arg
-#define _tcsncpy strncpy
-#define _tcscpy strcpy
-#define _tcslen strlen
-#define _tprintf printf
-#define _tfopen fopen
-#define _stprintf sprintf
-#define _tgetenv getenv
-#define _ftprintf fprintf
-#define _sntprintf snprintf
-#define _fputts fputs
-#define _vftprintf vfprintf
+
+/*! \file
+ * This file contains GlobalPlatform error to string functions.
+*/
+
+#ifndef OPGP_STRINGIFY_H
+#define OPGP_STRINGIFY_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#ifdef WIN32
+#include "stdafx.h"
+#endif
+
+#include "types.h"
+#include "library.h"
+#include "error.h"
+#include "unicode.h"
+
+//! \brief Stringifies the error.
+OPGP_API
+OPGP_STRING OPGP_stringify_error(DWORD errorCode);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

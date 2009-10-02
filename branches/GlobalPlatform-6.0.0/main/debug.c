@@ -26,7 +26,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
-#include "debug.h"
+#include "GlobalPlatform/debug.h"
+#include "GlobalPlatform/error.h"
 
 #ifdef HAVE_VSYSLOG
 #include <syslog.h>
@@ -36,9 +37,9 @@
 * The call is redirected to log_Log().
 * \param func The function name
 */
-void log_Start(LPTSTR func, LPTSTR file, int line)
+void OPGP_log_Start(OPGP_STRING func, OPGP_STRING file, int line)
 {
-    log_Log(_T("+%s in %s at line %d : start"), func, file, line);
+    OPGP_log_Log(_T("+%s in %s at line %d : start"), func, file, line);
 }
 
 /**
@@ -46,9 +47,9 @@ void log_Start(LPTSTR func, LPTSTR file, int line)
 * \param func The function name
 * \param rv The return value of the function
 */
-void log_End(LPTSTR func, LPTSTR file, int line, LONG rv)
+void OPGP_log_End(OPGP_STRING func, OPGP_STRING file, int line, OPGP_ERROR_STATUS status)
 {
-    log_Log(_T(" -%s in %s at line %d : end RV(0x%X)"), func, file, line, rv);
+	OPGP_log_Log(_T(" -%s in %s at line %d : end error code(0x%X): %s"), func, file, line, status.errorCode, status.errorMessage);
 }
 
 /**
@@ -61,7 +62,7 @@ void log_End(LPTSTR func, LPTSTR file, int line, LONG rv)
 * \param msg The formatted message which will be stored.
 * \prama ... Variable argument list
 */
-void log_Log(LPTSTR msg, ...)
+void OPGP_log_Log(OPGP_STRING msg, ...)
 {
     va_list args;
     FILE *fp;
@@ -86,12 +87,12 @@ filelog:
     if (_tgetenv(_T("GLOBALPLATFORM_LOGFILE")))
         fp = _tfopen(_tgetenv(_T("GLOBALPLATFORM_LOGFILE")), _T("a"));
     else
-        fp = _tfopen(LOG_FILENAME, _T("a"));
+        fp = _tfopen(OPGP_LOG_FILENAME, _T("a"));
 
     if (!fp)
     {
 	fp = stderr;
-	_ftprintf(fp, _T("Error, could not open log file: %s\n"), LOG_FILENAME);
+	_ftprintf(fp, _T("Error, could not open log file: %s\n"), OPGP_LOG_FILENAME);
     }
     time(&t);
     time_s = localtime(&t);

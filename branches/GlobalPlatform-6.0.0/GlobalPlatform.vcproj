@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="GlobalPlatform"
 	ProjectGUID="{1ECD7D44-4233-42CD-A4BB-EE2EB0BD12C7}"
 	RootNamespace="GlobalPlatform"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -72,6 +73,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/GlobalPlatform.pdb"
 				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -91,9 +94,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -155,6 +155,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -176,9 +178,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="copy &quot;$(OutDir)\GlobalPlatform.dll&quot;  &quot;GlobalPlatformWrapper\&quot;"
 				ExcludedFromBuild="true"
@@ -194,61 +193,41 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\debug.c"
+				RelativePath=".\src\connection.c"
 				>
 			</File>
 			<File
-				RelativePath=".\DLLMain.c"
+				RelativePath=".\src\debug.c"
 				>
 			</File>
 			<File
-				RelativePath=".\GlobalPlatform.c"
+				RelativePath=".\src\DLLMain.c"
 				>
 			</File>
 			<File
-				RelativePath=".\GlobalPlatformTest.c"
+				RelativePath=".\src\dyn_unix.c"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.c"
+				RelativePath=".\src\dyn_win32.c"
 				>
 			</File>
-			<Filter
-				Name="unzip"
+			<File
+				RelativePath=".\src\GlobalPlatform.c"
 				>
-				<File
-					RelativePath=".\unzip\ioapi.c"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\ioapi.h"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\iowin32.c"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\iowin32.h"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\unzip.c"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\unzip.h"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\zip.c"
-					>
-				</File>
-				<File
-					RelativePath=".\unzip\zip.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\src\GlobalPlatformTest.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\pcscconnectionplugin.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\stdafx.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -256,23 +235,55 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\debug.h"
+				RelativePath=".\src\GlobalPlatform\connection.h"
 				>
 			</File>
 			<File
-				RelativePath=".\GlobalPlatform\GlobalPlatform.h"
+				RelativePath=".\src\GlobalPlatform\connectionplugin.h"
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath=".\src\GlobalPlatform\debug.h"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
+				RelativePath=".\src\dyn_generic.h"
 				>
 			</File>
 			<File
-				RelativePath=".\GlobalPlatform\unicode.h"
+				RelativePath=".\src\GlobalPlatform\error.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GlobalPlatform\errorcodes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GlobalPlatform\GlobalPlatform.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GlobalPlatform\library.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\pcscconnectionplugin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GlobalPlatform\types.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GlobalPlatform\unicode.h"
 				>
 			</File>
 		</Filter>
@@ -286,10 +297,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

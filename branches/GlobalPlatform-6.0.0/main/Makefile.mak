@@ -6,10 +6,14 @@
 !MESSAGE
 !MESSAGE Possible Targets:
 !MESSAGE ALL [DEBUG=] - Build version.
+!MESSAGE   -- Use nmake with TARGET_ARCH=X64 if you want to build a 64 bit library. --
 !MESSAGE   -- Use nmake with STATIC= if you want to build a static library. --
 !MESSAGE CLEAN - Delete Debug and Release directories
 !MESSAGE DOC - Create documentation.
-!MESSAGE PREBUILD - Builds a prebuild zipped version. VERSION= must be set.
+!MESSAGE PREBUILD - Builds a prebuild zipped version. VERSION=... must be set.
+!MESSAGE
+!MESSAGE You can specify additional SDK directories with SDK_LIB1= and SDK_LIB2=
+!MESSAGE
 !MESSAGE
 
 !include makefile.inc
@@ -57,13 +61,10 @@ OUTDIR=Debug
 OUTDIR=Release
 !ENDIF
 
-OBJS=$(OUTDIR)/stdafx.obj $(OUTDIR)/DLLMain.obj $(OUTDIR)/GlobalPlatform.obj $(OUTDIR)/debug.obj
+#OBJS=$(OUTDIR)/stdafx.obj $(OUTDIR)/DLLMain.obj $(OUTDIR)/GlobalPlatform.obj $(OUTDIR)/debug.obj
+OBJS=$(OUTDIR)/stdafx.obj $(OUTDIR)/DLLMain.obj $(OUTDIR)/pcscconnectionplugin.obj $(OUTDIR)/debug.obj
 
 MINIZIP=$(OUTDIR)/zip.obj $(OUTDIR)/unzip.obj $(OUTDIR)/ioapi.obj
-
-# replace with the location of doxygen
-# or specify on command line
-DOXYGEN=e:\Programme\doxygen\bin\doxygen.exe
 
 LIB_NAME=GlobalPlatform # the name of the library
 
@@ -90,25 +91,39 @@ CPPFLAGS=/O2 /I "$(OPENSSL_INC)" /I $(ZLIB_INC) /D "WIN32" /D "NDEBUG" /D "_CONS
 LINK=link
 LIB=lib
 
+# Define dummy SDK_LIB1 for additional libraries if not given
+!IFNDEF SDK_LIB1
+SDK_LIB1=C:\DUMMY
+!ENDIF
+
+# Define dummy SDK_LIB2 for additional libraries if not given
+!IFNDEF SDK_LIB2
+SDK_LIB2=C:\DUMMY
+!ENDIF
+
+!IFNDEF TARGET_ARCH
+TARGET_ARCH=X86
+!ENDIF
+
 !IFDEF DEBUG
 !IFDEF STATIC
 LIBFLAGS=/OUT:$(OUTDIR)/$(LIB_NAME).lib /NOLOGO /LIBPATH:$(OPENSSL_LIB) /LIBPATH:$(ZLIB_LIB) /LIBPATH:"$(SDK_LIB1)" /LIBPATH:"$(SDK_LIB2)" \
-/SUBSYSTEM:CONSOLE /MACHINE:X86 zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib winspool.lib \
+/SUBSYSTEM:CONSOLE /MACHINE:$(TARGET_ARCH) zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib winspool.lib \
 comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib
 !ELSE
 LFLAGS=/OUT:$(OUTDIR)/$(LIB_NAME).dll /NOLOGO /LIBPATH:$(OPENSSL_LIB) /LIBPATH:$(ZLIB_LIB) /LIBPATH:"$(SDK_LIB1)" /LIBPATH:"$(SDK_LIB2)" /DLL /DEBUG /PDB:$(OUTDIR)/$(LIB_NAME).pdb \
-/SUBSYSTEM:CONSOLE /MACHINE:X86 zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib winspool.lib \
+/SUBSYSTEM:CONSOLE /MACHINE:$(TARGET_ARCH) zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib winspool.lib \
 comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib
 !ENDIF
 !ELSE
 !IFDEF STATIC
 LIBFLAGS=/OUT:$(OUTDIR)/$(LIB_NAME).lib /NOLOGO /LIBPATH:$(OPENSSL_LIB) /LIBPATH:$(ZLIB_LIB) /LIBPATH:"$(SDK_LIB1)" /LIBPATH:"$(SDK_LIB2)" \
-/SUBSYSTEM:CONSOLE /MACHINE:X86 zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib winspool.lib \
+/SUBSYSTEM:CONSOLE /MACHINE:$(TARGET_ARCH) zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib winspool.lib \
 comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib
 !ELSE
 LFLAGS=/OUT:$(OUTDIR)/$(LIB_NAME).dll /INCREMENTAL:NO /NOLOGO /LIBPATH:"$(SDK_LIB1)" /LIBPATH:"$(SDK_LIB2)" \
 /LIBPATH:$(OPENSSL_LIB) /LIBPATH:$(ZLIB_LIB) /DLL /SUBSYSTEM:CONSOLE \
-/OPT:REF /OPT:ICF /MACHINE:X86 zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib \
+/OPT:REF /OPT:ICF /MACHINE:$(TARGET_ARCH) zdll.lib ssleay32.lib libeay32.lib winscard.lib kernel32.lib user32.lib gdi32.lib \
 winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib
 !ENDIF
 !ENDIF
@@ -140,9 +155,9 @@ $(MINIZIP): unzip/$(@B).c
 
 version.res : version.rc
 !IFDEF DEBUG
-	rc /dDEBUG /i "$(MSSDK)\Include\mfc" version.rc
+	$(RC) /dDEBUG /i "$(MSSDK)\Include\mfc" version.rc
 !ELSE
-	rc /i "$(MSSDK)\Include\mfc" version.rc
+	$(RC) /i "$(MSSDK)\Include\mfc" version.rc
 !ENDIF
 
 # run doxygen
@@ -168,11 +183,6 @@ clean:
 
 do-doc:
 	-@mkdir Doc
-!IF !EXIST($(DOXYGEN))
-	ERROR Doxygen not found. Change the macro DOXYGEN in this Makefile to point to the \
-	correct location or specify it on the command line DOXYGEN=<LOCATION_OF_DOXYGEN_EXECUTABLE>
-!ELSE
-	$(DOXYGEN) Doxyfile.cfg
-!ENDIF
+	doxygen Doxyfile.cfg
 
 !include makefile.targ.inc

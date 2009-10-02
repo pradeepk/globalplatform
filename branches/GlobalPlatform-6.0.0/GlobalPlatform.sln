@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual C++ Express 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlobalPlatformWrapper", "GlobalPlatformWrapper\GlobalPlatformWrapper.vcproj", "{A852FBAC-DC39-43FA-8B1E-067912A0F085}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlobalPlatform", "GlobalPlatform.vcproj", "{1ECD7D44-4233-42CD-A4BB-EE2EB0BD12C7}"

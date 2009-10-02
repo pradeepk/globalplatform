@@ -15,8 +15,21 @@ You need also the libraries zlib 1.2.3 (zlib1.dll) and OpenSSL 0.9.7e
 in the system directory (C:\Windows\System32 or /usr/(local/)lib 
 usually) or application directory.
 
+If you compile this on your own:
+
+On other Windows systems you may need to install the Microsoft Visual C++ 2005 Redistributable 
+Package. It may be the case that you need an older or a newer 
+version like it is installed. Also if you get SideBySide errors the version is not correct. 
+This is called DLL hell. 
+Search for "vcredist_x86.exe" or use the following links and try to 
+find the right version:
+
+VC2005: http://www.microsoft.com/downloads/details.aspx?displaylang=de&FamilyID=32bc1bee-a3f9-4c13-9c99-220b62a191ee
+VC2008: http://www.microsoft.com/Downloads/details.aspx?familyid=9B2DA534-3E03-4391-8A4D-074B9F2BC1BF&displaylang=en
+VC2005 SP1: http://www.microsoft.com/downloads/details.aspx?FamilyID=200b2fd9-ae1a-4a14-984d-389c36f85647&displaylang=en
+
 If you experience problems a DEBUG output is always helpful.
-Set the varibale GLOBALPLATFORM_DEBUG=1 in the environment. You can set  
+Set the variable GLOBALPLATFORM_DEBUG=1 in the environment. You can set  
 the logfile with GLOBALPLATFORM_LOGFILE=<file>. Under Windows by 
 default C:\Temp\GlobalPlatform.log is chosen. The log file must be 
 writable for the user. The default log file under Unix systems is 
