@@ -11,6 +11,9 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 
+# get host
+AC_CANONICAL_HOST
+
 case "$host" in
 *-*-cygwin*)
 	AC_LIBTOOL_WIN32_DLL
@@ -73,6 +76,7 @@ esac
 AC_ARG_VAR(PCSCLITE_H_PATH, [Specifies the location of pcsclite.h for Windows])
 
 OLD_CFLAGS="$CFLAGS"
+AC_MSG_WARN([Host: $host])
 case "$host" in
 *-*-cygwin*)
 	if ! test -f "$PCSCLITE_H_PATH/pcsclite.h";
