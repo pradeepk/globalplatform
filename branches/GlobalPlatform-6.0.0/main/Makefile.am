@@ -13,7 +13,7 @@ GlobalPlatform/connection.h GlobalPlatform/debug.h GlobalPlatform/errorcodes.h G
 GlobalPlatform/types.h GlobalPlatform/stringify.h GlobalPlatform/security.h
 
 libGlobalPlatform_la_SOURCES = GlobalPlatform.c GlobalPlatform/connection.h GlobalPlatform/security.h GlobalPlatform/GlobalPlatform.h GlobalPlatform/debug.h \
-debug.c GlobalPlatform/unicode.h unzip/crypt.h unzip/ioapi.c unzip/ioapi.h \
+GlobalPlatform/unicode.h unzip/crypt.h unzip/ioapi.c unzip/ioapi.h \
 unzip/unzip.c unzip/unzip.h unzip/zip.c unzip/zip.h \
 GlobalPlatform/errorcodes.h GlobalPlatform/stringify.h GlobalPlatform/types.h GlobalPlatform/error.h \
 dyn_generic.h dyn_unix.c connection.c stringify.c crypto.h debug.c util.c util.h loadfile.c loadfile.h crypto.c

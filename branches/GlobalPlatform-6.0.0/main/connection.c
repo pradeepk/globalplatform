@@ -63,29 +63,33 @@ OPGP_ERROR_STATUS OPGP_establish_context(OPGP_CARD_CONTEXT *cardContext) {
 		goto end;
 	}
 	// now load functions
-	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions->cardConnect, "OPGP_PL_card_connect");
+	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions.cardConnect, "OPGP_PL_card_connect");
 	if (OPGP_ERROR_CHECK(errorStatus)) {
 		goto end;
 	}
-	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions->cardDisconnect, "OPGP_PL_card_disconnect");
+	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions.cardDisconnect, "OPGP_PL_card_disconnect");
 	if (OPGP_ERROR_CHECK(errorStatus)) {
 		goto end;
 	}
-	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions->establishContext, "OPGP_PL_establish_context");
+	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions.establishContext, "OPGP_PL_establish_context");
 	if (OPGP_ERROR_CHECK(errorStatus)) {
 		goto end;
 	}
-	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions->listReaders, "OPGP_PL_list_readers");
+	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions.listReaders, "OPGP_PL_list_readers");
 	if (OPGP_ERROR_CHECK(errorStatus)) {
 		goto end;
 	}
-	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions->releaseContext, "OPGP_PL_release_context");
+	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions.releaseContext, "OPGP_PL_release_context");
+	if (OPGP_ERROR_CHECK(errorStatus)) {
+		goto end;
+	}
+	errorStatus = DYN_GetAddress(cardContext->libraryHandle, &cardContext->connectionFunctions.sendAPDU, "OPGP_PL_send_APDU");
 	if (OPGP_ERROR_CHECK(errorStatus)) {
 		goto end;
 	}
 	OPGP_ERROR_CREATE_NO_ERROR(errorStatus);
 	// call the establish function
-	plugin_establishContextFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT*)) cardContext->connectionFunctions->establishContext;
+	plugin_establishContextFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT*)) cardContext->connectionFunctions.establishContext;
 	errorStatus = (*plugin_establishContextFunction) (cardContext);
 end:
 	OPGP_LOG_END(_T("OPGP_establish_context"), errorStatus);
@@ -105,22 +109,24 @@ OPGP_ERROR_STATUS OPGP_release_context(OPGP_CARD_CONTEXT cardContext) {
 	// only if handle is not NULL unload it
 	if (cardContext.libraryHandle != NULL) {
 		// call the release function
-		plugin_release_context = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT)) cardContext.connectionFunctions->releaseContext;
-		errorStatus = (*plugin_release_context) (cardContext);
-		if (OPGP_ERROR_CHECK(errorStatus)) {
-			goto end;
+		plugin_release_context = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT)) cardContext.connectionFunctions.releaseContext;
+		if (plugin_release_context != NULL) {
+			errorStatus = (*plugin_release_context) (cardContext);
+			if (OPGP_ERROR_CHECK(errorStatus)) {
+				goto end;
+			}
 		}
 		errorStatus = DYN_CloseLibrary(&cardContext.libraryHandle);
 		if (OPGP_ERROR_CHECK(errorStatus)) {
 			goto end;
 		}
 	}
-	cardContext.connectionFunctions->cardConnect = NULL;
-	cardContext.connectionFunctions->cardDisconnect = NULL;
-	cardContext.connectionFunctions->establishContext = NULL;
-	cardContext.connectionFunctions->listReaders = NULL;
-	cardContext.connectionFunctions->releaseContext = NULL;
-	cardContext.connectionFunctions->sendAPDU = NULL;
+	cardContext.connectionFunctions.cardConnect = NULL;
+	cardContext.connectionFunctions.cardDisconnect = NULL;
+	cardContext.connectionFunctions.establishContext = NULL;
+	cardContext.connectionFunctions.listReaders = NULL;
+	cardContext.connectionFunctions.releaseContext = NULL;
+	cardContext.connectionFunctions.sendAPDU = NULL;
 	OPGP_ERROR_CREATE_NO_ERROR(errorStatus);
 end:
 	OPGP_LOG_END(_T("OPGP_release_context"), errorStatus);
@@ -140,7 +146,7 @@ OPGP_ERROR_STATUS OPGP_list_readers(OPGP_CARD_CONTEXT cardContext, OPGP_STRING r
 	OPGP_ERROR_STATUS errorStatus;
 	OPGP_ERROR_STATUS(*plugin_listReadersFunction) (OPGP_CARD_CONTEXT, OPGP_STRING, PDWORD);
 	OPGP_LOG_START(_T("OPGP_list_readers"));
-	plugin_listReadersFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT, OPGP_STRING, PDWORD)) cardContext.connectionFunctions->listReaders;
+	plugin_listReadersFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT, OPGP_STRING, PDWORD)) cardContext.connectionFunctions.listReaders;
 	errorStatus = (*plugin_listReadersFunction) (cardContext, readerNames, readerNamesLength);
 end:
 	OPGP_LOG_END(_T("OPGP_list_readers"), errorStatus);
@@ -162,7 +168,7 @@ OPGP_ERROR_STATUS OPGP_card_connect(OPGP_CARD_CONTEXT cardContext, OPGP_CSTRING 
 	OPGP_ERROR_STATUS errorStatus;
 	OPGP_ERROR_STATUS(*plugin_cardConnectFunction) (OPGP_CARD_CONTEXT, OPGP_CSTRING, OPGP_CARD_INFO *, DWORD);
 	OPGP_LOG_START(_T("OPGP_card_connect"));
-	plugin_cardConnectFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT, OPGP_CSTRING, OPGP_CARD_INFO*, DWORD)) cardContext.connectionFunctions->cardConnect;
+	plugin_cardConnectFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT, OPGP_CSTRING, OPGP_CARD_INFO*, DWORD)) cardContext.connectionFunctions.cardConnect;
 	errorStatus = (*plugin_cardConnectFunction) (cardContext, readerName, cardInfo, protocol);
 end:
 	OPGP_LOG_END(_T("OPGP_card_connect"), errorStatus);
@@ -178,7 +184,7 @@ OPGP_ERROR_STATUS OPGP_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_
 	OPGP_ERROR_STATUS errorStatus;
 	OPGP_ERROR_STATUS(*plugin_cardDisconnectFunction) (OPGP_CARD_INFO);
 	OPGP_LOG_START(_T("OPGP_card_disconnect"));
-	plugin_cardDisconnectFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_INFO)) cardContext.connectionFunctions->cardDisconnect;
+	plugin_cardDisconnectFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_INFO)) cardContext.connectionFunctions.cardDisconnect;
 	errorStatus = (*plugin_cardDisconnectFunction) (cardInfo);
 end:
 	OPGP_LOG_END(_T("OPGP_card_disconnect"), errorStatus);
@@ -207,7 +213,7 @@ OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 	DWORD responseDataLength = *rapduLength;
 
 	OPGP_LOG_START(_T("OPGP_send_APDU"));
-	plugin_sendAPDUFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT, OPGP_CARD_INFO, PBYTE, DWORD, PBYTE, PDWORD)) cardContext.connectionFunctions->sendAPDU;
+	plugin_sendAPDUFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT, OPGP_CARD_INFO, PBYTE, DWORD, PBYTE, PDWORD)) cardContext.connectionFunctions.sendAPDU;
 
 	if (traceEnable) {
 		_ftprintf(traceFile, _T("Command --> "));

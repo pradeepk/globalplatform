@@ -57,9 +57,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libGlobalPlatform_la_LIBADD =
 am_libGlobalPlatform_la_OBJECTS =  \
 	libGlobalPlatform_la-GlobalPlatform.lo \
-	libGlobalPlatform_la-debug.lo libGlobalPlatform_la-ioapi.lo \
-	libGlobalPlatform_la-unzip.lo libGlobalPlatform_la-zip.lo \
-	libGlobalPlatform_la-dyn_unix.lo \
+	libGlobalPlatform_la-ioapi.lo libGlobalPlatform_la-unzip.lo \
+	libGlobalPlatform_la-zip.lo libGlobalPlatform_la-dyn_unix.lo \
 	libGlobalPlatform_la-connection.lo \
 	libGlobalPlatform_la-stringify.lo \
 	libGlobalPlatform_la-debug.lo libGlobalPlatform_la-util.lo \
@@ -117,7 +116,7 @@ CHECK_LIBS = -lcheck
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"GlobalPlatform\" -DPACKAGE_TARNAME=\"globalplatform\" -DPACKAGE_VERSION=\"6.0.0\" -DPACKAGE_STRING=\"GlobalPlatform\ 6.0.0\" -DPACKAGE_BUGREPORT=\"k_o_@users.sourceforge.net\" -DPACKAGE=\"globalplatform\" -DVERSION=\"6.0.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\" -DSTDC_HEADERS=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_VPRINTF=1 -DHAVE_MEMCPY=1 -DHAVE_VSYSLOG=1 -DHAVE_LIBPCSCLITE=1 -DHAVE_ZCONF_H=1 -DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -DHAVE_OPENSSL_RAND_H=1 -DHAVE_OPENSSL_ERR_H=1 -DHAVE_OPENSSL_EVP_H=1 -DHAVE_OPENSSL_PEM_H=1 -DHAVE_LIBCRYPTO=1
+DEFS = -DPACKAGE_NAME=\"GlobalPlatform\" -DPACKAGE_TARNAME=\"globalplatform\" -DPACKAGE_VERSION=\"6.0.0\" -DPACKAGE_STRING=\"GlobalPlatform\ 6.0.0\" -DPACKAGE_BUGREPORT=\"k_o_@users.sourceforge.net\" -DPACKAGE=\"globalplatform\" -DVERSION=\"6.0.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\" -DSTDC_HEADERS=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_VPRINTF=1 -DHAVE_MEMCPY=1 -DHAVE_VSYSLOG=1 -DDEBUG=1 -DHAVE_LIBPCSCLITE=1 -DHAVE_ZCONF_H=1 -DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -DHAVE_OPENSSL_RAND_H=1 -DHAVE_OPENSSL_ERR_H=1 -DHAVE_OPENSSL_EVP_H=1 -DHAVE_OPENSSL_PEM_H=1 -DHAVE_LIBCRYPTO=1
 DEPDIR = .deps
 DLLTOOL = 
 DSYMUTIL = 
@@ -209,7 +208,7 @@ mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /usr/local
+prefix = /usr
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
@@ -231,7 +230,7 @@ GlobalPlatform/connection.h GlobalPlatform/debug.h GlobalPlatform/errorcodes.h G
 GlobalPlatform/types.h GlobalPlatform/stringify.h GlobalPlatform/security.h
 
 libGlobalPlatform_la_SOURCES = GlobalPlatform.c GlobalPlatform/connection.h GlobalPlatform/security.h GlobalPlatform/GlobalPlatform.h GlobalPlatform/debug.h \
-debug.c GlobalPlatform/unicode.h unzip/crypt.h unzip/ioapi.c unzip/ioapi.h \
+GlobalPlatform/unicode.h unzip/crypt.h unzip/ioapi.c unzip/ioapi.h \
 unzip/unzip.c unzip/unzip.h unzip/zip.c unzip/zip.h \
 GlobalPlatform/errorcodes.h GlobalPlatform/stringify.h GlobalPlatform/types.h GlobalPlatform/error.h \
 dyn_generic.h dyn_unix.c connection.c stringify.c crypto.h debug.c util.c util.h loadfile.c loadfile.h crypto.c
@@ -364,13 +363,6 @@ libGlobalPlatform_la-GlobalPlatform.lo: GlobalPlatform.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libGlobalPlatform_la-GlobalPlatform.lo `test -f 'GlobalPlatform.c' || echo '$(srcdir)/'`GlobalPlatform.c
 
-libGlobalPlatform_la-debug.lo: debug.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libGlobalPlatform_la-debug.lo -MD -MP -MF $(DEPDIR)/libGlobalPlatform_la-debug.Tpo -c -o libGlobalPlatform_la-debug.lo `test -f 'debug.c' || echo '$(srcdir)/'`debug.c
-	mv -f $(DEPDIR)/libGlobalPlatform_la-debug.Tpo $(DEPDIR)/libGlobalPlatform_la-debug.Plo
-#	source='debug.c' object='libGlobalPlatform_la-debug.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libGlobalPlatform_la-debug.lo `test -f 'debug.c' || echo '$(srcdir)/'`debug.c
-
 libGlobalPlatform_la-ioapi.lo: unzip/ioapi.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libGlobalPlatform_la-ioapi.lo -MD -MP -MF $(DEPDIR)/libGlobalPlatform_la-ioapi.Tpo -c -o libGlobalPlatform_la-ioapi.lo `test -f 'unzip/ioapi.c' || echo '$(srcdir)/'`unzip/ioapi.c
 	mv -f $(DEPDIR)/libGlobalPlatform_la-ioapi.Tpo $(DEPDIR)/libGlobalPlatform_la-ioapi.Plo
@@ -412,6 +404,13 @@ libGlobalPlatform_la-stringify.lo: stringify.c
 #	source='stringify.c' object='libGlobalPlatform_la-stringify.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libGlobalPlatform_la-stringify.lo `test -f 'stringify.c' || echo '$(srcdir)/'`stringify.c
+
+libGlobalPlatform_la-debug.lo: debug.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libGlobalPlatform_la-debug.lo -MD -MP -MF $(DEPDIR)/libGlobalPlatform_la-debug.Tpo -c -o libGlobalPlatform_la-debug.lo `test -f 'debug.c' || echo '$(srcdir)/'`debug.c
+	mv -f $(DEPDIR)/libGlobalPlatform_la-debug.Tpo $(DEPDIR)/libGlobalPlatform_la-debug.Plo
+#	source='debug.c' object='libGlobalPlatform_la-debug.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libGlobalPlatform_la-debug.lo `test -f 'debug.c' || echo '$(srcdir)/'`debug.c
 
 libGlobalPlatform_la-util.lo: util.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libGlobalPlatform_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libGlobalPlatform_la-util.lo -MD -MP -MF $(DEPDIR)/libGlobalPlatform_la-util.Tpo -c -o libGlobalPlatform_la-util.lo `test -f 'util.c' || echo '$(srcdir)/'`util.c

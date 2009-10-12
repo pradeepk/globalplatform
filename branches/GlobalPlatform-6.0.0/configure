@@ -13935,8 +13935,6 @@ esac
 
 
 OLD_CFLAGS="$CFLAGS"
-{ $as_echo "$as_me:$LINENO: WARNING: Host: $host" >&5
-$as_echo "$as_me: WARNING: Host: $host" >&2;}
 case "$host" in
 *-*-cygwin*)
 	if ! test -f "$PCSCLITE_H_PATH/pcsclite.h";

@@ -33,13 +33,22 @@
 #include "GlobalPlatform/error.h"
 #include "dyn_generic.h"
 
+#define MAX_LIBRARY_NAME_SIZE 64
+#define LIBRARY_NAME_PREFIX _T("lib")
+#define LIBRARY_NAME_EXTENSION _T(".so")
+
 OPGP_ERROR_STATUS DYN_LoadLibrary(PVOID *libraryHandle, LPCTSTR libraryName)
 {
 	OPGP_ERROR_STATUS errorStatus;
 	*libraryHandle = NULL;
+	TCHAR internalLibraryName[MAX_LIBRARY_NAME_SIZE];
 	OPGP_LOG_START(_T("DYN_LoadLibrary"));
 
-	*libraryHandle = dlopen(libraryName, RTLD_LAZY);
+	_tcsncpy(internalLibraryName, LIBRARY_NAME_PREFIX, MAX_LIBRARY_NAME_SIZE);
+	_tcsncpy(internalLibraryName + _tcslen(LIBRARY_NAME_PREFIX), libraryName, MAX_LIBRARY_NAME_SIZE - _tcslen(LIBRARY_NAME_PREFIX));
+	_tcsncpy(internalLibraryName + _tcslen(LIBRARY_NAME_PREFIX) + _tcslen(libraryName), LIBRARY_NAME_EXTENSION, MAX_LIBRARY_NAME_SIZE - (_tcslen(LIBRARY_NAME_PREFIX) + _tcslen(libraryName)));
+	internalLibraryName[MAX_LIBRARY_NAME_SIZE-1] = _T('\0');
+	*libraryHandle = dlopen(internalLibraryName, RTLD_LAZY);
 
 	if (*libraryHandle == NULL)
 	{
@@ -62,7 +71,7 @@ OPGP_ERROR_STATUS DYN_CloseLibrary(PVOID *libraryHandle)
 	ret = dlclose(*libraryHandle);
 	*libraryHandle = NULL;
 
-	if (ret == 0)
+	if (ret == NULL)
 	{
 		OPGP_ERROR_CREATE_ERROR(errorStatus, -1, dlerror());
 		goto end;
