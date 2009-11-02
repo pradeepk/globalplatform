@@ -154,7 +154,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PCSCLITE_CFLAGS = @PCSCLITE_CFLAGS@
@@ -240,7 +239,7 @@ dyn_generic.h dyn_unix.c connection.c stringify.c crypto.h debug.c util.c util.h
 
 libGlobalPlatform_la_LDFLAGS = -version-info 6:0:0 $(PCSCLITE_LIBS)
 libGlobalPlatform_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
-GlobalPlatformTest_SOURCES = GlobalPlatformTest.c GlobalPlatform/GlobalPlatform.h
+GlobalPlatformTest_SOURCES = GlobalPlatformTest.c
 GlobalPlatformTest_CFLAGS = @CHECK_CFLAGS@ $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
 GlobalPlatformTest_LDADD = @CHECK_LIBS@ libGlobalPlatform.la $(PCSCLITE_LIBS)
 MAINTAINERCLEANFILES = \

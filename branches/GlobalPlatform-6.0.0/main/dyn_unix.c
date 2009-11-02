@@ -71,7 +71,7 @@ OPGP_ERROR_STATUS DYN_CloseLibrary(PVOID *libraryHandle)
 	ret = dlclose(*libraryHandle);
 	*libraryHandle = NULL;
 
-	if (ret == NULL)
+	if (ret != 0)
 	{
 		OPGP_ERROR_CREATE_ERROR(errorStatus, -1, dlerror());
 		goto end;

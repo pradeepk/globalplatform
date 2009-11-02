@@ -23,7 +23,7 @@ libGlobalPlatform_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
 
 TESTS = GlobalPlatformTest
 check_PROGRAMS = GlobalPlatformTest
-GlobalPlatformTest_SOURCES = GlobalPlatformTest.c GlobalPlatform/GlobalPlatform.h
+GlobalPlatformTest_SOURCES = GlobalPlatformTest.c
 GlobalPlatformTest_CFLAGS = @CHECK_CFLAGS@ $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
 GlobalPlatformTest_LDADD = @CHECK_LIBS@ libGlobalPlatform.la $(PCSCLITE_LIBS)
 

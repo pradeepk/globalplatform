@@ -36,7 +36,7 @@
 */
 #define BUFLEN 2048
 
-static void internal_release_context(OPGP_CARD_CONTEXT cardContext) {
+static void internal_release_context(OPGP_CARD_CONTEXT *cardContext) {
 	OPGP_ERROR_STATUS status;
 	status = OPGP_PL_release_context(cardContext);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -46,7 +46,7 @@ static void internal_release_context(OPGP_CARD_CONTEXT cardContext) {
 
 static void internal_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo) {
 	OPGP_ERROR_STATUS status;
-	status = OPGP_PL_card_disconnect (cardContext, cardInfo);
+	status = OPGP_PL_card_disconnect (cardContext, &cardInfo);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not disconnect from card: %s", status.errorMessage);
 	}
@@ -114,7 +114,7 @@ START_TEST(test_card_connect)
 	readerName = internal_list_readers(cardContext, cardInfo);
 	internal_card_connect(cardContext, &cardInfo, readerName);
 	internal_card_disconnect(cardContext, cardInfo);
-	internal_release_context(cardContext);
+	internal_release_context(&cardContext);
 }
 END_TEST
 
@@ -127,7 +127,7 @@ START_TEST (test_list_readers)
 	OPGP_CARD_INFO cardInfo;
 	internal_establish_context(&cardContext);
 	internal_list_readers(cardContext, cardInfo);
-	internal_release_context(cardContext);
+	internal_release_context(&cardContext);
 }
 END_TEST
 
@@ -139,7 +139,7 @@ START_TEST (test_establish_context)
 	OPGP_CARD_CONTEXT cardContext;
 	OPGP_CARD_INFO cardInfo;
 	internal_establish_context(&cardContext);
-	internal_release_context(cardContext);
+	internal_release_context(&cardContext);
 }
 END_TEST
 

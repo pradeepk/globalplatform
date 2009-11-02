@@ -92,18 +92,21 @@ end:
 }
 
 /**
- * \param cardContext IN The valid OPGP_CARDCONTEXT returned by establish_context()
+ * \param cardContext INOUT The valid OPGP_CARDCONTEXT returned by establish_context()
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */
-OPGP_ERROR_STATUS OPGP_PL_release_context(OPGP_CARD_CONTEXT cardContext) {
+OPGP_ERROR_STATUS OPGP_PL_release_context(OPGP_CARD_CONTEXT *cardContext) {
 	OPGP_ERROR_STATUS status;
 	LONG result;
 	OPGP_LOG_START(_T("OPGP_PL_release_context"));
-	CHECK_CARD_CONTEXT_INITIALIZATION(cardContext, status)
-	result = SCardReleaseContext(GET_SCARDCONTEXT(cardContext));
+	CHECK_CARD_CONTEXT_INITIALIZATION((*cardContext), status)
+	result = SCardReleaseContext(GET_SCARDCONTEXT((*cardContext)));
 	HANDLE_STATUS(status, result);
 	// frees the allocated memory
-	free(cardContext.librarySpecific);
+	if (cardContext->librarySpecific != NULL) {
+		free(cardContext->librarySpecific);
+		cardContext->librarySpecific = NULL;
+	}
 end:
 	OPGP_LOG_END(_T("OPGP_PL_release_context"), status);
 	return status;
@@ -241,19 +244,23 @@ end:
 
 /**
  * \param cardContext IN The valid OPGP_CARDCONTEXT returned by establish_context()
- * \param cardInfo IN The OPGP_CARD_INFO structure returned by card_connect().
+ * \param cardInfo INOUT The OPGP_CARD_INFO structure returned by card_connect().
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct.
  */
-OPGP_ERROR_STATUS OPGP_PL_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo) {
+OPGP_ERROR_STATUS OPGP_PL_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO *cardInfo) {
 	OPGP_ERROR_STATUS status;
 	LONG result;
 	OPGP_LOG_START(_T("OPGP_PL_card_disconnect"));
 	CHECK_CARD_CONTEXT_INITIALIZATION(cardContext, status)
-	CHECK_CARD_INFO_INITIALIZATION(cardInfo, status)
-	result = SCardDisconnect(GET_PCSC_CARD_INFO_SPECIFIC(cardInfo)->cardHandle, SCARD_RESET_CARD);
+	CHECK_CARD_INFO_INITIALIZATION((*cardInfo), status)
+	result = SCardDisconnect(GET_PCSC_CARD_INFO_SPECIFIC((*cardInfo))->cardHandle, SCARD_RESET_CARD);
 	HANDLE_STATUS(status, result);
 	// frees the allocated memory
-	free(cardInfo.librarySpecific);
+	if (cardInfo->librarySpecific != NULL) {
+		free(cardInfo->librarySpecific);
+		cardInfo->librarySpecific = NULL;
+	}
+	cardInfo->ATRLength = 0;
 end:
 	OPGP_LOG_END(_T("OPGP_PL_card_disconnect"), status);
 	return status;

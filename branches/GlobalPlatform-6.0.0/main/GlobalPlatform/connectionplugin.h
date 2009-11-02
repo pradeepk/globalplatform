@@ -51,7 +51,7 @@ OPGP_ERROR_STATUS OPGP_PL_establish_context(OPGP_CARD_CONTEXT *cardContext);
 
 //! \brief This function releases the context to the connection layer established by establish_context().
 OPGP_API
-OPGP_ERROR_STATUS OPGP_PL_release_context(OPGP_CARD_CONTEXT cardContext);
+OPGP_ERROR_STATUS OPGP_PL_release_context(OPGP_CARD_CONTEXT *cardContext);
 
 //! \brief This function returns a list of currently available readers.
 OPGP_API
@@ -63,7 +63,7 @@ OPGP_ERROR_STATUS OPGP_PL_card_connect(OPGP_CARD_CONTEXT cardContext, OPGP_CSTRI
 
 //! \brief This function disconnects a reader.
 OPGP_API
-OPGP_ERROR_STATUS OPGP_PL_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo);
+OPGP_ERROR_STATUS OPGP_PL_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO *cardInfo);
 
 //! \brief This function sends an APDU.
 OPGP_API

@@ -56,7 +56,7 @@ OPGP_ERROR_STATUS OPGP_establish_context(OPGP_CARD_CONTEXT *cardContext) {
 	OPGP_LOG_START(_T("OPGP_establish_context"));
 
 	// unload library
-	OPGP_release_context(*cardContext);
+	OPGP_release_context(cardContext);
 
 	errorStatus = DYN_LoadLibrary(&cardContext->libraryHandle, (LPCTSTR)cardContext->libraryName);
 	if (OPGP_ERROR_CHECK(errorStatus)) {
@@ -97,36 +97,36 @@ end:
 }
 
 /**
- * \param cardContext IN The valid OPGP_CARD_CONTEXT returned by establish_context()
+ * \param cardContext INOUT The valid OPGP_CARD_CONTEXT returned by establish_context()
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */
-OPGP_ERROR_STATUS OPGP_release_context(OPGP_CARD_CONTEXT cardContext) {
+OPGP_ERROR_STATUS OPGP_release_context(OPGP_CARD_CONTEXT *cardContext) {
 	OPGP_ERROR_STATUS errorStatus;
 	// plugin function pointer
-	OPGP_ERROR_STATUS(*plugin_release_context) (OPGP_CARD_CONTEXT);
+	OPGP_ERROR_STATUS(*plugin_release_context) (OPGP_CARD_CONTEXT *);
 
 	OPGP_LOG_START(_T("OPGP_release_context"));
 	// only if handle is not NULL unload it
-	if (cardContext.libraryHandle != NULL) {
+	if (cardContext->libraryHandle != NULL) {
 		// call the release function
-		plugin_release_context = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT)) cardContext.connectionFunctions.releaseContext;
+		plugin_release_context = (OPGP_ERROR_STATUS(*)(OPGP_CARD_CONTEXT *)) cardContext->connectionFunctions.releaseContext;
 		if (plugin_release_context != NULL) {
 			errorStatus = (*plugin_release_context) (cardContext);
 			if (OPGP_ERROR_CHECK(errorStatus)) {
 				goto end;
 			}
 		}
-		errorStatus = DYN_CloseLibrary(&cardContext.libraryHandle);
+		errorStatus = DYN_CloseLibrary(&cardContext->libraryHandle);
 		if (OPGP_ERROR_CHECK(errorStatus)) {
 			goto end;
 		}
 	}
-	cardContext.connectionFunctions.cardConnect = NULL;
-	cardContext.connectionFunctions.cardDisconnect = NULL;
-	cardContext.connectionFunctions.establishContext = NULL;
-	cardContext.connectionFunctions.listReaders = NULL;
-	cardContext.connectionFunctions.releaseContext = NULL;
-	cardContext.connectionFunctions.sendAPDU = NULL;
+	cardContext->connectionFunctions.cardConnect = NULL;
+	cardContext->connectionFunctions.cardDisconnect = NULL;
+	cardContext->connectionFunctions.establishContext = NULL;
+	cardContext->connectionFunctions.listReaders = NULL;
+	cardContext->connectionFunctions.releaseContext = NULL;
+	cardContext->connectionFunctions.sendAPDU = NULL;
 	OPGP_ERROR_CREATE_NO_ERROR(errorStatus);
 end:
 	OPGP_LOG_END(_T("OPGP_release_context"), errorStatus);
@@ -177,14 +177,14 @@ end:
 
 /**
  * \param cardContext IN The valid OPGP_CARD_CONTEXT returned by establish_context()
- * \param cardInfo IN The OPGP_CARD_INFO structure returned by card_connect().
+ * \param cardInfo INOUT The OPGP_CARD_INFO structure returned by card_connect().
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */
-OPGP_ERROR_STATUS OPGP_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo) {
+OPGP_ERROR_STATUS OPGP_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO *cardInfo) {
 	OPGP_ERROR_STATUS errorStatus;
-	OPGP_ERROR_STATUS(*plugin_cardDisconnectFunction) (OPGP_CARD_INFO);
+	OPGP_ERROR_STATUS(*plugin_cardDisconnectFunction) (OPGP_CARD_INFO *);
 	OPGP_LOG_START(_T("OPGP_card_disconnect"));
-	plugin_cardDisconnectFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_INFO)) cardContext.connectionFunctions.cardDisconnect;
+	plugin_cardDisconnectFunction = (OPGP_ERROR_STATUS(*)(OPGP_CARD_INFO *)) cardContext.connectionFunctions.cardDisconnect;
 	errorStatus = (*plugin_cardDisconnectFunction) (cardInfo);
 end:
 	OPGP_LOG_END(_T("OPGP_card_disconnect"), errorStatus);

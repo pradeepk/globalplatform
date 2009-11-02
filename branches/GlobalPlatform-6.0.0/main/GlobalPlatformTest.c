@@ -17,6 +17,7 @@
 #include <check.h>
 #include <stdlib.h>
 #include "GlobalPlatform/GlobalPlatform.h"
+#include <stdio.h>
 #include <string.h>
 
 /**
@@ -51,20 +52,22 @@ static TCHAR readerName[READERNAMELEN + 1];
 
 static void internal_disconnect_card() {
 	OPGP_ERROR_STATUS status;
-	status = OPGP_card_disconnect(cardContext, cardInfo);
+	status = OPGP_card_disconnect(cardContext, &cardInfo);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not connect to card: %s", status.errorMessage);
 	}
-	_tprintf(_T("Connected to reader %s\n"), readerName);
+	fail_unless(cardInfo.librarySpecific == NULL, "Library specific data must be NULL after disconnecting.");
+	_tprintf(_T("Disconnected from reader %s\n"), readerName);
 }
 
 static void internal_release_context() {
 	OPGP_ERROR_STATUS status;
-	status = OPGP_release_context(cardContext);
+	status = OPGP_release_context(&cardContext);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not connect to card: %s", status.errorMessage);
 	}
-	_tprintf(_T("Connected to reader %s\n"), readerName);
+	fail_unless(cardContext.libraryHandle == NULL, "Library handle must be NULL after releasing.");
+	fail_unless(cardContext.librarySpecific == NULL, "Library specific data must be NULL after releasing.");
 }
 
 static void internal_connect_card() {
@@ -155,6 +158,7 @@ END_TEST
 START_TEST (test_establish_context)
 {
 	internal_establish_context();
+	internal_release_context();
 }
 END_TEST
 
@@ -212,6 +216,7 @@ int main (void)
 	int number_failed;
 	Suite *s = GlobalPlatform_suite ();
 	SRunner *sr = srunner_create (s);
+	srunner_set_fork_status (sr, CK_NOFORK);
 	srunner_run_all (sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed (sr);
 	srunner_free (sr);
