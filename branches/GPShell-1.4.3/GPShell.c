@@ -46,6 +46,7 @@
 #define PLATFORM_MODE_OP_201 OP_201
 #define PLATFORM_MODE_GP_211 GP_211
 #define PASSPHRASELEN 64
+#define AUTOREADER -1
 
 /* Data Structures */
 typedef struct _OptionStr {
@@ -83,6 +84,7 @@ typedef struct _OptionStr {
     BYTE privilege;
     BYTE scp;
     BYTE scpImpl;
+	int apduTime;
 } OptionStr;
 
 /* Global Variables */
@@ -94,6 +96,16 @@ static int platform_mode = PLATFORM_MODE_OP_201;
 static int gemXpressoPro = 0;
 static char selectedAID[AIDLEN+1];
 static int selectedAIDLength = 0;
+
+static unsigned int GetTime() {
+#if WIN32
+	return GetTickCount();
+#else
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	return (t.tv_sec*1000) + (t.tv_usec/1000);
+#endif
+}
 
 /* Functions */
 static void ConvertTToC(char* pszDest, const TCHAR* pszSrc)
@@ -171,7 +183,7 @@ static char *strtokCheckComment(char *buf)
 
 static int handleOptions(OptionStr *pOptionStr)
 {
-	DWORD rv = EXIT_SUCCESS;
+	int rv = EXIT_SUCCESS;
     char *token;
 	char dummy[BUFLEN+1];
 
@@ -191,7 +203,7 @@ static int handleOptions(OptionStr *pOptionStr)
 	pOptionStr->APDULen = 0;
     pOptionStr->secureChannel = 0;
     pOptionStr->reader[0] = _T('\0');
-	pOptionStr->readerNumber = 0;
+	pOptionStr->readerNumber = AUTOREADER;
     pOptionStr->file[0] = _T('\0');
 	pOptionStr->passPhrase[0] = _T('\0');
 	pOptionStr->protocol = OPGP_CARD_PROTOCOL_T0 | OPGP_CARD_PROTOCOL_T1;
@@ -204,6 +216,7 @@ static int handleOptions(OptionStr *pOptionStr)
     pOptionStr->privilege = 0;
     pOptionStr->scp = 0;
     pOptionStr->scpImpl = 0;
+	pOptionStr->apduTime = 0;
 
     token = strtokCheckComment(NULL);
 
@@ -268,6 +281,11 @@ static int handleOptions(OptionStr *pOptionStr)
 			rv = EXIT_FAILURE;
 			goto end;
 	    } else {
+			if (strcmp(token,"0") == 0) {
+		    	printf("Error: option -readerNumber must be followed by number > 0\n");
+				rv = EXIT_FAILURE;
+				goto end;
+			}
 			pOptionStr->readerNumber = atoi(token)-1;
 	    }
 	} else if (strcmp(token, "-reader") == 0) {
@@ -502,6 +520,8 @@ static int handleOptions(OptionStr *pOptionStr)
 	    } else {
               pOptionStr->scpImpl = (int)strtol(token, dummy, 0);
 	    }
+	} else if (strcmp(token, "-time") == 0) {
+		pOptionStr->apduTime = 1;
 	} else {
 	    // unknown option
 	    printf ("Error: unknown option %s\n", token);
@@ -518,7 +538,7 @@ end:
 static int handleCommands(FILE *fd)
 {
     char buf[BUFLEN + 1], commandLine[BUFLEN + 1];
-    DWORD rv = EXIT_SUCCESS, i;
+    int rv = EXIT_SUCCESS, i;
     char *token;
     OptionStr optionStr;
 
@@ -575,12 +595,23 @@ static int handleCommands(FILE *fd)
 			}
 
 			for (j=0; j<(int)readerStrLen;) {
-				/* Check for end of readers */
+				// Check for end of readers
 				if (buf[j] == _T('\0'))
 					break;
 				_tcsncpy(optionStr.reader, buf+j, READERNAMELEN+1);
-				if (k == optionStr.readerNumber)
+
+
+				// if auto reader, connects now
+				if (optionStr.readerNumber == AUTOREADER) {
+	        		rv = card_connect(cardContext, optionStr.reader, &cardInfo, optionStr.protocol);
+					if (rv == 0) {
+						break;
+					}
+				} 
+				else if (k == optionStr.readerNumber) {
 					break;
+				}
+
 				k++;
 				j+=(int)_tcslen(buf+j)+1;
 			}
@@ -591,8 +622,9 @@ static int handleCommands(FILE *fd)
 #endif
 		}
 
-		rv = card_connect (cardContext, optionStr.reader,
-				   &cardInfo, optionStr.protocol);
+		if (optionStr.readerNumber != AUTOREADER) {
+		   	rv = card_connect (cardContext, optionStr.reader, &cardInfo, optionStr.protocol);
+		}
 
 		if (rv != 0) {
 		    _tprintf (_T("card_connect() returns 0x%08X (%s)\n"), rv,
@@ -1186,6 +1218,7 @@ static int handleCommands(FILE *fd)
 	    } else if (strcmp(token, "send_apdu") == 0 || strcmp(token, "send_apdu_nostop") == 0) {
 		unsigned char recvAPDU[258];
                 DWORD recvAPDULen = 258;
+				unsigned int it, ft;
         //        int i;
 		// Install for Load
 		rv = handleOptions(&optionStr);
@@ -1196,6 +1229,11 @@ static int handleCommands(FILE *fd)
 		//for (i=0; i<optionStr.APDULen; i++)
 		//    printf ("%02X ", optionStr.APDU[i] & 0xFF);
 		//printf ("\n");
+
+		// get the initial time
+		if (optionStr.apduTime) {
+			it = GetTime();
+		}
 
 		if (platform_mode == PLATFORM_MODE_OP_201) {
 		    rv = OP201_send_APDU(cardInfo,
@@ -1216,6 +1254,12 @@ static int handleCommands(FILE *fd)
 			rv = EXIT_FAILURE;
 			goto end;
 		    }
+		}
+
+		// get the final time and calculate the total time of the command
+		if (optionStr.apduTime) {
+			ft = GetTime();
+			_tprintf(_T("command time: %u ms\n"), (ft - it));
 		}
 
 		//printf ("Recv APDU: ");
@@ -1250,7 +1294,7 @@ end:
 int main(int argc, char* argv[])
 {
     FILE *fd = NULL;
-    DWORD rv = EXIT_SUCCESS;
+    int rv = EXIT_SUCCESS;
 
     // take care of input argument
     if (argc == 1) {
