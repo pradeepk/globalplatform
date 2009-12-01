@@ -1830,6 +1830,25 @@ OPGP_ERROR_STATUS OPGP_cap_to_ijc(OPGP_CSTRING capFileName, OPGP_STRING ijcFileN
 }
 
 /**
+ * \param loadFileName The load file name to parse.
+ * \param *loadFileParams The parsed parameters.
+ * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
+ */
+OPGP_ERROR_STATUS OPGP_read_executable_load_file_parameters(OPGP_STRING loadFileName, OPGP_LOAD_FILE_PARAMETERS *loadFileParams)  {
+	return read_executable_load_file_parameters(loadFileName, loadFileParams);
+}
+
+/**
+ * \param loadFileBuf The load file buffer.
+ * \param loadFileBufSize The size of the load file buffer.
+ * \param *loadFileParams The parsed parameters.
+ * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
+ */
+OPGP_ERROR_STATUS OPGP_read_executable_load_file_parameters_from_buffer(PBYTE loadFileBuf, DWORD loadFileBufSize, OPGP_LOAD_FILE_PARAMETERS *loadFileParams) {
+	return read_executable_load_file_parameters_from_buffer(loadFileBuf, loadFileBufSize, loadFileParams);
+}
+
+/**
  * An GP211_install_for_load() must precede.
  * The Load File Data Block Signature(s) must be the same block(s) and in the same order like in calculate_load_file_data_block_hash().
  * If no Load File Data Block Signatures are necessary the loadFileDataBlockSignature must be NULL and the loadFileDataBlockSignatureLength 0.

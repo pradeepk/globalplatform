@@ -21,33 +21,43 @@
 #include <string.h>
 
 /**
-* Maximum length of the reader name.
-*/
+ * Maximum length of the reader name.
+ */
 #define READERNAMELEN 256
 
 /**
-* Reader number to connect to.
-*/
+ * Reader number to connect to.
+ */
 #define READERNUM 3
 
 /**
-* Maximum buffer size for reader names.
-*/
+ * Maximum buffer size for reader names.
+ */
 #define BUFLEN 2048
 
 /**
-* Global card context for the test.
-*/
+ * Test load file
+ */
+#define TEST_LOAD_FILE "HelloWorld.cap"
+
+/**
+ * Global card context for the test.
+ */
 static OPGP_CARD_CONTEXT cardContext;
 
 /**
-* Global card info for the test.
-*/
+ * Global card info for the test.
+ */
 static OPGP_CARD_INFO cardInfo;
 
 /**
-* Readername for the test.
-*/
+ * GP 2.1.1 Security Info.
+ */
+static GP211_SECURITY_INFO securityInfo211;
+
+/**
+ * Readername for the test.
+ */
 static TCHAR readerName[READERNAMELEN + 1];
 
 static void internal_disconnect_card() {
@@ -72,8 +82,8 @@ static void internal_release_context() {
 
 static void internal_connect_card() {
 	OPGP_ERROR_STATUS status;
-	status = OPGP_card_connect (cardContext, readerName,
-		&cardInfo, (OPGP_CARD_PROTOCOL_T0|OPGP_CARD_PROTOCOL_T1));
+	status = OPGP_card_connect(cardContext, readerName, &cardInfo,
+			(OPGP_CARD_PROTOCOL_T0 | OPGP_CARD_PROTOCOL_T1));
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not connect to card: %s", status.errorMessage);
 	}
@@ -82,33 +92,52 @@ static void internal_connect_card() {
 
 static void internal_establish_context() {
 	OPGP_ERROR_STATUS status;
-	_tcsncpy(cardContext.libraryName, _T("pcscconnectionplugin"), sizeof(cardContext.libraryName));
+	_tcsncpy(cardContext.libraryName, _T("pcscconnectionplugin"),
+			sizeof(cardContext.libraryName));
 	status = OPGP_establish_context(&cardContext);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not establish context: %s", status.errorMessage);
 	}
 }
 
+static void internal_mutual_authentication() {
+	OPGP_ERROR_STATUS status;
+	BYTE scp;
+	BYTE scpImpl;
+	status = GP211_get_secure_channel_protocol_details(cardContext, cardInfo,
+			&scp, &scpImpl);
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not get secure channel details: %s", status.errorMessage);
+	}
+	status = GP211_mutual_authentication(cardContext, cardInfo, NULL,
+			(PBYTE) OPGP_VISA_DEFAULT_KEY, (PBYTE) OPGP_VISA_DEFAULT_KEY,
+			(PBYTE) OPGP_VISA_DEFAULT_KEY, 0, 0, scp, scpImpl,
+			GP211_SCP01_SECURITY_LEVEL_C_DEC_C_MAC, &securityInfo211);
+	if (OPGP_ERROR_CHECK(status)) {
+		fail("Could not do mutual authentication: %s", status.errorMessage);
+	}
+}
+
 static void internal_list_readers() {
 	OPGP_ERROR_STATUS status;
 	TCHAR buf[BUFLEN + 1];
-	int j,k;
+	int j, k;
 	DWORD readerStrLen = BUFLEN;
-	status = OPGP_list_readers (cardContext, buf, &readerStrLen);
+	status = OPGP_list_readers(cardContext, buf, &readerStrLen);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not list readers: %s", status.errorMessage);
 	}
 	// we choose the READERNUM reader
-	for (j=0; j<(int)readerStrLen;) {
+	for (j = 0; j < (int) readerStrLen;) {
 		/* Check for end of readers */
 		if (buf[j] == _T('\0')) {
 			break;
 		}
-		_tcsncpy(readerName, buf+j, READERNAMELEN+1);
+		_tcsncpy(readerName, buf + j, READERNAMELEN + 1);
 		if (j == READERNUM) {
 			break;
 		}
-		j+=(int)_tcslen(buf+j)+1;
+		j += (int) _tcslen(buf + j) + 1;
 	}
 	readerName[READERNAMELEN] = _T('\0');
 	if (_tcslen(readerName) == 0) {
@@ -129,95 +158,167 @@ static void internal_disconnect() {
 }
 
 /**
-* Tests the connection to the card.
-*/
+ * Tests the connection to the card.
+ */
 START_TEST(test_connect_card)
-{
-	internal_establish_context();
-	internal_list_readers();
-	internal_connect_card();
-	internal_disconnect_card();
-	internal_release_context();
-}
-END_TEST
+	{
+		internal_establish_context();
+		internal_list_readers();
+		internal_connect_card();
+		internal_disconnect_card();
+		internal_release_context();
+	}END_TEST
 
 /**
-* Tests the listing of readers.
-*/
+ * Tests the listing of readers.
+ */
 START_TEST (test_list_readers)
-{
-	internal_establish_context();
-	internal_list_readers();
-	internal_release_context();
-}
-END_TEST
+	{
+		internal_establish_context();
+		internal_list_readers();
+		internal_release_context();
+	}END_TEST
 
 /**
-* Tests the context establishment.
-*/
+ * Tests the context establishment.
+ */
 START_TEST (test_establish_context)
-{
-	internal_establish_context();
-	internal_release_context();
-}
-END_TEST
+	{
+		internal_establish_context();
+		internal_list_readers();
+		internal_connect_card();
+		internal_disconnect_card();
+		internal_release_context();
+	}END_TEST
 
 /**
-* Tests the key derivation according to gemXpresso scheme.
-*/
+ * Tests the key derivation according to gemXpresso scheme.
+ */
 START_TEST (test_OPGP_VISA2_derive_keys)
-{
-	internal_connect();
-	OPGP_ERROR_STATUS status;
-	BYTE motherKey[] = {0x4D, 0xA5, 0xFC, 0x18, 0xA4, 0x6F, 0x8A, 0x02, 0x05, 0xC7, 0x7C, 0x37, 0x3B, 0x58, 0x2A, 0x1F};
-	BYTE S_ENC[16], S_MAC[16], DEK[16];
-	int i;
-	status = OPGP_VISA2_derive_keys(cardContext, cardInfo, (PBYTE)GP211_CARD_MANAGER_AID_ALT1, sizeof(GP211_CARD_MANAGER_AID_ALT1), motherKey,
-		S_ENC, S_MAC, DEK);
-	if (OPGP_ERROR_CHECK(status)) {
-		fail("Derivation of keys failed:", status.errorMessage);
-	}
-	for (i = 0; i<16; i++) {
-		printf("%02X", S_ENC[i]);
-	}
-	printf("\n");
-	for (i = 0; i<16; i++) {
-		printf("%02X", S_MAC[i]);
-	}
-	printf("\n");
-	for (i = 0; i<16; i++) {
-		printf("%02X", DEK[i]);
-	}
-	printf("\n");
-	internal_disconnect();
-}
-END_TEST
+	{
+		internal_connect();
+		OPGP_ERROR_STATUS status;
+		BYTE motherKey[] = { 0x4D, 0xA5, 0xFC, 0x18, 0xA4, 0x6F, 0x8A, 0x02,
+				0x05, 0xC7, 0x7C, 0x37, 0x3B, 0x58, 0x2A, 0x1F };
+		BYTE S_ENC[16], S_MAC[16], DEK[16];
+		int i;
+		status = OPGP_VISA2_derive_keys(cardContext, cardInfo,
+				(PBYTE) GP211_CARD_MANAGER_AID_ALT1,
+				sizeof(GP211_CARD_MANAGER_AID_ALT1), motherKey, S_ENC, S_MAC,
+				DEK);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Derivation of keys failed: %s", status.errorMessage);
+		}
+		for (i = 0; i < 16; i++) {
+			printf("%02X", S_ENC[i]);
+		}
+		printf("\n");
+		for (i = 0; i < 16; i++) {
+			printf("%02X", S_MAC[i]);
+		}
+		printf("\n");
+		for (i = 0; i < 16; i++) {
+			printf("%02X", DEK[i]);
+		}
+		printf("\n");
+		internal_disconnect();
+	}END_TEST
 
+/**
+ * Tests the context establishment.
+ */
+START_TEST (test_mutual_authentication)
+	{
+		internal_establish_context();
+		internal_list_readers();
+		internal_connect_card();
+		internal_mutual_authentication();
+		internal_disconnect_card();
+		internal_release_context();
+	}END_TEST
 
+/**
+ * Tests the context establishment.
+ */
+START_TEST (test_install)
+	{
+		OPGP_LOAD_FILE_PARAMETERS loadFileParams;
+		DWORD receiptDataAvailable = 0;
+		DWORD receiptDataLen = 0;
 
-Suite * GlobalPlatform_suite (void)
-{
+		char installParam[1];
+		installParam[0] = 0;
 
+		OPGP_ERROR_STATUS status;
+		GP211_RECEIPT_DATA receipt;
 
-	Suite *s = suite_create ("GlobalPlatform");
+		internal_establish_context();
+		internal_list_readers();
+		internal_connect_card();
+		internal_mutual_authentication();
+
+		status = OPGP_read_executable_load_file_parameters(TEST_LOAD_FILE,
+				&loadFileParams);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("OPGP_read_executable_load_file_parameters() failed: ", status.errorMessage);
+		}
+
+		status = GP211_install_for_load(cardContext, cardInfo,
+				&securityInfo211, loadFileParams.loadFileAID.AID,
+				loadFileParams.loadFileAID.AIDLength, (PBYTE)GP211_CARD_MANAGER_AID,
+				sizeof(GP211_CARD_MANAGER_AID), NULL, NULL,
+				loadFileParams.loadFileSize, 500, 1000);
+
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("GP211_install_for_load() failed: ", status.errorMessage);
+		}
+
+		status = GP211_load(cardContext, cardInfo, &securityInfo211, NULL, 0,
+				TEST_LOAD_FILE, NULL, &receiptDataLen, NULL);
+
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("GP211_load() failed: ", status.errorMessage);
+		}
+
+		status = GP211_install_for_install_and_make_selectable(cardContext, cardInfo,
+				&securityInfo211, loadFileParams.loadFileAID.AID,
+				loadFileParams.loadFileAID.AIDLength,
+				loadFileParams.appletAIDs[0].AID,
+				loadFileParams.appletAIDs[0].AIDLength,
+				loadFileParams.appletAIDs[0].AID,
+				loadFileParams.appletAIDs[0].AIDLength, 0, 500, 1000, NULL, 0,
+				NULL, &receipt, &receiptDataAvailable);
+
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("GP211_install_for_install_and_make_selectable() failed: ", status.errorMessage);
+		}
+
+		internal_disconnect_card();
+		internal_release_context();
+	}END_TEST
+
+Suite * GlobalPlatform_suite(void) {
+
+	Suite *s = suite_create("GlobalPlatform");
 	/* Core test case */
-	TCase *tc_core = tcase_create ("Core");
+	TCase *tc_core = tcase_create("Core");
 	tcase_add_test (tc_core, test_establish_context);
 	tcase_add_test (tc_core, test_list_readers);
 	tcase_add_test (tc_core, test_connect_card);
 	tcase_add_test (tc_core, test_OPGP_VISA2_derive_keys);
-	suite_add_tcase (s, tc_core);
+	tcase_add_test (tc_core, test_mutual_authentication);
+	tcase_add_test (tc_core, test_install);
+	suite_add_tcase(s, tc_core);
 
 	return s;
 }
 
-int main (void)
-{
+int main(void) {
 	int number_failed;
-	Suite *s = GlobalPlatform_suite ();
-	SRunner *sr = srunner_create (s);
-	srunner_run_all (sr, CK_NORMAL);
-	number_failed = srunner_ntests_failed (sr);
-	srunner_free (sr);
+	Suite *s = GlobalPlatform_suite();
+	SRunner *sr = srunner_create(s);
+	srunner_run_all(sr, CK_NORMAL);
+	number_failed = srunner_ntests_failed(sr);
+	srunner_free(sr);
 	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -49,7 +49,7 @@ void OPGP_log_Start(OPGP_STRING func, OPGP_STRING file, int line)
 */
 void OPGP_log_End(OPGP_STRING func, OPGP_STRING file, int line, OPGP_ERROR_STATUS status)
 {
-	OPGP_log_Log(_T(" -%s in %s at line %d : end error code(0x%X): %s"), func, file, line, status.errorCode, status.errorMessage);
+	OPGP_log_Log(_T(" -%s in %s at line %d : end error code(0x%0X): %s"), func, file, line, status.errorCode, status.errorMessage);
 }
 
 /**
