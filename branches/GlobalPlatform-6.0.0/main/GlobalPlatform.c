@@ -187,6 +187,14 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 				 PBYTE loadFileBuf, DWORD loadFileBufSize,
 				 GP211_RECEIPT_DATA *receiptData, PDWORD receiptDataAvailable, OPGP_PROGRESS_CALLBACK *callback);
 
+/**
+ * Macro to check for the status word 9000, otherwise the status is set to the error and a jump to the end mark takes place.
+ */
+#define CHECK_SW_9000(recvBuffer, recvBufferLength, status) if (recvBuffer[recvBufferLength-2] != 0x90 || recvBuffer[recvBufferLength-1] != 0x00) {\
+	OPGP_ERROR_CREATE_ERROR(status, status.errorCode, OPGP_stringify_error(status.errorCode)); \
+	goto end; \
+}
+
 
 OPGP_NO_API
 void mapOP201ToGP211SecurityInfo(OP201_SECURITY_INFO op201secInfo,
@@ -1302,6 +1310,7 @@ OPGP_ERROR_STATUS get_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 		*recvBufferLength = 0;
 		goto end;
 	}
+	CHECK_SW_9000(cardData, cardDataLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("get_data: Data: "));
 	for (i=0; i<cardDataLength; i++) {

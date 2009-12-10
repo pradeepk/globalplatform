@@ -77,6 +77,6 @@ typedef struct {
  * \param code Must be the error code.
  */
 #define OPGP_ERROR_CREATE_NO_ERROR_WITH_CODE(status, code) status.errorStatus = OPGP_ERROR_STATUS_SUCCESS; \
-	status.errorCode = code
+	status.errorCode = code; status.errorMessage[0] = '\0'
 
 #endif

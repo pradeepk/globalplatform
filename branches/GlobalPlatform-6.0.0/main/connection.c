@@ -218,7 +218,7 @@ OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 	if (traceEnable) {
 		_ftprintf(traceFile, _T("Command --> "));
 		for (i=0; i<capduLength; i++) {
-			_ftprintf(traceFile, _T("%02X"), capdu[i]);
+			_ftprintf(traceFile, _T("%02X"), capdu[i] & 0x00FF);
 		}
 		_ftprintf(traceFile, _T("\n"));
 	}
@@ -234,7 +234,7 @@ OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 	if (traceEnable) {
 		_ftprintf(traceFile, _T("Wrapped command --> "));
 		for (i=0; i<apduCommandLength; i++) {
-			_ftprintf(traceFile, _T("%02X"), apduCommand[i]);
+			_ftprintf(traceFile, _T("%02X"), apduCommand[i] & 0x00FF);
 		}
 		_ftprintf(traceFile, _T("\n"));
 	}
@@ -252,7 +252,7 @@ OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 	if (traceEnable) {
 		_ftprintf(traceFile, _T("Response <-- "));
 		for (i=0; i<*rapduLength; i++) {
-			_ftprintf(traceFile, _T("%02X"), rapdu[i]);
+			_ftprintf(traceFile, _T("%02X"), rapdu[i] & 0x00FF);
 		}
 		_ftprintf(traceFile, _T("\n"));
 	}

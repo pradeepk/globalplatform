@@ -428,8 +428,9 @@ Suite * GlobalPlatform_suite(void) {
 
 int main(void) {
 	int number_failed;
-	//internal_install();
-	Suite *s = GlobalPlatform_suite();
+	internal_install();
+	return 1;
+	/*Suite *s = GlobalPlatform_suite();
 	SRunner *sr = srunner_create(s);
 
 	//srunner_set_fork_status(sr, CK_NOFORK);
@@ -438,4 +439,5 @@ int main(void) {
 	sleep(100);
 	srunner_free(sr);
 	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+	*/
 }

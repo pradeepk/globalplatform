@@ -22,18 +22,18 @@
 #include <string.h>
 
 /**
-* Maximum length of the reader name.
-*/
+ * Maximum length of the reader name.
+ */
 #define READERNAMELEN 256
 
 /**
-* Reader number to connect to.
-*/
+ * Reader number to connect to.
+ */
 #define READERNUM 1
 
 /**
-* Maximum buffer size for reader names.
-*/
+ * Maximum buffer size for reader names.
+ */
 #define BUFLEN 2048
 
 static void internal_release_context(OPGP_CARD_CONTEXT *cardContext) {
@@ -44,19 +44,21 @@ static void internal_release_context(OPGP_CARD_CONTEXT *cardContext) {
 	}
 }
 
-static void internal_card_disconnect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo) {
+static void internal_card_disconnect(OPGP_CARD_CONTEXT cardContext,
+		OPGP_CARD_INFO cardInfo) {
 	OPGP_ERROR_STATUS status;
-	status = OPGP_PL_card_disconnect (cardContext, &cardInfo);
+	status = OPGP_PL_card_disconnect(cardContext, &cardInfo);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not disconnect from card: %s", status.errorMessage);
 	}
 	//_tprintf(_T("Disconnected from reader %s\n"), readerName);
 }
 
-static void internal_card_connect(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO *cardInfo, OPGP_STRING readerName) {
+static void internal_card_connect(OPGP_CARD_CONTEXT cardContext,
+		OPGP_CARD_INFO *cardInfo, OPGP_STRING readerName) {
 	OPGP_ERROR_STATUS status;
-	status = OPGP_PL_card_connect (cardContext, readerName,
-		cardInfo, (OPGP_CARD_PROTOCOL_T0|OPGP_CARD_PROTOCOL_T1));
+	status = OPGP_PL_card_connect(cardContext, readerName, cardInfo,
+			(OPGP_CARD_PROTOCOL_T0 | OPGP_CARD_PROTOCOL_T1));
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not connect to card: %s", OPGP_PL_stringify_error(status.errorCode));
 	}
@@ -69,30 +71,33 @@ static void internal_establish_context(OPGP_CARD_CONTEXT *cardContext) {
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not establish context: %s", OPGP_PL_stringify_error(status.errorCode));
 	}
-	_tprintf(_T("Using card context %08X\n"), (unsigned int)((PCSC_CARD_CONTEXT_SPECIFIC *)cardContext->librarySpecific)->cardContext);
+	_tprintf(
+			_T("Using card context %08X\n"),
+			(unsigned int) ((PCSC_CARD_CONTEXT_SPECIFIC *) cardContext->librarySpecific)->cardContext);
 }
 
-static OPGP_STRING internal_list_readers(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo) {
+static OPGP_STRING internal_list_readers(OPGP_CARD_CONTEXT cardContext,
+		OPGP_CARD_INFO cardInfo) {
 	OPGP_ERROR_STATUS status;
 	TCHAR buf[BUFLEN + 1];
-	int j,k;
+	int j, k;
 	static TCHAR readerName[READERNAMELEN + 1];
 	DWORD readerStrLen = BUFLEN;
-	status = OPGP_PL_list_readers (cardContext, buf, &readerStrLen);
+	status = OPGP_PL_list_readers(cardContext, buf, &readerStrLen);
 	if (OPGP_ERROR_CHECK(status)) {
 		fail("Could not list readers: %s", OPGP_PL_stringify_error(status.errorCode));
 	}
 	// we choose the READERNUM reader
-	for (j=0; j<(int)readerStrLen;) {
+	for (j = 0; j < (int) readerStrLen;) {
 		/* Check for end of readers */
 		if (buf[j] == _T('\0')) {
 			break;
 		}
-		_tcsncpy(readerName, buf+j, READERNAMELEN+1);
+		_tcsncpy(readerName, buf + j, READERNAMELEN + 1);
 		if (j == READERNUM) {
 			break;
 		}
-		j+=(int)_tcslen(buf+j)+1;
+		j += (int) _tcslen(buf + j) + 1;
 	}
 	readerName[READERNAMELEN] = _T('\0');
 	if (_tcslen(readerName) == 0) {
@@ -103,67 +108,97 @@ static OPGP_STRING internal_list_readers(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
 }
 
 /**
-* Tests the connection to the card.
-*/
+ * Tests the connection to the card.
+ */
 START_TEST(test_card_connect)
-{
-	OPGP_CARD_CONTEXT cardContext;
-	OPGP_CARD_INFO cardInfo;
-	OPGP_STRING readerName;
-	internal_establish_context(&cardContext);
-	readerName = internal_list_readers(cardContext, cardInfo);
-	internal_card_connect(cardContext, &cardInfo, readerName);
-	internal_card_disconnect(cardContext, cardInfo);
-	internal_release_context(&cardContext);
-}
-END_TEST
+	{
+		OPGP_CARD_CONTEXT cardContext;
+		OPGP_CARD_INFO cardInfo;
+		OPGP_STRING readerName;
+		internal_establish_context(&cardContext);
+		readerName = internal_list_readers(cardContext, cardInfo);
+		internal_card_connect(cardContext, &cardInfo, readerName);
+		internal_card_disconnect(cardContext, cardInfo);
+		internal_release_context(&cardContext);
+	}END_TEST
 
 /**
-* Tests the listing of readers.
-*/
+ * Tests the listing of readers.
+ */
 START_TEST (test_list_readers)
-{
-	OPGP_CARD_CONTEXT cardContext;
-	OPGP_CARD_INFO cardInfo;
-	internal_establish_context(&cardContext);
-	internal_list_readers(cardContext, cardInfo);
-	internal_release_context(&cardContext);
-}
-END_TEST
+	{
+		OPGP_CARD_CONTEXT cardContext;
+		OPGP_CARD_INFO cardInfo;
+		internal_establish_context(&cardContext);
+		internal_list_readers(cardContext, cardInfo);
+		internal_release_context(&cardContext);
+	}END_TEST
 
 /**
-* Tests the context establishment.
-*/
+ * Tests the context establishment.
+ */
 START_TEST (test_establish_context)
-{
-	OPGP_CARD_CONTEXT cardContext;
-	OPGP_CARD_INFO cardInfo;
-	internal_establish_context(&cardContext);
-	internal_release_context(&cardContext);
-}
-END_TEST
+	{
+		OPGP_CARD_CONTEXT cardContext;
+		OPGP_CARD_INFO cardInfo;
+		internal_establish_context(&cardContext);
+		internal_release_context(&cardContext);
+	}END_TEST
 
+/**
+ * Tests the context establishment.
+ */
+START_TEST (test_send_APDU)
+	{
+		OPGP_CARD_CONTEXT cardContext;
+		OPGP_CARD_INFO cardInfo;
+		OPGP_STRING readerName;
+		OPGP_ERROR_STATUS status;
+		BYTE sendBuffer[5];
+		DWORD sendBufferLength = 5;
+		BYTE cardData[256];
+		DWORD cardDataLength = 256;
+		int i = 0;
+		sendBuffer[i++] = 0x80;
+		sendBuffer[i++] = 0xCA;
+		sendBuffer[i++] = 0;
+		sendBuffer[i++] = 0x66;
+		sendBuffer[i] = 0x00;
 
-Suite * pcscconnectionplugin_suite (void)
-{
-	Suite *s = suite_create ("pcscconnectionplugin");
+		internal_establish_context(&cardContext);
+		readerName = internal_list_readers(cardContext, cardInfo);
+		internal_card_connect(cardContext, &cardInfo, readerName);
+		status = OPGP_PL_send_APDU(cardContext, cardInfo, sendBuffer,
+				sendBufferLength, cardData, &cardDataLength);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not send APDU: %s", OPGP_PL_stringify_error(status.errorCode));
+		}
+		fail_unless(cardDataLength == 2 + 0x4C + 2, "Invalid data length.");
+		fail_unless(cardData[0] == 0x66, "Invalid data returned.");
+
+		internal_card_disconnect(cardContext, cardInfo);
+		internal_release_context(&cardContext);
+	}END_TEST
+
+Suite * pcscconnectionplugin_suite(void) {
+	Suite *s = suite_create("pcscconnectionplugin");
 	/* Core test case */
-	TCase *tc_core = tcase_create ("Core");
+	TCase *tc_core = tcase_create("Core");
 	tcase_add_test (tc_core, test_establish_context);
 	tcase_add_test (tc_core, test_list_readers);
 	tcase_add_test (tc_core, test_card_connect);
-	suite_add_tcase (s, tc_core);
+	tcase_add_test (tc_core, test_send_APDU);
+	suite_add_tcase(s, tc_core);
 
 	return s;
 }
 
-int main (void)
-{
+int main(void) {
 	int number_failed;
-	Suite *s = pcscconnectionplugin_suite ();
-	SRunner *sr = srunner_create (s);
-	srunner_run_all (sr, CK_NORMAL);
-	number_failed = srunner_ntests_failed (sr);
-	srunner_free (sr);
+	Suite *s = pcscconnectionplugin_suite();
+	SRunner *sr = srunner_create(s);
+	srunner_run_all(sr, CK_NORMAL);
+	number_failed = srunner_ntests_failed(sr);
+	srunner_free(sr);
 	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

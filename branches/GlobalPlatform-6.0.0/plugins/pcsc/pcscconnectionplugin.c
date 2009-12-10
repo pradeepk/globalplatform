@@ -303,6 +303,14 @@ OPGP_ERROR_STATUS OPGP_PL_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 		goto end;
 	}
 
+#ifdef DEBUG
+		OPGP_log_Log(_T("Command --> "));
+		for (i=0; i<capduLength; i++) {
+			OPGP_log_Log(_T("%02X"), capdu[i] & 0x00FF);
+		}
+		OPGP_log_Log(_T("\n"));
+#endif
+
 	// if T=1 or else T=0
 	if (GET_PCSC_CARD_INFO_SPECIFIC(cardInfo)->protocol == SCARD_PROTOCOL_T1) {
 
@@ -674,6 +682,14 @@ OPGP_ERROR_STATUS OPGP_PL_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 
 	// get SW
 	result = get_short(rapdu, *rapduLength-2);
+
+#ifdef DEBUG
+		OPGP_log_Log(_T("Response <-- "));
+		for (i=0; i<*rapduLength; i++) {
+			OPGP_log_Log(_T("%02X"), rapdu[i] & 0x00FF);
+		}
+		OPGP_log_Log(_T("\n"));
+#endif
 
 	OPGP_ERROR_CREATE_NO_ERROR_WITH_CODE(status, OPGP_ISO7816_ERROR_PREFIX | result);
 end:
