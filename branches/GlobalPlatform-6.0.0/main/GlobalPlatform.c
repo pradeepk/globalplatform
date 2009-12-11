@@ -417,21 +417,22 @@ OPGP_ERROR_STATUS OPGP_select_application(OPGP_CARD_CONTEXT cardContext, OPGP_CA
 #endif
 	status = OPGP_send_APDU(cardContext, cardInfo, NULL, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
 	if ( OPGP_ERROR_CHECK(status) ) {
-		switch (status.errorCode) {
-			case OPGP_ISO7816_ERROR_CONDITIONS_NOT_SATISFIED:
-				{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_NOT_MULTI_SELECTABLE, OPGP_stringify_error(OPGP_ISO7816_ERROR_NOT_MULTI_SELECTABLE)); goto end; }
-			case OPGP_ISO7816_ERROR_6999:
-			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_SELECTION_REJECTED, OPGP_stringify_error(OPGP_ISO7816_ERROR_SELECTION_REJECTED)); goto end; }
-			case OPGP_ISO7816_ERROR_FUNC_NOT_SUPPORTED:
-				{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_APPLET_NOT_SELECTABLE, OPGP_stringify_error(OPGP_ISO7816_ERROR_APPLET_NOT_SELECTABLE)); goto end; }
-			case OPGP_ISO7816_ERROR_FILE_NOT_FOUND:
-				{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_APPLET_NOT_FOUND, OPGP_stringify_error(OPGP_ISO7816_ERROR_APPLET_NOT_FOUND)); goto end; }
-			case OPGP_ISO7816_ERROR_FILE_INVALIDATED:
-				{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_WARNING_CM_LOCKED, OPGP_stringify_error(OPGP_ISO7816_WARNING_CM_LOCKED)); goto end; }
-			default:
-				goto end;
-		}
+		goto end;
 	}
+	switch (status.errorCode) {
+		case OPGP_ISO7816_ERROR_CONDITIONS_NOT_SATISFIED:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_NOT_MULTI_SELECTABLE, OPGP_stringify_error(OPGP_ISO7816_ERROR_NOT_MULTI_SELECTABLE)); goto end; }
+		case OPGP_ISO7816_ERROR_6999:
+		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_SELECTION_REJECTED, OPGP_stringify_error(OPGP_ISO7816_ERROR_SELECTION_REJECTED)); goto end; }
+		case OPGP_ISO7816_ERROR_FUNC_NOT_SUPPORTED:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_APPLET_NOT_SELECTABLE, OPGP_stringify_error(OPGP_ISO7816_ERROR_APPLET_NOT_SELECTABLE)); goto end; }
+		case OPGP_ISO7816_ERROR_FILE_NOT_FOUND:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_APPLET_NOT_FOUND, OPGP_stringify_error(OPGP_ISO7816_ERROR_APPLET_NOT_FOUND)); goto end; }
+		case OPGP_ISO7816_ERROR_FILE_INVALIDATED:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_WARNING_CM_LOCKED, OPGP_stringify_error(OPGP_ISO7816_WARNING_CM_LOCKED)); goto end; }
+	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
+
 #ifdef DEBUG
 	OPGP_log_Log(_T("select_application: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -543,6 +544,7 @@ OPGP_ERROR_STATUS put_rsa_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO card
 	if ( OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("put_rsa_key: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -622,6 +624,7 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 	if ( OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	memcpy(sendBuffer+i, keyDataField, keyDataFieldLength); // key
 	i+=keyDataFieldLength;
 
@@ -637,6 +640,7 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 	if ( OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("put_3des_key: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -751,6 +755,7 @@ OPGP_ERROR_STATUS put_delegated_management_keys(OPGP_CARD_CONTEXT cardContext, O
 	if ( OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("put_delegated_management_keys: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -893,6 +898,7 @@ OPGP_ERROR_STATUS put_secure_channel_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CA
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("put_secure_channel_keys: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -1016,6 +1022,7 @@ OPGP_ERROR_STATUS delete_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("delete_key: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -1093,6 +1100,7 @@ OPGP_ERROR_STATUS delete_application(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_IN
 		*receiptDataLength = 0;
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	if (recvBufferLength-count > sizeof(GP211_RECEIPT_DATA)) { // assumption that a GP211_RECEIPT_DATA structure is returned in a delegated management deletion
 		*receiptDataLength=0;
 		while (recvBufferLength-count > sizeof(GP211_RECEIPT_DATA)) {
@@ -1160,6 +1168,7 @@ OPGP_ERROR_STATUS put_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("put_data: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -1238,6 +1247,7 @@ OPGP_ERROR_STATUS GP211_begin_R_MAC(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	secInfo->securityLevel |= securityLevel;
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
@@ -1277,6 +1287,7 @@ OPGP_ERROR_STATUS GP211_end_R_MAC(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO 
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	secInfo->securityLevel &= ~GP211_SCP02_SECURITY_LEVEL_R_MAC;
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
@@ -1311,6 +1322,7 @@ OPGP_ERROR_STATUS get_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInf
 		goto end;
 	}
 	CHECK_SW_9000(cardData, cardDataLength, status);
+
 #ifdef DEBUG
 	OPGP_log_Log(_T("get_data: Data: "));
 	for (i=0; i<cardDataLength; i++) {
@@ -1368,6 +1380,7 @@ OPGP_ERROR_STATUS GP211_get_data_iso7816_4(OPGP_CARD_CONTEXT cardContext, OPGP_C
 		*recvBufferLength = 0;
 		goto end;
 	}
+	CHECK_SW_9000(cardData, cardDataLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("get_data_iso7816-4: Data: "));
 	for (i=0; i<cardDataLength; i++) {
@@ -1620,6 +1633,7 @@ OPGP_ERROR_STATUS get_key_information_templates(OPGP_CARD_CONTEXT cardContext, O
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(cardData, cardDataLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("get_key_information_templates: Data: "));
 	for (i=0; i<cardDataLength; i++) {
@@ -1700,6 +1714,7 @@ OPGP_ERROR_STATUS set_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("set_status: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -1756,8 +1771,11 @@ OPGP_ERROR_STATUS GP211_get_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 
 #endif
 		status = OPGP_send_APDU(cardContext, cardInfo, secInfo,sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
-		if ( OPGP_ERROR_CHECK(status) && !(status.errorCode == OPGP_ISO7816_ERROR_MORE_DATA_AVAILABLE)) {
+		if ( OPGP_ERROR_CHECK(status)) {
 			goto end;
+		}
+		if (status.errorCode != OPGP_ISO7816_ERROR_MORE_DATA_AVAILABLE) {
+			CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 		}
 #ifdef DEBUG
 	OPGP_log_Log(_T("get_status: Data: "));
@@ -1970,6 +1988,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 			if (OPGP_ERROR_CHECK(status)) {
 				goto end;
 			}
+			CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 			OPGP_log_Log(_T("load_from_buffer: Data: "));
 			for (g=0; g<recvBufferLength; g++) {
@@ -2060,6 +2079,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if (OPGP_ERROR_CHECK(status)) {
 			goto end;
 		}
+		CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 		OPGP_log_Log(_T("load_from_buffer: Data: "));
 		for (i=0; i<recvBufferLength; i++) {
@@ -2091,6 +2111,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if (OPGP_ERROR_CHECK(status)) {
 			goto end;
 		}
+		CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 		OPGP_log_Log(_T("load_from_buffer: Data: "));
 		for (i=0; i<recvBufferLength; i++) {
@@ -2153,6 +2174,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if (OPGP_ERROR_CHECK(status)) {
 			goto end;
 		}
+		CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 		OPGP_log_Log(_T("load_from_buffer: Data: "));
 		for (i=0; i<recvBufferLength; i++) {
@@ -2210,6 +2232,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if (OPGP_ERROR_CHECK(status)) {
 			goto end;
 		}
+		CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 		if (!(total == loadFileBufSize)) {
 			OPGP_log_Log(_T("load_from_buffer: Data: "));
@@ -2374,6 +2397,7 @@ OPGP_ERROR_STATUS install_for_load(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("install_for_load: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -2486,6 +2510,7 @@ OPGP_ERROR_STATUS install_for_install(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	if (recvBufferLength > sizeof(GP211_RECEIPT_DATA)) { // assumption that a GP211_RECEIPT_DATA structure is returned in a delegated management deletion
 		fillReceipt(recvBuffer, receiptData);
 		*receiptDataAvailable = 1;
@@ -2601,6 +2626,7 @@ OPGP_ERROR_STATUS install_for_install_and_make_selectable(OPGP_CARD_CONTEXT card
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	if (recvBufferLength > sizeof(GP211_RECEIPT_DATA)) { // assumption that a GP211_RECEIPT_DATA structure is returned in a delegated management deletion
 		fillReceipt(recvBuffer, receiptData);
 		*receiptDataAvailable = 1;
@@ -2685,6 +2711,7 @@ OPGP_ERROR_STATUS GP211_install_for_extradition(OPGP_CARD_CONTEXT cardContext, O
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	if (recvBufferLength > sizeof(GP211_RECEIPT_DATA)) { // assumption that a GP211_RECEIPT_DATA structure is returned in a delegated management deletion
 		fillReceipt(recvBuffer, receiptData);
 		*receiptDataAvailable = 1;
@@ -2751,6 +2778,7 @@ OPGP_ERROR_STATUS GP211_install_for_personalization(OPGP_CARD_CONTEXT cardContex
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("install_for_personalization: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -2845,6 +2873,7 @@ OPGP_ERROR_STATUS install_for_make_selectable(OPGP_CARD_CONTEXT cardContext, OPG
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	if (recvBufferLength > sizeof(GP211_RECEIPT_DATA)) { // assumption that a GP211_RECEIPT_DATA structure is returned in a delegated management deletion
 		fillReceipt(recvBuffer, receiptData);
 		*receiptDataAvailable = 1;
@@ -3758,6 +3787,7 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	if ( OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("mutual_authentication: INITIALIZE UPDATE Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -4046,13 +4076,13 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 #endif
 	status = OPGP_send_APDU(cardContext, cardInfo, NULL, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
 	if ( OPGP_ERROR_CHECK(status)) {
-		switch (status.errorCode) {
-			case OPGP_ISO7816_ERROR_6300:
-				{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_HOST_CRYPTOGRAM_VERIFICATION, OPGP_stringify_error(OPGP_ISO7816_ERROR_HOST_CRYPTOGRAM_VERIFICATION)); goto end; }
-			default:
-				goto end;
-		}
+		goto end;
 	}
+	switch (status.errorCode) {
+		case OPGP_ISO7816_ERROR_6300:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_HOST_CRYPTOGRAM_VERIFICATION, OPGP_stringify_error(OPGP_ISO7816_ERROR_HOST_CRYPTOGRAM_VERIFICATION)); goto end; }
+	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 
 #ifdef DEBUG
 	OPGP_log_Log(_T("mutual_authentication: EXTERNAL AUTHENTICATE Data: "));
@@ -4272,12 +4302,13 @@ OPGP_ERROR_STATUS pin_change(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardI
 #endif
 	status = OPGP_send_APDU(cardContext, cardInfo, secInfo,sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
 	if (OPGP_ERROR_CHECK(status)) {
-		if (status.errorCode == OPGP_ISO7816_ERROR_WRONG_DATA)
-			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT, OPGP_stringify_error(OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT)); goto end; }
-		if (status.errorCode == OPGP_ISO7816_ERROR_INCORRECT_P1P2)
-			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_WRONG_PIN_TRY_LIMIT, OPGP_stringify_error(OPGP_ISO7816_ERROR_WRONG_PIN_TRY_LIMIT)); goto end; }
 		goto end;
 	}
+	if (status.errorCode == OPGP_ISO7816_ERROR_WRONG_DATA)
+		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT, OPGP_stringify_error(OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT)); goto end; }
+	if (status.errorCode == OPGP_ISO7816_ERROR_INCORRECT_P1P2)
+		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_WRONG_PIN_TRY_LIMIT, OPGP_stringify_error(OPGP_ISO7816_ERROR_WRONG_PIN_TRY_LIMIT)); goto end; }
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("pin_change: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -4347,6 +4378,7 @@ OPGP_ERROR_STATUS GP211_store_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if (OPGP_ERROR_CHECK(status)) {
 			goto end;
 		}
+		CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 		if (sendBuffer[2] != 0x80) {
 			OPGP_log_Log(_T("store_data: Data: "));
@@ -4430,6 +4462,7 @@ OPGP_ERROR_STATUS OPGP_manage_channel(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 #ifdef DEBUG
 	OPGP_log_Log(_T("manage_channel: Data: "));
 	for (i=0; i<recvBufferLength; i++) {
@@ -4803,8 +4836,11 @@ OPGP_ERROR_STATUS OP201_get_status(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 
 #endif
 		status = OP201_send_APDU(cardContext, cardInfo, secInfo, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
-		if ( (OPGP_ERROR_CHECK(status)) && !(status.errorCode == OPGP_ISO7816_ERROR_MORE_DATA_AVAILABLE)) {
+		if (OPGP_ERROR_CHECK(status)) {
 			goto end;
+		}
+		if (status.errorCode != OPGP_ISO7816_ERROR_MORE_DATA_AVAILABLE) {
+			CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 		}
 #ifdef DEBUG
 	OPGP_log_Log(_T("get_status: Data: "));

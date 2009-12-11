@@ -203,6 +203,7 @@ end:
  */
 OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, GP211_SECURITY_INFO *secInfo, PBYTE capdu, DWORD capduLength, PBYTE rapdu, PDWORD rapduLength) {
 	OPGP_ERROR_STATUS errorStatus;
+	OPGP_ERROR_STATUS securityStatus;
 	LONG result;
 	OPGP_ERROR_STATUS(*plugin_sendAPDUFunction) (OPGP_CARD_CONTEXT, OPGP_CARD_INFO, PBYTE, DWORD, PBYTE, PDWORD);
 	BYTE apduCommand[261];
@@ -244,9 +245,9 @@ OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 		goto end;
 	}
 
-	errorStatus = GP211_check_R_MAC(capdu, capduLength, rapdu, *rapduLength, secInfo);
-	if (OPGP_ERROR_CHECK(errorStatus)) {
-		goto end;
+	securityStatus = GP211_check_R_MAC(capdu, capduLength, rapdu, *rapduLength, secInfo);
+	if (OPGP_ERROR_CHECK(securityStatus)) {
+		goto securityFailed;
 	}
 
 	if (traceEnable) {
@@ -260,6 +261,10 @@ OPGP_ERROR_STATUS OPGP_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 end:
 	OPGP_LOG_END(_T("OPGP_send_APDU"), errorStatus);
 	return errorStatus;
+securityFailed:
+	OPGP_LOG_END(_T("OPGP_send_APDU"), securityStatus);
+	return securityStatus;
+
 }
 
 
