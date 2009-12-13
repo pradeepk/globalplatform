@@ -117,7 +117,7 @@ static OPGP_ERROR_STATUS internal_mutual_authentication() {
 	status = GP211_mutual_authentication(cardContext, cardInfo, NULL,
 			(PBYTE) OPGP_VISA_DEFAULT_KEY, (PBYTE) OPGP_VISA_DEFAULT_KEY,
 			(PBYTE) OPGP_VISA_DEFAULT_KEY, 0, 0, scp, scpImpl,
-			GP211_SCP01_SECURITY_LEVEL_C_DEC_C_MAC, &securityInfo211);
+			GP211_SCP01_SECURITY_LEVEL_C_MAC, &securityInfo211);
 	if (OPGP_ERROR_CHECK(status)) {
 		return status;
 	}
@@ -181,6 +181,30 @@ static OPGP_ERROR_STATUS internal_disconnect() {
 		return status;
 	}
 	status = internal_release_context();
+	if (OPGP_ERROR_CHECK(status)) {
+		return status;
+	}
+	OPGP_ERROR_CREATE_NO_ERROR(status);
+	return status;
+}
+
+static OPGP_ERROR_STATUS internal_delete() {
+	OPGP_ERROR_STATUS status;
+	GP211_RECEIPT_DATA receiptData;
+	DWORD receiptDataLength;
+	OPGP_AID deletePackage;
+	OPGP_AID deleteApplet;
+	BYTE packageAID[10] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x03, 0x01, 0x0c, 0x01, 0x01};
+	BYTE appletAID[11] = {0xa0, 0x00, 0x00, 0x00, 0x62, 0x03, 0x01, 0x0c, 0x01, 0x01, 0x01};
+	memcpy(deletePackage.AID, packageAID, sizeof(packageAID));
+	deletePackage.AIDLength = sizeof(packageAID);
+	memcpy(deleteApplet.AID, appletAID, sizeof(appletAID));
+	deleteApplet.AIDLength = sizeof(appletAID);
+	status = GP211_delete_application(cardContext, cardInfo, &securityInfo211, &deletePackage, 1, &receiptData, &receiptDataLength);
+	if (OPGP_ERROR_CHECK(status)) {
+		return status;
+	}
+	status = GP211_delete_application(cardContext, cardInfo, &securityInfo211, &deleteApplet, 1, &receiptData, &receiptDataLength);
 	if (OPGP_ERROR_CHECK(status)) {
 		return status;
 	}
@@ -267,7 +291,7 @@ START_TEST (test_OPGP_VISA2_derive_keys)
 	}END_TEST
 
 /**
- * Tests the context establishment.
+ * Tests the mutual authentication.
  */
 START_TEST (test_mutual_authentication)
 	{
@@ -287,6 +311,7 @@ START_TEST (test_mutual_authentication)
 		_tprintf(_T("Mutual authentication succeeded\n"));
 	}END_TEST
 
+	/* TODO: remove
 static OPGP_ERROR_STATUS internal_install() {
 	OPGP_LOAD_FILE_PARAMETERS loadFileParams;
 	DWORD receiptDataAvailable = 0;
@@ -345,9 +370,10 @@ static OPGP_ERROR_STATUS internal_install() {
 	OPGP_ERROR_CREATE_NO_ERROR(status);
 	return status;
 }
+*/
 
 /**
- * Tests the context establishment.
+ * Tests the install commands.
  */
 START_TEST (test_install)
 	{
@@ -370,6 +396,8 @@ START_TEST (test_install)
 			fail("Could not do mutual authentication: %s", status.errorMessage);
 		}
 
+		internal_delete();
+
 		status = OPGP_read_executable_load_file_parameters(TEST_LOAD_FILE,
 				&loadFileParams);
 		if (OPGP_ERROR_CHECK(status)) {
@@ -379,8 +407,8 @@ START_TEST (test_install)
 		status = GP211_install_for_load(cardContext, cardInfo,
 				&securityInfo211, loadFileParams.loadFileAID.AID,
 				loadFileParams.loadFileAID.AIDLength,
-				(PBYTE) GP211_CARD_MANAGER_AID, sizeof(GP211_CARD_MANAGER_AID),
-				NULL, NULL, loadFileParams.loadFileSize, 500, 1000);
+				(PBYTE) GP211_CARD_MANAGER_AID_ALT1, sizeof(GP211_CARD_MANAGER_AID_ALT1),
+				NULL, NULL, loadFileParams.loadFileSize, 0, 500);
 
 		if (OPGP_ERROR_CHECK(status)) {
 			fail("GP211_install_for_load() failed: ", status.errorMessage);
@@ -412,6 +440,26 @@ START_TEST (test_install)
 		}
 	}END_TEST
 
+START_TEST (test_delete) {
+		OPGP_ERROR_STATUS status;
+		status = internal_connect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not connect: %s", status.errorMessage);
+		}
+		status = internal_mutual_authentication();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not do mutual authentication: %s", status.errorMessage);
+		}
+		status = internal_delete();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not delete applets: %s", status.errorMessage);
+		}
+		status = internal_disconnect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not disconnect: %s", status.errorMessage);
+		}
+} END_TEST
+
 Suite * GlobalPlatform_suite(void) {
 	Suite *s = suite_create("GlobalPlatform");
 	/* Core test case */
@@ -428,9 +476,9 @@ Suite * GlobalPlatform_suite(void) {
 
 int main(void) {
 	int number_failed;
-	internal_install();
-	return 1;
-	/*Suite *s = GlobalPlatform_suite();
+//	internal_install();
+	//return 1;
+	Suite *s = GlobalPlatform_suite();
 	SRunner *sr = srunner_create(s);
 
 	//srunner_set_fork_status(sr, CK_NOFORK);
@@ -439,5 +487,4 @@ int main(void) {
 	sleep(100);
 	srunner_free(sr);
 	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-	*/
 }
