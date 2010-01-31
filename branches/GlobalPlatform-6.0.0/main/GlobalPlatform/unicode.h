@@ -42,6 +42,7 @@
 #define _sntprintf snprintf
 #define _fputts fputs
 #define _vftprintf vfprintf
+#define _tcserror_s strerror_r
 #endif
 
 #endif

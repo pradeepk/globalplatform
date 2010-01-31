@@ -1,9 +1,10 @@
 History
 =======
 
-6.0.0 - Fri, June 19, 2008, Karsten Ohme
+6.0.0 - Sun, Jan 31, 2010, Karsten Ohme
+	Connection plugin architecture, support for other transport protocols than PC/SC
+	Improved error handling in API
 	VISA 2 key derivation support
-	Support for other transport protocols than PC/SC
 	internal TLV parsing
 	memory leaks fixed
 

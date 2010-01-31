@@ -52,7 +52,7 @@ extern "C"
 
 //! \brief Logs something to a file or the syslog.
 OPGP_API
-void OPGP_log_Log(OPGP_STRING msg, ...);
+void OPGP_log_Msg(OPGP_STRING msg, ...);
 
 //! \brief Logs the end of a function and its return code.
 OPGP_API
@@ -61,6 +61,10 @@ void OPGP_log_End(OPGP_STRING func, OPGP_STRING file, int line, OPGP_ERROR_STATU
 //! \brief Logs the start of a function
 OPGP_API
 void OPGP_log_Start(OPGP_STRING func, OPGP_STRING file, int line);
+
+//! \brief Logs a buffer as hex string.
+OPGP_API
+void OPGP_log_Hex(OPGP_STRING msg, PBYTE buffer, DWORD bufferLength);
 
 #ifdef __cplusplus
 }

@@ -133,7 +133,7 @@ OPGP_ERROR_STATUS OPGP_PL_list_readers(OPGP_CARD_CONTEXT cardContext, OPGP_STRIN
 		goto end;
 	}
 #ifdef DEBUG
-	OPGP_log_Log(_T("readerSize: %d"), readersSize);
+	OPGP_log_Msg(_T("OPGP_PL_list_readers: readerSize: %d"), readersSize);
 #endif
 	if (readerNames == NULL) {
 		*readerNamesLength = readersSize;
@@ -226,11 +226,8 @@ OPGP_ERROR_STATUS OPGP_PL_card_connect(OPGP_CARD_CONTEXT cardContext, OPGP_CSTRI
 	pcscCardInfo->state = state;
 
 #ifdef DEBUG
-	OPGP_log_Log(_T("OPGP_PL_card_connect: Connected to card in reader %s with protocol %d in card state %d"), readerName, pcscCardInfo->protocol, pcscCardInfo->state);
-	OPGP_log_Log(_T("OPGP_PL_card_connect: Card ATR: "));
-	for (i=0; i<cardInfo->ATRLength; i++) {
-		OPGP_log_Log(_T(" 0x%02x"), cardInfo->ATR[i]);
-	}
+	OPGP_log_Msg(_T("OPGP_PL_card_connect: Connected to card in reader %s with protocol %d in card state %d"), readerName, pcscCardInfo->protocol, pcscCardInfo->state);
+	OPGP_log_Hex(_T("OPGP_PL_card_connect: Card ATR: "), cardInfo->ATR, cardInfo->ATRLength);
 #endif
 
 	cardInfo->logicalChannel = 0;
@@ -302,14 +299,6 @@ OPGP_ERROR_STATUS OPGP_PL_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 		HANDLE_STATUS(status, result);
 		goto end;
 	}
-
-#ifdef DEBUG
-		OPGP_log_Log(_T("Command --> "));
-		for (i=0; i<capduLength; i++) {
-			OPGP_log_Log(_T("%02X"), capdu[i] & 0x00FF);
-		}
-		OPGP_log_Log(_T("\n"));
-#endif
 
 	// if T=1 or else T=0
 	if (GET_PCSC_CARD_INFO_SPECIFIC(cardInfo)->protocol == SCARD_PROTOCOL_T1) {
@@ -682,14 +671,6 @@ OPGP_ERROR_STATUS OPGP_PL_send_APDU(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 
 	// get SW
 	result = get_short(rapdu, *rapduLength-2);
-
-#ifdef DEBUG
-		OPGP_log_Log(_T("Response <-- "));
-		for (i=0; i<*rapduLength; i++) {
-			OPGP_log_Log(_T("%02X"), rapdu[i] & 0x00FF);
-		}
-		OPGP_log_Log(_T("\n"));
-#endif
 
 	OPGP_ERROR_CREATE_NO_ERROR_WITH_CODE(status, OPGP_ISO7816_ERROR_PREFIX | result);
 end:

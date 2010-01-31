@@ -829,7 +829,7 @@ end:
 OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE wrappedApduCommand, PDWORD wrappedApduCommandLength, GP211_SECURITY_INFO *secInfo) {
 	OPGP_ERROR_STATUS status;
 	BYTE lc;
-	BYTE le;
+	BYTE le = 0;
 	DWORD wrappedLength;
 	unsigned char mac[8];
 	unsigned char encryption[240];
@@ -989,16 +989,10 @@ OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE
 			}
 		}
 #ifdef DEBUG
-		OPGP_log_Log(_T("ICV for MAC: "));
-		for (i=0; i<8; i++) {
-			OPGP_log_Log(_T("0x%02x "), C_MAC_ICV[i]);
-		}
+		OPGP_log_Hex(_T("wrap_command: ICV for MAC: "), C_MAC_ICV, 8);
 #endif
 #ifdef DEBUG
-		OPGP_log_Log(_T("Generated MAC: "));
-		for (i=0; i<8; i++) {
-			OPGP_log_Log(_T("0x%02x "), mac[i]);
-		}
+		OPGP_log_Hex(_T("wrap_command: Generated MAC: "), mac, 8);
 #endif
 
 		/* C_MAC on unmodified APDU */
@@ -1093,13 +1087,6 @@ OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE
 		} // if (secInfo->securityLevel == GP211_SCP01_SECURITY_LEVEL_C_DEC_C_MAC || secInfo->securityLevel == GP211_SCP02_SECURITY_LEVEL_C_DEC_C_MAC)
 		*wrappedApduCommandLength = wrappedLength;
 	} // if (secInfo->securityLevel != GP211_SCP02_SECURITY_LEVEL_NO_SECURE_MESSAGING && secInfo->securityLevel != GP211_SCP01_SECURITY_LEVEL_NO_SECURE_MESSAGING)
-//#ifdef DEBUG
-//	OPGP_log_Log(_T("wrap_command: Data to send: "));
-//	for (i=0; i<wrappedLength; i++) {
-//		OPGP_log_Log(_T(" 0x%02x"), wrappedApduCommand[i]);
-//	}
-//
-//#endif
 
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
@@ -1308,14 +1295,8 @@ OPGP_ERROR_STATUS GP211_check_R_MAC(PBYTE apduCommand, DWORD apduCommandLength, 
 	GP211_calculate_R_MAC(apduCommand, apduCommand, lc, responseData, le,
 			responseData+responseDataLength-2, secInfo, mac);
 #ifdef DEBUG
-	OPGP_log_Log(_T("check_R_MAC: received R-MAC: "));
-	for (i=0; i<8; i++) {
-		OPGP_log_Log(_T(" 0x%02x"), responseData[responseDataLength-10+i]);
-	}
-	OPGP_log_Log(_T("check_R_MAC: calculated R-MAC: "));
-	for (i=0; i<8; i++) {
-		OPGP_log_Log(_T(" 0x%02x"), mac[i]);
-	}
+	OPGP_log_Hex(_T("check_R_MAC: received R-MAC: "), responseData-10, responseDataLength-10);
+	OPGP_log_Hex(_T("check_R_MAC: calculated R-MAC: "), mac, 8);
 #endif
 	if (memcmp(mac, responseData+responseDataLength-10, 8)) {
 		OPGP_ERROR_CREATE_ERROR(status, GP211_ERROR_VALIDATION_R_MAC, OPGP_stringify_error(GP211_ERROR_VALIDATION_R_MAC));
@@ -1412,7 +1393,7 @@ OPGP_ERROR_STATUS calculate_MAC_right_des_3des(unsigned char key[16], unsigned c
 {
 	int result;
 	OPGP_ERROR_STATUS status;
-	DWORD i;
+	int i;
 	int outl;
 	unsigned char des_key[8];
 	EVP_CIPHER_CTX ctx;

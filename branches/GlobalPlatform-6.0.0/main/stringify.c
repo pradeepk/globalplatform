@@ -18,6 +18,7 @@
 #include "GlobalPlatform/stringify.h"
 #include "GlobalPlatform/errorcodes.h"
 #include <stdio.h>
+#include <errno.h>
 
 /**
  * This method can stringify many general purpose error codes defined in #errorcodes.h and system error codes.
@@ -26,7 +27,12 @@
  */
 OPGP_STRING OPGP_stringify_error(DWORD errorCode) {
 	static TCHAR strError[256];
+	int rv;
 	unsigned int strErrorSize = 256;
+
+		const char *test;
+char *test2;
+
 #ifdef _WIN32
 #ifdef _UNICODE
 	char str1[256];
@@ -227,7 +233,14 @@ OPGP_STRING OPGP_stringify_error(DWORD errorCode) {
 				return strError;
 	#else
 			default:
-				strerror_r((int)errorCode, strError, (size_t)strErrorSize);
+
+				rv = _tcserror_s(errorCode, strError, strErrorSize);
+				if (rv != 0) {
+				   // return _T("Could not generate error string.");
+				}
+				test = strerror(errno);
+				test2 = strdup(test);
+				printf("still alive2 %08X %d %s", errorCode, strErrorSize,  test2);
 				return (OPGP_STRING)strError;
 	#endif
 		}

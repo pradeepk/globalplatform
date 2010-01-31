@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
+#include <string.h>
 #include "GlobalPlatform/debug.h"
 #include "GlobalPlatform/error.h"
 
@@ -39,7 +40,34 @@
 */
 void OPGP_log_Start(OPGP_STRING func, OPGP_STRING file, int line)
 {
-    OPGP_log_Log(_T("+%s in %s at line %d : start"), func, file, line);
+    OPGP_log_Msg(_T("+%s in %s at line %d : start"), func, file, line);
+}
+
+/**
+ * \param msg The message to print in front of the message. If NULL or empty nothing is printed.
+ * \param buffer The buffer to print.
+ * \param bufferLength The length of the buffer.
+ */
+void OPGP_log_Hex(OPGP_STRING msg, PBYTE buffer, DWORD bufferLength) {
+	TCHAR *bufferMsg;
+	int i;
+	// each hex string needs the double size + termination
+	bufferMsg = (TCHAR *)malloc(bufferLength * sizeof(TCHAR)*2 + 1);
+	// allocation did not succeed
+	if (bufferMsg == NULL) {
+		OPGP_log_Msg(_T("%sLOG ERROR: Could not allocate log buffer."), msg);
+		return;
+	}
+	for (i=0; (DWORD)i<bufferLength; i++) {
+		_sntprintf(bufferMsg+(i*2), (bufferLength-i)*sizeof(TCHAR)*2+1, "%02X", (buffer[i] & 0x00FF));
+	}
+	// print msg or not
+	if ((msg == NULL) || (_tcslen(msg) == 0)) {
+		OPGP_log_Msg(_T("%s"), bufferMsg);
+	}
+	else {
+		OPGP_log_Msg(_T("%s%s"), msg, bufferMsg);
+	}
 }
 
 /**
@@ -49,7 +77,7 @@ void OPGP_log_Start(OPGP_STRING func, OPGP_STRING file, int line)
 */
 void OPGP_log_End(OPGP_STRING func, OPGP_STRING file, int line, OPGP_ERROR_STATUS status)
 {
-	OPGP_log_Log(_T(" -%s in %s at line %d : end error code(0x%0X): %s"), func, file, line, status.errorCode, status.errorMessage);
+	OPGP_log_Msg(_T(" -%s in %s at line %d : end error code(0x%0X): %s"), func, file, line, status.errorCode, status.errorMessage);
 }
 
 /**
@@ -62,7 +90,7 @@ void OPGP_log_End(OPGP_STRING func, OPGP_STRING file, int line, OPGP_ERROR_STATU
 * \param msg The formatted message which will be stored.
 * \prama ... Variable argument list
 */
-void OPGP_log_Log(OPGP_STRING msg, ...)
+void OPGP_log_Msg(OPGP_STRING msg, ...)
 {
     va_list args;
     FILE *fp;
