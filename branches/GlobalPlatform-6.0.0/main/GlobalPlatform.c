@@ -1761,9 +1761,10 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 #ifdef DEBUG
 	DWORD g;
 #endif
-	INIT_PROGRESS_CALLBACK_PARAMETERS(callbackParameters, callback);
 	BYTE sequenceNumber=0x00;
+    INIT_PROGRESS_CALLBACK_PARAMETERS(callbackParameters, callback);
 	OPGP_LOG_START(_T("load_from_buffer"));
+
 	*receiptDataAvailable = 0;
 	sendBuffer[0] = 0x80;
 	sendBuffer[1] = 0xE8;
@@ -2044,7 +2045,6 @@ OPGP_ERROR_STATUS load(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, G
 	if (OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
-
 	status = load_from_buffer(cardContext, cardInfo, secInfo, loadFileDataBlockSignature,
 			loadFileDataBlockSignatureLength, loadFileBuf, loadFileBufSize, receiptData, receiptDataAvailable, callback);
 	if (OPGP_ERROR_CHECK(status)) {

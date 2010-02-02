@@ -230,8 +230,8 @@ static const BYTE OP201_GET_DATA_WHOLE_EF_PROD[2] = {0xDF, 0x7F}; //!< Whole EF<
 #define OPGP_WORK_UNKNOWN -1 //!< The amount of work is not known.
 #define OPGP_TASK_FINISHED 1 //!< The task is finished.
 
-#define INIT_PROGRESS_CALLBACK_PARAMETERS(callbackParameters, callback) 	callbackParameters.parameters = callback->parameters; \
-	callbackParameters.finished = !OPGP_TASK_FINISHED
+#define INIT_PROGRESS_CALLBACK_PARAMETERS(callbackParameters, callback) 	if (callback != NULL) {callbackParameters.parameters = callback->parameters; \
+	callbackParameters.finished = !OPGP_TASK_FINISHED;}
 
 /**
  * The structure measures the progress of a task. This structure is passed to the callback function.
