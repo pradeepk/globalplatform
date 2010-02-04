@@ -85,9 +85,9 @@ CHECK_LIBS = -lcheck
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"GlobalPlatform\" -DPACKAGE_TARNAME=\"globalplatform\" -DPACKAGE_VERSION=\"6.0.0\" -DPACKAGE_STRING=\"GlobalPlatform\ 6.0.0\" -DPACKAGE_BUGREPORT=\"k_o_@users.sourceforge.net\" -DPACKAGE_URL=\"\" -DPACKAGE=\"globalplatform\" -DVERSION=\"6.0.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\" -DSTDC_HEADERS=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_VPRINTF=1 -DHAVE_MEMCPY=1 -DHAVE_VSYSLOG=1 -DDEBUG=1 -DHAVE_LIBPCSCLITE=1 -DHAVE_ZCONF_H=1 -DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -DHAVE_OPENSSL_RAND_H=1 -DHAVE_OPENSSL_ERR_H=1 -DHAVE_OPENSSL_EVP_H=1 -DHAVE_OPENSSL_PEM_H=1 -DHAVE_LIBCRYPTO=1
+DEFS = -DPACKAGE_NAME=\"GlobalPlatform\" -DPACKAGE_TARNAME=\"globalplatform\" -DPACKAGE_VERSION=\"6.0.0\" -DPACKAGE_STRING=\"GlobalPlatform\ 6.0.0\" -DPACKAGE_BUGREPORT=\"k_o_@users.sourceforge.net\" -DPACKAGE=\"globalplatform\" -DVERSION=\"6.0.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\" -DSTDC_HEADERS=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_VPRINTF=1 -DHAVE_MEMCPY=1 -DHAVE_VSYSLOG=1 -DDEBUG=1 -DHAVE_LIBPCSCLITE=1 -DHAVE_ZCONF_H=1 -DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -DHAVE_OPENSSL_RAND_H=1 -DHAVE_OPENSSL_ERR_H=1 -DHAVE_OPENSSL_EVP_H=1 -DHAVE_OPENSSL_PEM_H=1 -DHAVE_LIBCRYPTO=1
 DEPDIR = .deps
-DLLTOOL = false
+DLLTOOL = 
 DSYMUTIL = 
 DUMPBIN = 
 ECHO_C = 
@@ -129,8 +129,6 @@ PCSCLITE_CFLAGS = -I/usr/include/PCSC
 PCSCLITE_H_PATH = 
 PCSCLITE_LIBS = -lpcsclite  
 PKG_CONFIG = /usr/bin/pkg-config
-PKG_CONFIG_LIBDIR = 
-PKG_CONFIG_PATH = 
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -174,6 +172,7 @@ libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
+lt_ECHO = echo
 mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
@@ -186,14 +185,13 @@ sharedstatedir = ${prefix}/com
 srcdir = .
 sysconfdir = ${prefix}/etc
 target_alias = 
-to_host_path_cmd = func_noop_path_convert
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
 EXTRA_DIST = Makefile.mak Install.w32 reconf GlobalPlatform.sln.old \
 GlobalPlatform.vcproj.7.10.old GlobalPlatform.sln GlobalPlatform.vcproj
 
-SUBDIRS = main plugins/pcsc
+SUBDIRS = plugins/pcsc main
 MAINTAINERCLEANFILES = \
 	Makefile.in \
 	configure \

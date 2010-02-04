@@ -4,6 +4,8 @@ History
 6.0.0 - Sun, Jan 31, 2010, Karsten Ohme
 	Connection plugin architecture, support for other transport protocols than PC/SC
 	Improved error handling in API
+	Callback support for long running functions
+	Code much more modular
 	VISA 2 key derivation support
 	internal TLV parsing
 	memory leaks fixed

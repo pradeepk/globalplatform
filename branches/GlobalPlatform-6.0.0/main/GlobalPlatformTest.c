@@ -105,7 +105,7 @@ static OPGP_ERROR_STATUS internal_connect_card() {
 
 static OPGP_ERROR_STATUS internal_establish_context() {
 	OPGP_ERROR_STATUS status;
-	_tcsncpy(cardContext.libraryName, _T("pcscconnectionplugin"),
+	_tcsncpy(cardContext.libraryName, _T("gppcscconnectionplugin"),
 			sizeof(cardContext.libraryName));
 	status = OPGP_establish_context(&cardContext);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -209,10 +209,9 @@ static OPGP_ERROR_STATUS internal_delete() {
 	deletePackage.AIDLength = sizeof(packageAID);
 	memcpy(deleteApplet.AID, appletAID, sizeof(appletAID));
 	deleteApplet.AIDLength = sizeof(appletAID);
-	status = GP211_delete_application(cardContext, cardInfo, &securityInfo211, &deleteApplet, 1, &receiptData, &receiptDataLength);
-	if (OPGP_ERROR_CHECK(status)) {
-		return status;
-	}
+	// first try to delete applet
+	GP211_delete_application(cardContext, cardInfo, &securityInfo211, &deleteApplet, 1, &receiptData, &receiptDataLength);
+	// now delete package
 	status = GP211_delete_application(cardContext, cardInfo, &securityInfo211, &deletePackage, 1, &receiptData, &receiptDataLength);
 	if (OPGP_ERROR_CHECK(status)) {
 		return status;
@@ -320,62 +319,6 @@ START_TEST (test_mutual_authentication)
 		_tprintf(_T("Mutual authentication succeeded\n"));
 	}END_TEST
 
-	/* TODO: remove*/
-static OPGP_ERROR_STATUS internal_install() {
-	OPGP_LOAD_FILE_PARAMETERS loadFileParams;
-	DWORD receiptDataAvailable = 0;
-	DWORD receiptDataLen = 0;
-
-	char installParam[1];
-	installParam[0] = 0;
-
-	OPGP_ERROR_STATUS status;
-	GP211_RECEIPT_DATA receipt;
-
-	status = internal_connect();
-	if (OPGP_ERROR_CHECK(status)) {
-		return status;
-	}
-	status = internal_mutual_authentication();
-	if (OPGP_ERROR_CHECK(status)) {
-		return status;
-	}
-
-	status = OPGP_read_executable_load_file_parameters(TEST_LOAD_FILE,
-			&loadFileParams);
-	if (OPGP_ERROR_CHECK(status)) {
-		return status;
-	}
-
-	status = GP211_install_for_load(cardContext, cardInfo, &securityInfo211,
-			loadFileParams.loadFileAID.AID,
-			loadFileParams.loadFileAID.AIDLength,
-			(PBYTE) GP211_CARD_MANAGER_AID, sizeof(GP211_CARD_MANAGER_AID),
-			NULL, NULL, loadFileParams.loadFileSize, 500, 1000);
-
-	status = GP211_load(cardContext, cardInfo, &securityInfo211, NULL, 0,
-			TEST_LOAD_FILE, NULL, &receiptDataLen, NULL);
-
-	if (OPGP_ERROR_CHECK(status)) {
-		return status;
-	}
-
-	status = GP211_install_for_install_and_make_selectable(cardContext,
-			cardInfo, &securityInfo211, loadFileParams.loadFileAID.AID,
-			loadFileParams.loadFileAID.AIDLength,
-			loadFileParams.appletAIDs[0].AID,
-			loadFileParams.appletAIDs[0].AIDLength,
-			loadFileParams.appletAIDs[0].AID,
-			loadFileParams.appletAIDs[0].AIDLength, 0, 500, 1000, NULL, 0,
-			NULL, &receipt, &receiptDataAvailable);
-
-	if (OPGP_ERROR_CHECK(status)) {
-		return status;
-	}
-	OPGP_ERROR_CREATE_NO_ERROR(status);
-	return status;
-}
-
 
 /**
  * Tests the install commands.
@@ -402,7 +345,6 @@ START_TEST (test_install)
 		}
 
 		internal_delete();
-
 
 		status = OPGP_read_executable_load_file_parameters(TEST_LOAD_FILE,
 				&loadFileParams);
@@ -470,12 +412,14 @@ Suite * GlobalPlatform_suite(void) {
 	Suite *s = suite_create("GlobalPlatform");
 	/* Core test case */
 	TCase *tc_core = tcase_create("Core");
+    tcase_set_timeout(tc_core, 10);
 	tcase_add_test (tc_core, test_list_readers);
 	tcase_add_test (tc_core, test_connect_card);
 	tcase_add_test (tc_core, test_OPGP_VISA2_derive_keys);
 	tcase_add_test (tc_core, test_mutual_authentication);
 	tcase_add_test (tc_core, test_install);
-	//tcase_add_test (tc_core, test_delete);
+    tcase_add_test (tc_core, test_delete);
+
 	suite_add_tcase(s, tc_core);
 
 	return s;
@@ -489,7 +433,6 @@ int main(void) {
 	//srunner_set_fork_status(sr, CK_NOFORK);
 	srunner_run_all(sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed(sr);
-	sleep(100);
 	srunner_free(sr);
 	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

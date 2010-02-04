@@ -54,25 +54,25 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)" \
 	"$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libpcscconnectionplugin_la_LIBADD =
-am_libpcscconnectionplugin_la_OBJECTS =  \
-	libpcscconnectionplugin_la-pcscconnectionplugin.lo \
-	libpcscconnectionplugin_la-util.lo \
-	libpcscconnectionplugin_la-stringify.lo \
-	libpcscconnectionplugin_la-debug.lo
-libpcscconnectionplugin_la_OBJECTS =  \
-	$(am_libpcscconnectionplugin_la_OBJECTS)
-libpcscconnectionplugin_la_LINK = $(LIBTOOL) --tag=CC \
+libgppcscconnectionplugin_la_LIBADD =
+am_libgppcscconnectionplugin_la_OBJECTS =  \
+	libgppcscconnectionplugin_la-pcscconnectionplugin.lo \
+	libgppcscconnectionplugin_la-util.lo \
+	libgppcscconnectionplugin_la-stringify.lo \
+	libgppcscconnectionplugin_la-debug.lo
+libgppcscconnectionplugin_la_OBJECTS =  \
+	$(am_libgppcscconnectionplugin_la_OBJECTS)
+libgppcscconnectionplugin_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libpcscconnectionplugin_la_LDFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS) $(libgppcscconnectionplugin_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am_pcscconnectionpluginTest_OBJECTS =  \
 	pcscconnectionpluginTest-pcscconnectionpluginTest.$(OBJEXT)
 pcscconnectionpluginTest_OBJECTS =  \
 	$(am_pcscconnectionpluginTest_OBJECTS)
 am__DEPENDENCIES_1 =
-pcscconnectionpluginTest_DEPENDENCIES = libpcscconnectionplugin.la \
-	$(am__DEPENDENCIES_1)
+pcscconnectionpluginTest_DEPENDENCIES =  \
+	$(builddir)/libgppcscconnectionplugin.la $(am__DEPENDENCIES_1)
 pcscconnectionpluginTest_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(pcscconnectionpluginTest_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
@@ -89,9 +89,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libpcscconnectionplugin_la_SOURCES) \
+SOURCES = $(libgppcscconnectionplugin_la_SOURCES) \
 	$(pcscconnectionpluginTest_SOURCES)
-DIST_SOURCES = $(libpcscconnectionplugin_la_SOURCES) \
+DIST_SOURCES = $(libgppcscconnectionplugin_la_SOURCES) \
 	$(pcscconnectionpluginTest_SOURCES)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 nobase_includeHEADERS_INSTALL = $(install_sh_DATA)
@@ -115,9 +115,9 @@ CHECK_LIBS = -lcheck
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"GlobalPlatform\" -DPACKAGE_TARNAME=\"globalplatform\" -DPACKAGE_VERSION=\"6.0.0\" -DPACKAGE_STRING=\"GlobalPlatform\ 6.0.0\" -DPACKAGE_BUGREPORT=\"k_o_@users.sourceforge.net\" -DPACKAGE_URL=\"\" -DPACKAGE=\"globalplatform\" -DVERSION=\"6.0.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\" -DSTDC_HEADERS=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_VPRINTF=1 -DHAVE_MEMCPY=1 -DHAVE_VSYSLOG=1 -DDEBUG=1 -DHAVE_LIBPCSCLITE=1 -DHAVE_ZCONF_H=1 -DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -DHAVE_OPENSSL_RAND_H=1 -DHAVE_OPENSSL_ERR_H=1 -DHAVE_OPENSSL_EVP_H=1 -DHAVE_OPENSSL_PEM_H=1 -DHAVE_LIBCRYPTO=1
+DEFS = -DPACKAGE_NAME=\"GlobalPlatform\" -DPACKAGE_TARNAME=\"globalplatform\" -DPACKAGE_VERSION=\"6.0.0\" -DPACKAGE_STRING=\"GlobalPlatform\ 6.0.0\" -DPACKAGE_BUGREPORT=\"k_o_@users.sourceforge.net\" -DPACKAGE=\"globalplatform\" -DVERSION=\"6.0.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 -DLT_OBJDIR=\".libs/\" -DSTDC_HEADERS=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_VPRINTF=1 -DHAVE_MEMCPY=1 -DHAVE_VSYSLOG=1 -DDEBUG=1 -DHAVE_LIBPCSCLITE=1 -DHAVE_ZCONF_H=1 -DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -DHAVE_OPENSSL_RAND_H=1 -DHAVE_OPENSSL_ERR_H=1 -DHAVE_OPENSSL_EVP_H=1 -DHAVE_OPENSSL_PEM_H=1 -DHAVE_LIBCRYPTO=1
 DEPDIR = .deps
-DLLTOOL = false
+DLLTOOL = 
 DSYMUTIL = 
 DUMPBIN = 
 ECHO_C = 
@@ -159,8 +159,6 @@ PCSCLITE_CFLAGS = -I/usr/include/PCSC
 PCSCLITE_H_PATH = 
 PCSCLITE_LIBS = -lpcsclite  
 PKG_CONFIG = /usr/bin/pkg-config
-PKG_CONFIG_LIBDIR = 
-PKG_CONFIG_PATH = 
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -204,6 +202,7 @@ libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
+lt_ECHO = echo
 mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
@@ -216,23 +215,22 @@ sharedstatedir = ${prefix}/com
 srcdir = .
 sysconfdir = ${prefix}/etc
 target_alias = 
-to_host_path_cmd = func_noop_path_convert
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 EXTRA_DIST = stdafx.c stdafx.h resource.h version.rc DLLMain.c Makefile.mak
-lib_LTLIBRARIES = libpcscconnectionplugin.la
+lib_LTLIBRARIES = libgppcscconnectionplugin.la
 include_HEADERS = 
 nobase_include_HEADERS = 
-libpcscconnectionplugin_la_SOURCES = pcscconnectionplugin.h pcscconnectionplugin.c \
+libgppcscconnectionplugin_la_SOURCES = pcscconnectionplugin.h pcscconnectionplugin.c \
 	$(top_builddir)/main/util.h $(top_builddir)/main/util.c $(top_builddir)/main/stringify.c \
 	$(top_builddir)/main/debug.c
 
-libpcscconnectionplugin_la_LDFLAGS = -version-info 1:0:0 $(PCSCLITE_LIBS)
-libpcscconnectionplugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
+libgppcscconnectionplugin_la_LDFLAGS = -version-info 1:0:0 $(PCSCLITE_LIBS)
+libgppcscconnectionplugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
 pcscconnectionpluginTest_SOURCES = pcscconnectionpluginTest.c $(top_builddir)/GlobalPlatform/GlobalPlatform.h
 pcscconnectionpluginTest_CFLAGS =   $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
-pcscconnectionpluginTest_LDADD = -lcheck   libpcscconnectionplugin.la $(PCSCLITE_LIBS)
+pcscconnectionpluginTest_LDADD = -lcheck   $(builddir)/libgppcscconnectionplugin.la $(PCSCLITE_LIBS)
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
@@ -296,8 +294,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libpcscconnectionplugin.la: $(libpcscconnectionplugin_la_OBJECTS) $(libpcscconnectionplugin_la_DEPENDENCIES) 
-	$(libpcscconnectionplugin_la_LINK) -rpath $(libdir) $(libpcscconnectionplugin_la_OBJECTS) $(libpcscconnectionplugin_la_LIBADD) $(LIBS)
+libgppcscconnectionplugin.la: $(libgppcscconnectionplugin_la_OBJECTS) $(libgppcscconnectionplugin_la_DEPENDENCIES) 
+	$(libgppcscconnectionplugin_la_LINK) -rpath $(libdir) $(libgppcscconnectionplugin_la_OBJECTS) $(libgppcscconnectionplugin_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; for p in $$list; do \
@@ -315,10 +313,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/libpcscconnectionplugin_la-debug.Plo
-include ./$(DEPDIR)/libpcscconnectionplugin_la-pcscconnectionplugin.Plo
-include ./$(DEPDIR)/libpcscconnectionplugin_la-stringify.Plo
-include ./$(DEPDIR)/libpcscconnectionplugin_la-util.Plo
+include ./$(DEPDIR)/libgppcscconnectionplugin_la-debug.Plo
+include ./$(DEPDIR)/libgppcscconnectionplugin_la-pcscconnectionplugin.Plo
+include ./$(DEPDIR)/libgppcscconnectionplugin_la-stringify.Plo
+include ./$(DEPDIR)/libgppcscconnectionplugin_la-util.Plo
 include ./$(DEPDIR)/pcscconnectionpluginTest-pcscconnectionpluginTest.Po
 
 .c.o:
@@ -342,33 +340,33 @@ include ./$(DEPDIR)/pcscconnectionpluginTest-pcscconnectionpluginTest.Po
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LTCOMPILE) -c -o $@ $<
 
-libpcscconnectionplugin_la-pcscconnectionplugin.lo: pcscconnectionplugin.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpcscconnectionplugin_la-pcscconnectionplugin.lo -MD -MP -MF $(DEPDIR)/libpcscconnectionplugin_la-pcscconnectionplugin.Tpo -c -o libpcscconnectionplugin_la-pcscconnectionplugin.lo `test -f 'pcscconnectionplugin.c' || echo '$(srcdir)/'`pcscconnectionplugin.c
-	mv -f $(DEPDIR)/libpcscconnectionplugin_la-pcscconnectionplugin.Tpo $(DEPDIR)/libpcscconnectionplugin_la-pcscconnectionplugin.Plo
-#	source='pcscconnectionplugin.c' object='libpcscconnectionplugin_la-pcscconnectionplugin.lo' libtool=yes \
+libgppcscconnectionplugin_la-pcscconnectionplugin.lo: pcscconnectionplugin.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgppcscconnectionplugin_la-pcscconnectionplugin.lo -MD -MP -MF $(DEPDIR)/libgppcscconnectionplugin_la-pcscconnectionplugin.Tpo -c -o libgppcscconnectionplugin_la-pcscconnectionplugin.lo `test -f 'pcscconnectionplugin.c' || echo '$(srcdir)/'`pcscconnectionplugin.c
+	mv -f $(DEPDIR)/libgppcscconnectionplugin_la-pcscconnectionplugin.Tpo $(DEPDIR)/libgppcscconnectionplugin_la-pcscconnectionplugin.Plo
+#	source='pcscconnectionplugin.c' object='libgppcscconnectionplugin_la-pcscconnectionplugin.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpcscconnectionplugin_la-pcscconnectionplugin.lo `test -f 'pcscconnectionplugin.c' || echo '$(srcdir)/'`pcscconnectionplugin.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgppcscconnectionplugin_la-pcscconnectionplugin.lo `test -f 'pcscconnectionplugin.c' || echo '$(srcdir)/'`pcscconnectionplugin.c
 
-libpcscconnectionplugin_la-util.lo: $(top_builddir)/main/util.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpcscconnectionplugin_la-util.lo -MD -MP -MF $(DEPDIR)/libpcscconnectionplugin_la-util.Tpo -c -o libpcscconnectionplugin_la-util.lo `test -f '$(top_builddir)/main/util.c' || echo '$(srcdir)/'`$(top_builddir)/main/util.c
-	mv -f $(DEPDIR)/libpcscconnectionplugin_la-util.Tpo $(DEPDIR)/libpcscconnectionplugin_la-util.Plo
-#	source='$(top_builddir)/main/util.c' object='libpcscconnectionplugin_la-util.lo' libtool=yes \
+libgppcscconnectionplugin_la-util.lo: $(top_builddir)/main/util.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgppcscconnectionplugin_la-util.lo -MD -MP -MF $(DEPDIR)/libgppcscconnectionplugin_la-util.Tpo -c -o libgppcscconnectionplugin_la-util.lo `test -f '$(top_builddir)/main/util.c' || echo '$(srcdir)/'`$(top_builddir)/main/util.c
+	mv -f $(DEPDIR)/libgppcscconnectionplugin_la-util.Tpo $(DEPDIR)/libgppcscconnectionplugin_la-util.Plo
+#	source='$(top_builddir)/main/util.c' object='libgppcscconnectionplugin_la-util.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpcscconnectionplugin_la-util.lo `test -f '$(top_builddir)/main/util.c' || echo '$(srcdir)/'`$(top_builddir)/main/util.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgppcscconnectionplugin_la-util.lo `test -f '$(top_builddir)/main/util.c' || echo '$(srcdir)/'`$(top_builddir)/main/util.c
 
-libpcscconnectionplugin_la-stringify.lo: $(top_builddir)/main/stringify.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpcscconnectionplugin_la-stringify.lo -MD -MP -MF $(DEPDIR)/libpcscconnectionplugin_la-stringify.Tpo -c -o libpcscconnectionplugin_la-stringify.lo `test -f '$(top_builddir)/main/stringify.c' || echo '$(srcdir)/'`$(top_builddir)/main/stringify.c
-	mv -f $(DEPDIR)/libpcscconnectionplugin_la-stringify.Tpo $(DEPDIR)/libpcscconnectionplugin_la-stringify.Plo
-#	source='$(top_builddir)/main/stringify.c' object='libpcscconnectionplugin_la-stringify.lo' libtool=yes \
+libgppcscconnectionplugin_la-stringify.lo: $(top_builddir)/main/stringify.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgppcscconnectionplugin_la-stringify.lo -MD -MP -MF $(DEPDIR)/libgppcscconnectionplugin_la-stringify.Tpo -c -o libgppcscconnectionplugin_la-stringify.lo `test -f '$(top_builddir)/main/stringify.c' || echo '$(srcdir)/'`$(top_builddir)/main/stringify.c
+	mv -f $(DEPDIR)/libgppcscconnectionplugin_la-stringify.Tpo $(DEPDIR)/libgppcscconnectionplugin_la-stringify.Plo
+#	source='$(top_builddir)/main/stringify.c' object='libgppcscconnectionplugin_la-stringify.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpcscconnectionplugin_la-stringify.lo `test -f '$(top_builddir)/main/stringify.c' || echo '$(srcdir)/'`$(top_builddir)/main/stringify.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgppcscconnectionplugin_la-stringify.lo `test -f '$(top_builddir)/main/stringify.c' || echo '$(srcdir)/'`$(top_builddir)/main/stringify.c
 
-libpcscconnectionplugin_la-debug.lo: $(top_builddir)/main/debug.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libpcscconnectionplugin_la-debug.lo -MD -MP -MF $(DEPDIR)/libpcscconnectionplugin_la-debug.Tpo -c -o libpcscconnectionplugin_la-debug.lo `test -f '$(top_builddir)/main/debug.c' || echo '$(srcdir)/'`$(top_builddir)/main/debug.c
-	mv -f $(DEPDIR)/libpcscconnectionplugin_la-debug.Tpo $(DEPDIR)/libpcscconnectionplugin_la-debug.Plo
-#	source='$(top_builddir)/main/debug.c' object='libpcscconnectionplugin_la-debug.lo' libtool=yes \
+libgppcscconnectionplugin_la-debug.lo: $(top_builddir)/main/debug.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgppcscconnectionplugin_la-debug.lo -MD -MP -MF $(DEPDIR)/libgppcscconnectionplugin_la-debug.Tpo -c -o libgppcscconnectionplugin_la-debug.lo `test -f '$(top_builddir)/main/debug.c' || echo '$(srcdir)/'`$(top_builddir)/main/debug.c
+	mv -f $(DEPDIR)/libgppcscconnectionplugin_la-debug.Tpo $(DEPDIR)/libgppcscconnectionplugin_la-debug.Plo
+#	source='$(top_builddir)/main/debug.c' object='libgppcscconnectionplugin_la-debug.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpcscconnectionplugin_la-debug.lo `test -f '$(top_builddir)/main/debug.c' || echo '$(srcdir)/'`$(top_builddir)/main/debug.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgppcscconnectionplugin_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgppcscconnectionplugin_la-debug.lo `test -f '$(top_builddir)/main/debug.c' || echo '$(srcdir)/'`$(top_builddir)/main/debug.c
 
 pcscconnectionpluginTest-pcscconnectionpluginTest.o: pcscconnectionpluginTest.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pcscconnectionpluginTest_CFLAGS) $(CFLAGS) -MT pcscconnectionpluginTest-pcscconnectionpluginTest.o -MD -MP -MF $(DEPDIR)/pcscconnectionpluginTest-pcscconnectionpluginTest.Tpo -c -o pcscconnectionpluginTest-pcscconnectionpluginTest.o `test -f 'pcscconnectionpluginTest.c' || echo '$(srcdir)/'`pcscconnectionpluginTest.c

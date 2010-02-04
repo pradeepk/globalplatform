@@ -121,10 +121,8 @@
 			<Target title="Linux Test">
 				<Option platforms="Unix;Mac;" />
 				<Option output="GlobalPlatformTest" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="main" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wfatal-errors" />
@@ -137,7 +135,7 @@
 				</Compiler>
 				<Linker>
 					<Add library="./GlobalPlatform.so" />
-					<Add directory="../GlobalPlatform" />
+					<Add directory="../../GlobalPlatform" />
 				</Linker>
 			</Target>
 		</Build>
@@ -242,6 +240,9 @@
 			<Option target="Linux Test" />
 		</Unit>
 		<Unit filename="main/HelloWorld.cap">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="main/Makefile.am">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="main/connection.c">
@@ -369,9 +370,6 @@
 		<Unit filename="main/version.rc">
 			<Option target="Debug Win32" />
 			<Option target="Release Win32" />
-		</Unit>
-		<Unit filename="make2003.bat">
-			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Extensions>
 			<envvars set="globalplatform" />

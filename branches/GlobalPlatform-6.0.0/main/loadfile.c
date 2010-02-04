@@ -572,10 +572,7 @@ OPGP_ERROR_STATUS read_executable_load_file_parameters_from_buffer(PBYTE loadFil
 	memcpy(packageAID, loadFileBuf+offset, packageAIDLength);
 	offset+=packageAIDLength;
 #ifdef DEBUG
-	OPGP_log_Msg(_T("Package AID:"));
-	for (j=0; j<packageAIDLength; j++) {
-		OPGP_log_Msg(_T("0x%02x"), packageAID[j]);
-	}
+	OPGP_log_Hex(_T("Package AID: "), packageAID, packageAIDLength);
 #endif
 	/* directory component */
 	componentOffset+=componentSize+3;
@@ -647,10 +644,7 @@ OPGP_ERROR_STATUS read_executable_load_file_parameters_from_buffer(PBYTE loadFil
 		memcpy(appletAIDs[i].AID, loadFileBuf+offset, appletAIDs[i].AIDLength);
 		offset+=appletAIDs[i].AIDLength;
 #ifdef DEBUG
-		OPGP_log_Msg(_T("Applet AID:"));
-		for (j=0; j<appletAIDs[i].AIDLength; j++) {
-			OPGP_log_Msg(_T("0x%02x"), appletAIDs[i].AID[j]);
-		}
+		OPGP_log_Hex(_T("Applet AID: "), appletAIDs[i].AID, appletAIDs[i].AIDLength);
 #endif
 		/* install_method_offset */
 		offset+=2;
@@ -764,10 +758,7 @@ OPGP_ERROR_STATUS get_load_data(PBYTE executableLoadFileAID, DWORD executableLoa
 	memcpy(loadData, buf, i);
 	*loadDataLength = i;
 #ifdef DEBUG
-	OPGP_log_Msg(_T("get_load_data: Gathered data : "));
-	for (i=0; i<*loadDataLength; i++) {
-		OPGP_log_Msg(_T(" 0x%02X"), loadData[i] & 0x00FF);
-	}
+	OPGP_log_Hex(_T("get_load_data: Gathered data : "), loadData, *loadDataLength);
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:

@@ -3,7 +3,7 @@
 EXTRA_DIST = Makefile.mak Install.w32 reconf GlobalPlatform.sln.old \
 GlobalPlatform.vcproj.7.10.old GlobalPlatform.sln GlobalPlatform.vcproj
 
-SUBDIRS = main plugins/pcsc
+SUBDIRS = plugins/pcsc main
 
 doc:
 	cd main && $(MAKE) $(AM_MAKEFLAGS) doc

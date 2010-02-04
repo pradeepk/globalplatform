@@ -22,6 +22,7 @@ libGlobalPlatform_la_LDFLAGS = -version-info 6:0:0 $(PCSCLITE_LIBS)
 libGlobalPlatform_la_CPPFLAGS = $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
 
 TESTS = GlobalPlatformTest
+TESTS_ENVIRONMENT = export LD_LIBRARY_PATH=$(top_builddir)/plugins/pcsc/.libs/:$LD_LIBRARY_PATH;
 check_PROGRAMS = GlobalPlatformTest
 GlobalPlatformTest_SOURCES = GlobalPlatformTest.c
 GlobalPlatformTest_CFLAGS = @CHECK_CFLAGS@ $(AM_CPPFLAGS) $(PCSCLITE_CFLAGS)
