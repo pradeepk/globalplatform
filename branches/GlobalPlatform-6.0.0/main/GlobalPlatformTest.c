@@ -408,18 +408,143 @@ START_TEST (test_delete) {
 		}
 } END_TEST
 
+/**
+ * Test the get status command.
+ */
+START_TEST (test_get_status) {
+		OPGP_ERROR_STATUS status;
+		GP211_APPLICATION_DATA appData[10];
+		GP211_EXECUTABLE_MODULES_DATA modulesData[10];
+		BYTE appAID[8] = {0xa0,0,0,0,4,0x10,0x10};
+		BYTE loadFileAID[8] = {0xa0,0,0,0,3,0x53,0x50};
+		BYTE domainAID[8] = {0xa0,00,00,00,03,00,00,00};
+		DWORD dataLength = 10;
+		status = internal_connect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not connect: %s", status.errorMessage);
+		}
+		status = internal_mutual_authentication();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not do mutual authentication: %s", status.errorMessage);
+		}
+		status = GP211_get_status(cardContext, cardInfo, &securityInfo211, GP211_STATUS_APPLICATIONS, appData, modulesData, &dataLength);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not get status from applications: %s", status.errorMessage);
+		}
+
+		printf("%d", memcmp(appData[0].AID, appAID, sizeof(appAID)));
+		fail_unless(dataLength == 4, "Incorrect application status");
+		fail_unless(appData[0].lifeCycleState == 7, "Incorrect application status");
+		fail_unless(appData[0].privileges == 2, "Incorrect application status");
+		fail_unless(memcmp(appData[0].AID, appAID, sizeof(appAID))==0, "Incorrect application status");
+
+        dataLength = 10;
+		status = GP211_get_status(cardContext, cardInfo, &securityInfo211, GP211_STATUS_LOAD_FILES, appData, modulesData, &dataLength);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not get status from applications: %s", status.errorMessage);
+		}
+		fail_unless(dataLength == 5, "Incorrect load file status");
+		fail_unless(appData[0].lifeCycleState == 1, "Incorrect load file status");
+		fail_unless(appData[0].privileges == 0, "Incorrect load file status");
+		fail_unless(memcmp(appData[0].AID, loadFileAID, sizeof(loadFileAID))==0, "Incorrect load file status");
+
+        dataLength = 10;
+		status = GP211_get_status(cardContext, cardInfo, &securityInfo211, GP211_STATUS_ISSUER_SECURITY_DOMAIN, appData, modulesData, &dataLength);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not get status from applications: %s", status.errorMessage);
+		}
+		fail_unless(dataLength == 1, "Incorrect issuer security status");
+		fail_unless(appData[0].lifeCycleState == 1, "Incorrect issuer security status");
+		fail_unless(appData[0].privileges == 0x9e, "Incorrect issuer security status");
+
+
+		fail_unless(memcmp(appData[0].AID, domainAID, sizeof(domainAID)) == 0, "Incorrect issuer security status");
+
+		status = internal_disconnect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not disconnect: %s", status.errorMessage);
+		}
+} END_TEST
+
+/**
+ * Tests the install commands.
+ */
+START_TEST (test_install_callback) {
+		OPGP_LOAD_FILE_PARAMETERS loadFileParams;
+		DWORD receiptDataAvailable = 0;
+		DWORD receiptDataLen = 0;
+
+		char installParam[1];
+		installParam[0] = 0;
+
+		OPGP_ERROR_STATUS status;
+		GP211_RECEIPT_DATA receipt;
+
+		status = internal_connect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not connect: %s", status.errorMessage);
+		}
+		status = internal_mutual_authentication();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not do mutual authentication: %s", status.errorMessage);
+		}
+
+		internal_delete();
+
+		status = OPGP_read_executable_load_file_parameters(TEST_LOAD_FILE,
+				&loadFileParams);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("OPGP_read_executable_load_file_parameters() failed: ", status.errorMessage);
+		}
+
+		status = GP211_install_for_load(cardContext, cardInfo,
+				&securityInfo211, loadFileParams.loadFileAID.AID,
+				loadFileParams.loadFileAID.AIDLength,
+				(PBYTE) GP211_CARD_MANAGER_AID_ALT1, sizeof(GP211_CARD_MANAGER_AID_ALT1),
+				NULL, NULL, loadFileParams.loadFileSize, 0, 2000);
+
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("GP211_install_for_load() failed: ", status.errorMessage);
+		}
+
+		status = GP211_load(cardContext, cardInfo, &securityInfo211, NULL, 0,
+				TEST_LOAD_FILE, NULL, &receiptDataLen, NULL);
+
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("GP211_load() failed: ", status.errorMessage);
+		}
+
+		status = GP211_install_for_install_and_make_selectable(cardContext,
+				cardInfo, &securityInfo211, loadFileParams.loadFileAID.AID,
+				loadFileParams.loadFileAID.AIDLength,
+				loadFileParams.appletAIDs[0].AID,
+				loadFileParams.appletAIDs[0].AIDLength,
+				loadFileParams.appletAIDs[0].AID,
+				loadFileParams.appletAIDs[0].AIDLength, 0, 500, 1000, NULL, 0,
+				NULL, &receipt, &receiptDataAvailable);
+
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("GP211_install_for_install_and_make_selectable() failed: ", status.errorMessage);
+		}
+
+		status = internal_disconnect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not disconnect: %s", status.errorMessage);
+		}
+	}END_TEST
+
 Suite * GlobalPlatform_suite(void) {
 	Suite *s = suite_create("GlobalPlatform");
 	/* Core test case */
 	TCase *tc_core = tcase_create("Core");
-    tcase_set_timeout(tc_core, 10);
+    tcase_set_timeout(tc_core, 0);
 	tcase_add_test (tc_core, test_list_readers);
 	tcase_add_test (tc_core, test_connect_card);
 	tcase_add_test (tc_core, test_OPGP_VISA2_derive_keys);
 	tcase_add_test (tc_core, test_mutual_authentication);
 	tcase_add_test (tc_core, test_install);
     tcase_add_test (tc_core, test_delete);
-
+    tcase_add_test (tc_core, test_get_status);
 	suite_add_tcase(s, tc_core);
 
 	return s;
