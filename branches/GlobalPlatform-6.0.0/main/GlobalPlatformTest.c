@@ -127,7 +127,7 @@ static OPGP_ERROR_STATUS internal_mutual_authentication() {
 	status = GP211_mutual_authentication(cardContext, cardInfo, NULL,
 			(PBYTE) OPGP_VISA_DEFAULT_KEY, (PBYTE) OPGP_VISA_DEFAULT_KEY,
 			(PBYTE) OPGP_VISA_DEFAULT_KEY, 0, 0, scp, scpImpl,
-			GP211_SCP01_SECURITY_LEVEL_NO_SECURE_MESSAGING, &securityInfo211);
+			GP211_SCP01_SECURITY_LEVEL_C_DEC_C_MAC, &securityInfo211);
 	if (OPGP_ERROR_CHECK(status)) {
 		return status;
 	}
@@ -432,11 +432,10 @@ START_TEST (test_get_status) {
 			fail("Could not get status from applications: %s", status.errorMessage);
 		}
 
-		printf("%d", memcmp(appData[0].AID, appAID, sizeof(appAID)));
-		fail_unless(dataLength == 4, "Incorrect application status");
-		fail_unless(appData[0].lifeCycleState == 7, "Incorrect application status");
-		fail_unless(appData[0].privileges == 2, "Incorrect application status");
-		fail_unless(memcmp(appData[0].AID, appAID, sizeof(appAID))==0, "Incorrect application status");
+		fail_unless(dataLength == 4, "Incorrect application status length");
+		fail_unless(appData[0].lifeCycleState == 7, "Incorrect application status life cycle state");
+		fail_unless(appData[0].privileges == 2, "Incorrect application status privileges");
+		fail_unless(strncmp(appData[0].AID, appAID, sizeof(appAID))==0, "Incorrect application status AID");
 
         dataLength = 10;
 		status = GP211_get_status(cardContext, cardInfo, &securityInfo211, GP211_STATUS_LOAD_FILES, appData, modulesData, &dataLength);
@@ -446,7 +445,7 @@ START_TEST (test_get_status) {
 		fail_unless(dataLength == 5, "Incorrect load file status");
 		fail_unless(appData[0].lifeCycleState == 1, "Incorrect load file status");
 		fail_unless(appData[0].privileges == 0, "Incorrect load file status");
-		fail_unless(memcmp(appData[0].AID, loadFileAID, sizeof(loadFileAID))==0, "Incorrect load file status");
+		fail_unless(strncmp(appData[0].AID, loadFileAID, sizeof(loadFileAID))==0, "Incorrect load file status");
 
         dataLength = 10;
 		status = GP211_get_status(cardContext, cardInfo, &securityInfo211, GP211_STATUS_ISSUER_SECURITY_DOMAIN, appData, modulesData, &dataLength);
@@ -458,13 +457,68 @@ START_TEST (test_get_status) {
 		fail_unless(appData[0].privileges == 0x9e, "Incorrect issuer security status");
 
 
-		fail_unless(memcmp(appData[0].AID, domainAID, sizeof(domainAID)) == 0, "Incorrect issuer security status");
+		fail_unless(strncmp(appData[0].AID, domainAID, sizeof(domainAID)) == 0, "Incorrect issuer security status");
 
 		status = internal_disconnect();
 		if (OPGP_ERROR_CHECK(status)) {
 			fail("Could not disconnect: %s", status.errorMessage);
 		}
 } END_TEST
+
+
+START_TEST (test_put_3des_key) {
+		OPGP_ERROR_STATUS status;
+		BYTE key[16] = {0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5};
+		status = internal_connect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not connect: %s", status.errorMessage);
+		}
+		status = internal_mutual_authentication();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not do mutual authentication: %s", status.errorMessage);
+		}
+		status = GP211_put_3des_key(cardContext, cardInfo, &securityInfo211, 0, 1, 5, key);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not put key: %s", status.errorMessage);
+		}
+		status = internal_disconnect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not disconnect: %s", status.errorMessage);
+		}
+} END_TEST
+
+START_TEST (test_delete_key) {
+		OPGP_ERROR_STATUS status;
+		status = internal_connect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not connect: %s", status.errorMessage);
+		}
+		status = internal_mutual_authentication();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not do mutual authentication: %s", status.errorMessage);
+		}
+		status = GP211_delete_key(cardContext, cardInfo, &securityInfo211, 5, 1);
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not delete key: %s", status.errorMessage);
+		}
+		status = internal_disconnect();
+		if (OPGP_ERROR_CHECK(status)) {
+			fail("Could not disconnect: %s", status.errorMessage);
+		}
+} END_TEST
+
+static DWORD totalWork;
+static DWORD currentWork;
+static DWORD finished;
+
+/**
+ * Callback function. Must be called from a callback enabled function.
+ */
+static void callback_function(OPGP_PROGRESS_CALLBACK_PARAMETERS parameters) {
+    currentWork = parameters.currentWork;
+    totalWork = parameters.totalWork;
+    finished = parameters.finished;
+}
 
 /**
  * Tests the install commands.
@@ -473,6 +527,7 @@ START_TEST (test_install_callback) {
 		OPGP_LOAD_FILE_PARAMETERS loadFileParams;
 		DWORD receiptDataAvailable = 0;
 		DWORD receiptDataLen = 0;
+		OPGP_PROGRESS_CALLBACK callback;
 
 		char installParam[1];
 		installParam[0] = 0;
@@ -507,25 +562,17 @@ START_TEST (test_install_callback) {
 			fail("GP211_install_for_load() failed: ", status.errorMessage);
 		}
 
+		callback.callback = (void(*)(OPGP_PROGRESS_CALLBACK_PARAMETERS))callback_function;
 		status = GP211_load(cardContext, cardInfo, &securityInfo211, NULL, 0,
-				TEST_LOAD_FILE, NULL, &receiptDataLen, NULL);
+				TEST_LOAD_FILE, NULL, &receiptDataLen, &callback);
 
 		if (OPGP_ERROR_CHECK(status)) {
 			fail("GP211_load() failed: ", status.errorMessage);
 		}
 
-		status = GP211_install_for_install_and_make_selectable(cardContext,
-				cardInfo, &securityInfo211, loadFileParams.loadFileAID.AID,
-				loadFileParams.loadFileAID.AIDLength,
-				loadFileParams.appletAIDs[0].AID,
-				loadFileParams.appletAIDs[0].AIDLength,
-				loadFileParams.appletAIDs[0].AID,
-				loadFileParams.appletAIDs[0].AIDLength, 0, 500, 1000, NULL, 0,
-				NULL, &receipt, &receiptDataAvailable);
-
-		if (OPGP_ERROR_CHECK(status)) {
-			fail("GP211_install_for_install_and_make_selectable() failed: ", status.errorMessage);
-		}
+        fail_unless(totalWork == 411, "Incorrect total size");
+        fail_unless(currentWork == 411, "Incorrect currentWork");
+        fail_unless(finished == OPGP_TASK_FINISHED, "Incorrect finished state");
 
 		status = internal_disconnect();
 		if (OPGP_ERROR_CHECK(status)) {
@@ -545,6 +592,10 @@ Suite * GlobalPlatform_suite(void) {
 	tcase_add_test (tc_core, test_install);
     tcase_add_test (tc_core, test_delete);
     tcase_add_test (tc_core, test_get_status);
+    tcase_add_test (tc_core, test_install_callback);
+    tcase_add_test (tc_core, test_put_3des_key);
+    // not working with JCOP
+    //tcase_add_test (tc_core, test_delete_key);
 	suite_add_tcase(s, tc_core);
 
 	return s;

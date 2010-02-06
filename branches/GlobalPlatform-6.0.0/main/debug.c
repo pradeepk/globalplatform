@@ -77,7 +77,7 @@ void OPGP_log_Hex(OPGP_STRING msg, PBYTE buffer, DWORD bufferLength) {
 */
 void OPGP_log_End(OPGP_STRING func, OPGP_STRING file, int line, OPGP_ERROR_STATUS status)
 {
-	OPGP_log_Msg(_T(" -%s in %s at line %d : end error code(0x%0X): %s"), func, file, line, status.errorCode, status.errorMessage);
+	OPGP_log_Msg(_T(" -%s in %s at line %d : end status %d, error code(0x%0X): %s"), func, file, line, status.errorStatus, status.errorCode, status.errorMessage);
 }
 
 /**

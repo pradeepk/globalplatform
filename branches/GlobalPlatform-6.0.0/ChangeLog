@@ -6,6 +6,7 @@ History
 	Improved error handling in API
 	Callback support for long running functions
 	Code much more modular
+	Check unit tests
 	VISA 2 key derivation support
 	internal TLV parsing
 	memory leaks fixed

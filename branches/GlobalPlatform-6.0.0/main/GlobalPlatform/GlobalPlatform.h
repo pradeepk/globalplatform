@@ -244,10 +244,10 @@ typedef struct {
 } OPGP_PROGRESS_CALLBACK_PARAMETERS;
 
 /**
- * The structure is called when the progress for a task changes in functions supporting callbacks.
+ * The structure is used when the progress for a task changes in functions supporting callbacks.
  */
 typedef struct {
-	void (* callback)(OPGP_PROGRESS_CALLBACK_PARAMETERS); //!< The callback function.
+	PVOID callback; //!< The callback function. The must accept a #OPGP_PROGRESS_CALLBACK_PARAMETERS parameter and return void, so the function signature is: void (*callback)(OPGP_PROGRESS_CALLBACK_PARAMETERS).
 	PVOID parameters; //!< Proprietary parameters for the callback function. Passed in when the function is called.
 } OPGP_PROGRESS_CALLBACK;
 

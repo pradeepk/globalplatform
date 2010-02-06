@@ -524,7 +524,7 @@ OPGP_ERROR_STATUS put_rsa_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO card
 		goto end;
 	}
 	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
-	{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_STATUS_SUCCESS, OPGP_stringify_error(OPGP_ERROR_STATUS_SUCCESS)); goto end; }
+	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
 
 	OPGP_LOG_END(_T("put_rsa_key"), status);
@@ -596,7 +596,7 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 	if ( OPGP_ERROR_CHECK(status)) {
 		goto end;
 	}
-	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
+
 	memcpy(sendBuffer+i, keyDataField, keyDataFieldLength); // key
 	i+=keyDataFieldLength;
 
@@ -609,7 +609,7 @@ OPGP_ERROR_STATUS put_3des_key(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO car
 	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
 	if (memcmp(keyCheckValue, recvBuffer+1, 3) != 0)
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_KEY_CHECK_VALUE, OPGP_stringify_error(OPGP_ERROR_KEY_CHECK_VALUE)); goto end; }
-	{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_STATUS_SUCCESS, OPGP_stringify_error(OPGP_ERROR_STATUS_SUCCESS)); goto end; }
+	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
 
 	OPGP_LOG_END(_T("put_3des_key"), status);
@@ -710,7 +710,7 @@ OPGP_ERROR_STATUS put_delegated_management_keys(OPGP_CARD_CONTEXT cardContext, O
 
 	if (memcmp(keyCheckValue, recvBuffer+1, 3) != 0)
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_KEY_CHECK_VALUE, OPGP_stringify_error(OPGP_ERROR_KEY_CHECK_VALUE)); goto end; }
-	{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_STATUS_SUCCESS, OPGP_stringify_error(OPGP_ERROR_STATUS_SUCCESS)); goto end; }
+	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
 
 	OPGP_LOG_END(_T("put_delegated_management_keys"), status);
@@ -1879,7 +1879,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if(callback != NULL) {
 			callbackParameters.currentWork = total;
 			callbackParameters.totalWork = loadFileBufSize;
-			(*callback->callback)(callbackParameters);
+			((void(*)(OPGP_PROGRESS_CALLBACK_PARAMETERS))(callback->callback))(callbackParameters);
 		}
 	}
 	// Not enough space to start load file data block. First send data then start load file data block.
@@ -1951,7 +1951,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if(callback != NULL) {
 			callbackParameters.currentWork = total;
 			callbackParameters.totalWork = loadFileBufSize;
-			(*callback->callback)(callbackParameters);
+			((void(*)(OPGP_PROGRESS_CALLBACK_PARAMETERS))(callback->callback))(callbackParameters);
 		}
 	}
 	// The rest of the load file data block
@@ -1997,7 +1997,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		if(callback != NULL) {
 			callbackParameters.currentWork = total;
 			callbackParameters.totalWork = loadFileBufSize;
-			(*callback->callback)(callbackParameters);
+			((void(*)(OPGP_PROGRESS_CALLBACK_PARAMETERS))(callback->callback))(callbackParameters);
 		}
 	}
 	if (recvBufferLength > sizeof(GP211_RECEIPT_DATA)) { // assumption that a GP211_RECEIPT_DATA structure is returned in a delegated management deletion
@@ -2011,7 +2011,7 @@ end:
 		callbackParameters.currentWork = total;
 		callbackParameters.totalWork = loadFileBufSize;
 		callbackParameters.finished = OPGP_TASK_FINISHED;
-		(*callback->callback)(callbackParameters);
+		((void(*)(OPGP_PROGRESS_CALLBACK_PARAMETERS))(callback->callback))(callbackParameters);
 	}
 	OPGP_LOG_END(_T("load_from_buffer"), status);
 	return status;
