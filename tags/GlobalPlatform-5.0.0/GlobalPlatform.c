@@ -6323,6 +6323,7 @@ static LONG pin_change(OPGP_CARD_INFO cardInfo, GP211_SECURITY_INFO *secInfo, BY
 	sendBuffer[i++] = tryLimit;
 	if (tryLimit != 0) {
 		sendBuffer[i++] = 0x08;
+		memset ( PINFormat, 0, sizeof ( PINFormat ));
 		PINFormat[0] = 0x20;
 		PINFormat[0] |= newPINLength & 0x0f;
 		for (j=0; j<newPINLength; j++) {
