@@ -1,7 +1,5 @@
 INCLUDE(FindPCSC)
-#INCLUDE(FindOpenSSL)
-PKG_CHECK_MODULES(OPENSSL REQUIRED openssl)
-
+INCLUDE(FindOpenSSL)
 INCLUDE(FindZLIB)
 SET(SOURCES connection.c stringify.c crypto.c loadfile.c util.c debug.c globalplatform.c)
 
@@ -53,21 +51,22 @@ ENDIF(WIN32)
 
 # Install
 IF(WIN32)
- INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX})
-ELSEIF(WIN32)
  INSTALL(TARGETS globalplatform RUNTIME DESTINATION lib${LIB_SUFFIX})
+ELSE(WIN32)
+ INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX})
 ENDIF(WIN32)
 
-
-# Tests
-PKG_CHECK_MODULES(CHECK check>=0.9.2)
-
-IF(CHECK_FOUND)
-  ENABLE_TESTING()
-  ADD_EXECUTABLE(globalplatformTest globalplatformTest.c)
-  TARGET_LINK_LIBRARIES(globalplatformTest globalplatform check)
-  ADD_TEST(globalplatformTest ${EXECUTABLE_OUTPUT_PATH}/globalplatformTest)
-  SET_TESTS_PROPERTIES(globalplatformTest PROPERTIES PASS_REGULAR_EXPRESSION "Failures: 0")
-ENDIF(CHECK_FOUND)
+# Testing
+IF(TESTING)
+  PKG_CHECK_MODULES(CHECK check>=0.9.2)
+  IF(CHECK_FOUND)
+    ENABLE_TESTING()
+    INCLUDE_DIRECTORIES(${CHECK_INCLUDE_DIRS})
+    ADD_EXECUTABLE(globalplatformTest globalplatformTest.c)
+    TARGET_LINK_LIBRARIES(globalplatformTest globalplatform ${CHECK_LIBRARIES})
+    ADD_TEST(globalplatformTest ${EXECUTABLE_OUTPUT_PATH}/globalplatformTest)
+    SET_TESTS_PROPERTIES(globalplatformTest PROPERTIES PASS_REGULAR_EXPRESSION "Failures: 0")
+  ENDIF(CHECK_FOUND)
+ENDIF(TESTING)
 
 ADD_SUBDIRECTORY(globalplatform)
