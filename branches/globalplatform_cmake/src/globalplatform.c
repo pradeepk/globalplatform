@@ -1012,7 +1012,7 @@ OPGP_ERROR_STATUS delete_application(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_IN
 			*receiptDataLength = 0;
 			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_COMMAND_TOO_LARGE, OPGP_stringify_error(OPGP_ERROR_COMMAND_TOO_LARGE)); goto end; }
 		}
-		OPGP_log_Hex(_T("delete_application: AID to delete: "), AIDs[j].AID, AIDs[j].AIDLength);
+		OPGP_LOG_HEX(_T("delete_application: AID to delete: "), AIDs[j].AID, AIDs[j].AIDLength);
 		sendBuffer[4] += AIDs[j].AIDLength+2;
 		sendBuffer[i++] = 0x4F;
 		sendBuffer[i++] = AIDs[j].AIDLength;
@@ -1337,9 +1337,7 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	/* {globalPlatform 1} OID for Card Recognition Data */
 	memcpy(OIDCardRecognitionData, tlv1.value, tlv1.length);
 	OIDCardRecognitionDataLength = tlv1.length;
-#ifdef DEBUG
-	OPGP_log_Hex(_T("GP211_get_secure_channel_protocol_details: OIDCardRecognitionData: "), OIDCardRecognitionData, OIDCardRecognitionDataLength);
-#endif
+	OPGP_LOG_HEX(_T("GP211_get_secure_channel_protocol_details: OIDCardRecognitionData: "), OIDCardRecognitionData, OIDCardRecognitionDataLength);
 
 	/* Application tag 0 and length */
 	result = read_TLV(_73tlv.value+offset, _73tlv.length-offset, &tlv1);
@@ -1357,10 +1355,7 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	/* {globalPlatform 2 v} OID for Card Management Type and Version */
 	memcpy(OIDCardManagementTypeAndVersion, tlv2.value, tlv2.length);
 	OIDCardManagementTypeAndVersionLength = tlv2.length;
-#ifdef DEBUG
-	OPGP_log_Hex(_T("GP211_get_secure_channel_protocol_details: OIDCardManagementTypeAndVersion: "), OIDCardManagementTypeAndVersion, OIDCardManagementTypeAndVersionLength);
-
-#endif
+	OPGP_LOG_HEX(_T("GP211_get_secure_channel_protocol_details: OIDCardManagementTypeAndVersion: "), OIDCardManagementTypeAndVersion, OIDCardManagementTypeAndVersionLength);
 
 	/* Application tag 3 and length */
 	result = read_TLV(_73tlv.value+offset, _73tlv.length-offset, &tlv1);
@@ -1378,10 +1373,7 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	/* {globalPlatform 3} OID for Card Identification Scheme */
 	memcpy(OIDCardIdentificationScheme, tlv2.value, tlv2.length);
 	OIDCardIdentificationSchemeLength = tlv2.length;
-#ifdef DEBUG
-	OPGP_log_Hex(_T("GP211_get_secure_channel_protocol_details: OIDCardIdentificationScheme: "), OIDCardIdentificationScheme, OIDCardIdentificationSchemeLength);
-
-#endif
+	OPGP_LOG_HEX(_T("GP211_get_secure_channel_protocol_details: OIDCardIdentificationScheme: "), OIDCardIdentificationScheme, OIDCardIdentificationSchemeLength);
 
 	/* Application tag 4 and length */
 	result = read_TLV(_73tlv.value+offset, _73tlv.length-offset, &tlv1);
@@ -1401,10 +1393,7 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 	*/
 	memcpy(OIDSecureChannelProtocol, tlv2.value, tlv2.length);
 	OIDSecureChannelProtocolLength = tlv2.length;
-#ifdef DEBUG
-	OPGP_log_Hex(_T("GP211_get_secure_channel_protocol_details: OIDSecureChannelProtocol: "), OIDSecureChannelProtocol, OIDSecureChannelProtocolLength);
-
-#endif
+	OPGP_LOG_HEX(_T("GP211_get_secure_channel_protocol_details: OIDSecureChannelProtocol: "), OIDSecureChannelProtocol, OIDSecureChannelProtocolLength);
 	*secureChannelProtocol = OIDSecureChannelProtocol[OIDSecureChannelProtocolLength-2];
 	*secureChannelProtocolImpl = OIDSecureChannelProtocol[OIDSecureChannelProtocolLength-1];
 
@@ -1421,9 +1410,7 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 		/* Card configuration details */
 		memcpy(CardConfigurationDetails, tlv1.value, tlv1.length);
 		CardConfigurationDetailsLength = tlv1.length;
-#ifdef DEBUG
-		OPGP_log_Hex(_T("GP211_get_secure_channel_protocol_details: CardConfigurationDetails: "), CardConfigurationDetails, CardConfigurationDetailsLength);
-#endif
+		OPGP_LOG_HEX(_T("GP211_get_secure_channel_protocol_details: CardConfigurationDetails: "), CardConfigurationDetails, CardConfigurationDetailsLength);
 	}
 	if (_73tlv.length > offset) {
 		/* Application tag 6 and length */
@@ -1436,9 +1423,7 @@ OPGP_ERROR_STATUS GP211_get_secure_channel_protocol_details(OPGP_CARD_CONTEXT ca
 		/* Card / chip details */
 		memcpy(CardChipDetails, tlv1.value, tlv1.length);
 		CardChipDetailsLength = tlv1.length;
-#ifdef DEBUG
-		OPGP_log_Hex(_T("GP211_get_secure_channel_protocol_details: CardChipDetails: "), CardChipDetails, CardChipDetailsLength);
-#endif
+		OPGP_LOG_HEX(_T("GP211_get_secure_channel_protocol_details: CardChipDetails: "), CardChipDetails, CardChipDetailsLength);
 	}
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
@@ -1504,7 +1489,7 @@ OPGP_ERROR_STATUS get_key_information_templates(OPGP_CARD_CONTEXT cardContext, O
 	}
 
 	*keyInformationLength = i;
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	for (i=0; i<*keyInformationLength; i++) {
 		OPGP_log_Msg(_T("get_key_information_templates: Key index: 0x%02x\n"), keyInformation[i].keyIndex);
 		OPGP_log_Msg(_T("get_key_information_templates: Key set version: 0x%02x\n"), keyInformation[i].keySetVersion);
@@ -1836,10 +1821,12 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		switch(fileSizeSize) {
 			case 1: {
 				sendBuffer[5+j++] = (BYTE)loadFileBufSize;
+				break;
 					}
 			case 2: {
 				sendBuffer[5+j++] = 0x81;
 				sendBuffer[5+j++] = (BYTE)loadFileBufSize;
+				break;
 					}
 			case 3: {
 				sendBuffer[5+j++] = 0x82;
@@ -1907,10 +1894,12 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 		switch(fileSizeSize) {
 			case 1: {
 				sendBuffer[5+j++] = (BYTE)loadFileBufSize;
+				break;
 				}
 			case 2: {
 				sendBuffer[5+j++] = 0x81;
 				sendBuffer[5+j++] = (BYTE)loadFileBufSize;
+				break;
 				}
 			case 3: {
 				sendBuffer[5+j++] = 0x82;
@@ -1963,9 +1952,7 @@ OPGP_ERROR_STATUS load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO
 
 	while(!(total == loadFileBufSize)) {
 		j = 0;
-#ifdef DEBUG
-		OPGP_log_Msg(_T("load_from_buffer: left: %d"), loadFileBufSize-total);
-#endif
+		OPGP_LOG_MSG(_T("load_from_buffer: left: %d"), loadFileBufSize-total);
 		if (loadFileBufSize-total > MAX_APDU_DATA_SIZE_FOR_SECURE_MESSAGING) {
 			count=MAX_APDU_DATA_SIZE_FOR_SECURE_MESSAGING;
 		}
@@ -2806,7 +2793,7 @@ OPGP_ERROR_STATUS GP211_get_load_token_signature_data(PBYTE executableLoadFileAI
 								   PDWORD loadTokenSignatureDataLength) {
 	BYTE buf[258];
 	DWORD i=0;
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	DWORD j=0;
 #endif
 	DWORD hiByte, loByte;
@@ -2884,23 +2871,23 @@ OPGP_ERROR_STATUS GP211_get_load_token_signature_data(PBYTE executableLoadFileAI
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_INSUFFICIENT_BUFFER, OPGP_stringify_error(OPGP_ERROR_INSUFFICIENT_BUFFER)); goto end; }
 	memcpy(loadTokenSignatureData, buf, i);
 	*loadTokenSignatureDataLength = i;
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Reference control parameter P1: 0x%02x"), loadTokenSignatureData[j++]);
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Reference control parameter P2: 0x%02x"), loadTokenSignatureData[j++]);
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Length of the following fields: 0x%02x"), loadTokenSignatureData[j++]);
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Load file AID length: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("GP211_get_load_token_signature_data: Load file AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("GP211_get_load_token_signature_data: Load file AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 
 	j+=loadTokenSignatureData[j-1];
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Security Domain AID length: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("GP211_get_load_token_signature_data: Security Domain AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("GP211_get_load_token_signature_data: Security Domain AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 	j+=loadTokenSignatureData[j-1];
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Length of the Load File Data Block Hash: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("GP211_get_load_token_signature_data: Load File Data Block Hash: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("GP211_get_load_token_signature_data: Load File Data Block Hash: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 	j+=loadTokenSignatureData[j-1];
 
 	OPGP_log_Msg(_T("GP211_get_load_token_signature_data: Load parameters field length: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("GP211_get_load_token_signature_data: Load parameters field: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("GP211_get_load_token_signature_data: Load parameters field: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 	j+=loadTokenSignatureData[j-1];
 
 #endif
@@ -3223,9 +3210,7 @@ OPGP_ERROR_STATUS OPGP_VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CAR
 
 	OPGP_LOG_START(_T("OPGP_VISA2_derive_keys"));
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("OPGP_VISA2_derive_keys: Card Manager AID: "), AID, AIDLength);
-#endif
+	OPGP_LOG_HEX(_T("OPGP_VISA2_derive_keys: Card Manager AID: "), AID, AIDLength);
 
 	status = OP201_get_data(cardContext, cardInfo, NULL, (PBYTE)OP201_GET_DATA_CPLC_WHOLE_CPLC,
 		cardCPLCData, &cplcDataLen);
@@ -3277,9 +3262,7 @@ OPGP_ERROR_STATUS VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 
 	OPGP_LOG_START(_T("VISA2_derive_keys"));
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("VISA2_derive_keys: Base Key Diversification Data: "), baseKeyDiversificationData, 10);
-#endif
+	OPGP_LOG_HEX(_T("VISA2_derive_keys: Base Key Diversification Data: "), baseKeyDiversificationData, 10);
 
 	/* Key Diversification data
 	KDCAUTH/ENC xxh xxh || IC serial number || F0h 01h ||xxh xxh || IC serial number
@@ -3305,9 +3288,7 @@ OPGP_ERROR_STATUS VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
  	keyDiversificationData[14] = 0x0F;
  	keyDiversificationData[15] = 0x01;
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("VISA2_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
-#endif
+	OPGP_LOG_HEX(_T("VISA2_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
 
 	status = calculate_enc_ecb_two_key_triple_des(masterKey, keyDiversificationData, 16, S_ENC, &outl);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -3321,9 +3302,7 @@ OPGP_ERROR_STATUS VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 	keyDiversificationData[14] = 0x0F;
 	keyDiversificationData[15] = 0x02;
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("VISA2_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
-#endif
+	OPGP_LOG_HEX(_T("VISA2_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
 
 	status = calculate_enc_ecb_two_key_triple_des(masterKey, keyDiversificationData, 16, S_MAC, &outl);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -3339,10 +3318,7 @@ OPGP_ERROR_STATUS VISA2_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INF
 	keyDiversificationData[14] = 0x0F;
 	keyDiversificationData[15] = 0x03;
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("VISA2_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
-
-#endif
+	OPGP_LOG_HEX(_T("VISA2_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
 
 	status = calculate_enc_ecb_two_key_triple_des(masterKey, keyDiversificationData, 16, DEK, &outl);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -3450,9 +3426,7 @@ OPGP_ERROR_STATUS EMV_CPS11_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
     keyDiversificationData[14] = 0x0F;
     keyDiversificationData[15] = 0x01;
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("EMV_CPS11_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
-#endif
+	OPGP_LOG_HEX(_T("EMV_CPS11_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
 
 	status = calculate_enc_ecb_two_key_triple_des(masterKey, keyDiversificationData, 16, S_ENC, &outl);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -3466,9 +3440,7 @@ OPGP_ERROR_STATUS EMV_CPS11_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	keyDiversificationData[14] = 0x0F;
 	keyDiversificationData[15] = 0x02;
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("EMV_CPS11_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
-#endif
+	OPGP_LOG_HEX(_T("EMV_CPS11_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
 
 	status = calculate_enc_ecb_two_key_triple_des(masterKey, keyDiversificationData, 16, S_MAC, &outl);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -3484,10 +3456,7 @@ OPGP_ERROR_STATUS EMV_CPS11_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	keyDiversificationData[14] = 0x0F;
 	keyDiversificationData[15] = 0x03;
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("EMV_CPS11_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
-
-#endif
+	OPGP_LOG_HEX(_T("EMV_CPS11_derive_keys: Key Diversification Data: "), keyDiversificationData, 16);
 
 	status = calculate_enc_ecb_two_key_triple_des(masterKey, keyDiversificationData, 16, DEK, &outl);
 	if (OPGP_ERROR_CHECK(status)) {
@@ -3597,7 +3566,7 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 	secInfo->secureChannelProtocol = secureChannelProtocol;
 	secInfo->secureChannelProtocolImpl = secureChannelProtocolImpl;
 
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	OPGP_log_Msg(_T("mutual_authentication: Secure Channel Protocol: 0x%02X"), secureChannelProtocol);
 	OPGP_log_Msg(_T("mutual_authentication: Secure Channel Protocol Implementation: 0x%02X"), secureChannelProtocolImpl);
 #endif
@@ -3607,10 +3576,7 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 		goto end;
 	}
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("mutual_authentication: Generated Host Challenge: "), hostChallenge, 8);
-
-#endif
+	OPGP_LOG_HEX(_T("mutual_authentication: Generated Host Challenge: "), hostChallenge, 8);
 
 	// INITIALIZE UPDATE
 	i=0;
@@ -3668,20 +3634,20 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 			goto end;
 		}
 	}
-#ifdef DEBUG
-	OPGP_log_Hex(_T("mutual_authentication: Key Diversification Data: "), key_diversification_data, 10);
+#ifdef OPGP_DEBUG
+	OPGP_LOG_HEX(_T("mutual_authentication: Key Diversification Data: "), key_diversification_data, 10);
 
-	OPGP_log_Hex(_T("mutual_authentication: Key Information Data: "), key_information_data, 2);
+	OPGP_LOG_HEX(_T("mutual_authentication: Key Information Data: "), key_information_data, 2);
 
 	if (secInfo->secureChannelProtocol == GP211_SCP02) {
-		OPGP_log_Hex(_T("mutual_authentication: Sequence Counter: "), sequenceCounter, 2);
-		OPGP_log_Hex(_T("mutual_authentication: Card Challenge: "), cardChallengeSCP02, 6);
+		OPGP_LOG_HEX(_T("mutual_authentication: Sequence Counter: "), sequenceCounter, 2);
+		OPGP_LOG_HEX(_T("mutual_authentication: Card Challenge: "), cardChallengeSCP02, 6);
 	}
 	else {
-		OPGP_log_Hex(_T("mutual_authentication: Card Challenge: "), cardChallengeSCP01, 8);
+		OPGP_LOG_HEX(_T("mutual_authentication: Card Challenge: "), cardChallengeSCP01, 8);
 	}
 
-	OPGP_log_Hex(_T("mutual_authentication: Retrieved Card Cryptogram: "), cardCryptogram, 8);
+	OPGP_LOG_HEX(_T("mutual_authentication: Retrieved Card Cryptogram: "), cardCryptogram, 8);
 
 #endif
 
@@ -3795,29 +3761,25 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 		goto end;
 	}
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("mutual_authentication: S-ENC Session Key: "), secInfo->encryptionSessionKey, 16);
-#endif
+	OPGP_LOG_HEX(_T("mutual_authentication: S-ENC Session Key: "), secInfo->encryptionSessionKey, 16);
 
-#ifdef DEBUG
-	OPGP_log_Msg(_T("mutual_authentication: S-MAC Session Key: "), secInfo->C_MACSessionKey, 16);
-#endif
+	OPGP_LOG_MSG(_T("mutual_authentication: S-MAC Session Key: "), secInfo->C_MACSessionKey, 16);
 
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	if (secInfo->secureChannelProtocol == GP211_SCP01) {
-		OPGP_log_Hex(_T("mutual_authentication: Data Encryption Key: "), secInfo->dataEncryptionSessionKey, 16);
+		OPGP_LOG_HEX(_T("mutual_authentication: Data Encryption Key: "), secInfo->dataEncryptionSessionKey, 16);
 	}
 #endif
 
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	if (secInfo->secureChannelProtocol == GP211_SCP02) {
-		OPGP_log_Hex(_T("mutual_authentication: R-MAC Session Key: "), secInfo->R_MACSessionKey, 16);
+		OPGP_LOG_HEX(_T("mutual_authentication: R-MAC Session Key: "), secInfo->R_MACSessionKey, 16);
 	}
 #endif
 
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	if (secInfo->secureChannelProtocol == GP211_SCP02) {
-		OPGP_log_Hex(_T("mutual_authentication: DEK Session Key: "), secInfo->dataEncryptionSessionKey, 16);
+		OPGP_LOG_HEX(_T("mutual_authentication: DEK Session Key: "), secInfo->dataEncryptionSessionKey, 16);
 	}
 #endif
 
@@ -3837,10 +3799,7 @@ OPGP_ERROR_STATUS mutual_authentication(OPGP_CARD_CONTEXT cardContext, OPGP_CARD
 		}
 	}
 
-#ifdef DEBUG
-	OPGP_log_Hex(_T("mutual_authentication: Card Cryptogram to compare: "), card_cryptogram_ver, 8);
-
-#endif
+	OPGP_LOG_HEX(_T("mutual_authentication: Card Cryptogram to compare: "), card_cryptogram_ver, 8);
 
 	if (memcmp(cardCryptogram, card_cryptogram_ver, 8) != 0) {
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_CARD_CRYPTOGRAM_VERIFICATION, OPGP_stringify_error(OPGP_ERROR_CARD_CRYPTOGRAM_VERIFICATION)); goto end; }
@@ -4231,16 +4190,12 @@ OPGP_ERROR_STATUS OPGP_manage_channel(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_I
 	if (openClose == GP211_MANAGE_CHANNEL_OPEN) {
 		*channelNumberOpened = recvBuffer[0];
 		cardInfo->logicalChannel = recvBuffer[0];
-#ifdef DEBUG
-	OPGP_log_Msg(_T("OPGP_manage_channel: Logical Channel number opened: %d"), *channelNumberOpened);
-#endif
+	OPGP_LOG_MSG(_T("OPGP_manage_channel: Logical Channel number opened: %d"), *channelNumberOpened);
 	}
 	else {
 		*channelNumberOpened = 0;
 		cardInfo->logicalChannel = 0;
-#ifdef DEBUG
-	OPGP_log_Msg(_T("OPGP_manage_channel: Logical Channel closed: %d"), channelNumberToClose);
-#endif
+	OPGP_LOG_MSG(_T("OPGP_manage_channel: Logical Channel closed: %d"), channelNumberToClose);
 	}
 
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
@@ -4993,7 +4948,7 @@ OPGP_ERROR_STATUS OP201_get_load_token_signature_data(PBYTE executableLoadFileAI
 								   PDWORD loadTokenSignatureDataLength) {
 	BYTE buf[258];
 	DWORD i=0;
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	DWORD j=0;
 #endif
 	DWORD hiByte, loByte;
@@ -5071,20 +5026,20 @@ OPGP_ERROR_STATUS OP201_get_load_token_signature_data(PBYTE executableLoadFileAI
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_INSUFFICIENT_BUFFER, OPGP_stringify_error(OPGP_ERROR_INSUFFICIENT_BUFFER)); goto end; }
 	memcpy(loadTokenSignatureData, buf, i);
 	*loadTokenSignatureDataLength = i;
-#ifdef DEBUG
+#ifdef OPGP_DEBUG
 	OPGP_log_Msg(_T("OP201_get_load_token_signature_data: P1: 0x%02x"), loadTokenSignatureData[j++]);
 	OPGP_log_Msg(_T("OP201_get_load_token_signature_data: P2: 0x%02x"), loadTokenSignatureData[j++]);
 	OPGP_log_Msg(_T("OP201_get_load_token_signature_data: Lc: 0x%02x"), loadTokenSignatureData[j++]);
 	OPGP_log_Msg(_T("OP201_get_load_token_signature_data: Load file AID length indicator: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("OP201_get_load_token_signature_data: Load file AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("OP201_get_load_token_signature_data: Load file AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 	j+=loadTokenSignatureData[j-1];
 	OPGP_log_Msg(_T("OP201_get_load_token_signature_data: Security Domain AID length indicator: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("OP201_get_load_token_signature_data: Security Domain AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("OP201_get_load_token_signature_data: Security Domain AID: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 	j+=loadTokenSignatureData[j-1];
 	OPGP_log_Msg(_T("OP201_get_load_token_signature_data: Load parameters length indicator: 0x%02x"), loadTokenSignatureData[j++]);
-	OPGP_log_Hex(_T("OP201_get_load_token_signature_data: Load parameters: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
+	OPGP_LOG_HEX(_T("OP201_get_load_token_signature_data: Load parameters: "), loadTokenSignatureData+(j-1), *loadTokenSignatureDataLength-(j-1));
 	j+=loadTokenSignatureData[j-1];
-	OPGP_log_Hex(_T("OP201_get_load_token_signature_data: Hash of Load File: "), loadTokenSignatureData+j, 20);
+	OPGP_LOG_HEX(_T("OP201_get_load_token_signature_data: Hash of Load File: "), loadTokenSignatureData+j, 20);
 	j+=loadTokenSignatureData[j-1];
 #endif
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
@@ -5170,9 +5125,7 @@ OPGP_ERROR_STATUS OP201_calculate_load_file_DAP(OP201_DAP_BLOCK *dapBlock, DWORD
 		{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ERROR_INVALID_FILENAME, OPGP_stringify_error(OPGP_ERROR_INVALID_FILENAME)); goto end; }
 
 	for (i=0; i<dapBlockLength; i++) {
-#ifdef DEBUG
-		OPGP_log_Msg(_T("OP201_calculate_load_file_DAP: Hashing DAP block %lu."), i);
-#endif
+		OPGP_LOG_MSG(_T("OP201_calculate_load_file_DAP: Hashing DAP block %lu."), i);
 		j=0;
 		k = dapBufSize;
 		status = readDAPBlock(dapBuf, &k, dapBlock[i]);

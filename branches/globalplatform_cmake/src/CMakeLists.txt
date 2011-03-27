@@ -3,8 +3,10 @@ INCLUDE(FindOpenSSL)
 INCLUDE(FindZLIB)
 SET(SOURCES connection.c stringify.c crypto.c loadfile.c util.c debug.c globalplatform.c)
 
+SET(CMAKE_BUILD_TYPE "Release")
+
 # Enable debugging output
-ADD_DEFINITIONS(-DDEBUG)
+ADD_DEFINITIONS(-DOPGP_DEBUG)
 
 # Handle Unix build
 IF(UNIX)

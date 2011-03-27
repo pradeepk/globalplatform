@@ -38,6 +38,7 @@ This can be obtained in standard Unix distributions over the integrated package 
 
 On a command line type:
 
+cd \path\to\globalplatform
 cmake .
 make
 
@@ -50,11 +51,16 @@ Compilation under Windows
 Tested with:
 
 **** SDK ****
-Microsoft Windows SDK for Windows 7 and .NET Framework 4 
+Microsoft Windows SDK for Windows 7 and .NET Framework 4
+http://msdn.microsoft.com/en-us/windows/bb980924
+
+**** VISUAL C++ 2010 EXPRESS ****
+To have nmake install VISUAL C++ 2010 EXPRESS
+http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
 
 **** OpenSSL ****
 http://www.slproweb.com/products/Win32OpenSSL.html
---> Win32 OpenSSL v1.0.0c
+--> Win32 OpenSSL v1.0.0d
 --> Visual C++ 2008 Redistributables
 
 **** zlib ****
@@ -69,21 +75,31 @@ http://www.zlib.net/
 
 **** CMake ****
 http://www.cmake.org/
---> CMake 2.8.3
+--> CMake 2.8.4
 
 **** Compile ****
 
+  Launch Visual Studio Command Prompt (2010)
   cd \path\to\globalplatform
-  mkdir bin
-  cd bin
 
-  cmake ..
+  cmake .
   ## CMake looks for PC/SC, OpenSSL and zlib ##
 
   nmake
 
-
 Done!
+
+CMake Issues
+------------ 
+
+You must rebuild the build system if your build tools have changed. Otherwise 
+CMake uses the old cached values from the cache. You have to delete manually 
+the CMakeCache.txt file (and maybe also the CMakeLists directory and 
+cmake_install.cmake).
+
+If your are using Cygwin and you have installed the GNU compiler tools and the
+bin directory is on the PATH environment variable CMake will favor these tools 
+and the linking step will fail. So remove the Cygwin bin directory from the path.  
 
 ------------------
 
