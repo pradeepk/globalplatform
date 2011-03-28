@@ -27,7 +27,7 @@ ENDIF(UNIX)
 
 # Handle Windows build
 IF(WIN32)
-    SET(SOURCES ${SOURCES} dyn_win32.c unzip/unzip.c unzip/iowin32.c unzip/ioapi.c)
+    SET(SOURCES ${SOURCES} dyn_win32.c unzip/unzip.c unzip/iowin32.c unzip/ioapi.c version.rc)
     ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
     ADD_DEFINITIONS(-DUNICODE)
 ENDIF(WIN32)
