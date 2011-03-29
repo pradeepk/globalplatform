@@ -5,7 +5,7 @@
 #  GLOBALPLATFORM_INCLUDE_DIRS - the GlobalPlatform include directory
 #  GLOBALPLATFORM_LIBRARIES - The libraries needed to use GlobalPlatform
 #
-# Author: Karsten Ohme <k_o_@sourceforge.net>
+# Author: Karsten Ohme <k_o_@users.sourceforge.net>
 # Version: 20110329
 #
 
@@ -18,9 +18,9 @@ ENDIF(PKG_CONFIG_FOUND)
 
 IF(NOT GLOBALPLATFORM_FOUND)
    # Will find GlobalPlatform headers both on Mac and Windows
-   FIND_PATH(GLOBALPLATFORM_INCLUDE_DIRS NAMES globalplatform.h PATHS ../globalplatform/src PATH_SUFFIXES globalplatform)
+   FIND_PATH(GLOBALPLATFORM_INCLUDE_DIRS NAMES globalplatform/globalplatform.h PATHS "D://Dokumente und Einstellungen/koh/workspaces/GlobalPlatform/branches/globalplatform_cmake/gppcscconnectionplugin/../globalplatform/src")
    # GlobalPlatform library naming
-   FIND_LIBRARY(GLOBALPLATFORM_LIBRARIES NAMES globalplatform GlobalPlatform PATHS ../globalplatform/src)
+   FIND_LIBRARY(GLOBALPLATFORM_LIBRARIES NAMES globalplatform GlobalPlatform PATHS "D://Dokumente und Einstellungen/koh/workspaces/GlobalPlatform/branches/globalplatform_cmake/gppcscconnectionplugin/../globalplatform/src")
 ENDIF(NOT GLOBALPLATFORM_FOUND)
 
 INCLUDE(FindPackageHandleStandardArgs)
