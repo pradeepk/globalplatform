@@ -18,9 +18,9 @@ ENDIF(PKG_CONFIG_FOUND)
 
 IF(NOT GLOBALPLATFORM_FOUND)
    # Will find GlobalPlatform headers both on Mac and Windows
-   FIND_PATH(GLOBALPLATFORM_INCLUDE_DIRS NAMES globalplatform.h PATH_SUFFIXES globalplatform)
-   # GlobalPlatform library is for Mac, WinSCard library is for Windows
-   FIND_LIBRARY(GLOBALPLATFORM_LIBRARIES NAMES globalplatform GlobalPlatform)
+   FIND_PATH(GLOBALPLATFORM_INCLUDE_DIRS NAMES globalplatform.h PATHS ../globalplatform/src PATH_SUFFIXES globalplatform)
+   # GlobalPlatform library naming
+   FIND_LIBRARY(GLOBALPLATFORM_LIBRARIES NAMES globalplatform GlobalPlatform PATHS ../globalplatform/src)
 ENDIF(NOT GLOBALPLATFORM_FOUND)
 
 INCLUDE(FindPackageHandleStandardArgs)
