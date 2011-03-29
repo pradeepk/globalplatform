@@ -1,0 +1,119 @@
+******************************************************
+Title    : GlobalPlatform
+Authors  : Karsten Ohme <k_o_@users.sourceforge.net>
+License  : See file COPYING
+Requires : PC/SC Lite http://www.musclecard.com/ (for UNIXes)
+           OpenSSL http://www.openssl.org/
+           zlib http://www.zlib.net/
+******************************************************
+
+This is a library for providing access to OpenPlatform 2.0.1' and
+GlobalPlatform 2.1.1 conforming smart cards.
+
+You need also the libraries zlib 1.2.3 (zlib1.dll in Windows) and OpenSSL 0.9.7e
+(libeay32.dll and ssleay32.dll in Windows) or compatible.
+
+------------------
+
+If you experience problems a DEBUG output is always helpful.
+Set the variable GLOBALPLATFORM_DEBUG=1 in the environment. You can set
+the logfile with GLOBALPLATFORM_LOGFILE=<file>. Under Windows by
+default C:\Temp\GlobalPlatform.log is chosen. The log file must be
+writable for the user. The default log file under Unix systems is
+/tmp/GlobalPlatform.log. But usually syslog is available and this will
+be used by default, so you may have to specify the log file manually,
+if you don't have access to the syslog or don't want to use it.
+Keep in mind that the debugging output may contain sensitive information,
+e.g. keys!
+
+------------------
+
+If you compile this on your own:
+
+Compilation under Unix
+----------------------
+
+You must have CMake installed. http://www.cmake.org/ 
+This can be obtained in standard Unix distributions over the integrated package system.
+
+On a command line type:
+
+cd \path\to\globalplatform
+cmake .
+make
+
+
+Compilation under Windows
+-------------------------
+
+-- Requirements --
+
+Tested with:
+
+**** SDK ****
+Microsoft Windows SDK for Windows 7 and .NET Framework 4
+http://msdn.microsoft.com/en-us/windows/bb980924
+
+**** VISUAL C++ 2010 EXPRESS ****
+To have nmake install VISUAL C++ 2010 EXPRESS
+http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
+
+**** OpenSSL ****
+http://www.slproweb.com/products/Win32OpenSSL.html
+--> Win32 OpenSSL v1.0.0d
+--> Visual C++ 2008 Redistributables
+
+**** zlib ****
+http://www.zlib.net/
+--> zlib compiled DLL, version 1.2.5
+
+  * Copy the zlib1.dll to C:\Windows\System32
+  * Copy the files from the include directory to
+    C:\Program Files\Microsoft SDKs\Windows\v7.1\Include
+  * Copy the file "zdll.lib" from the lib directory to
+    C:\Program Files\Microsoft SDKs\Windows\v7.1\Lib
+
+**** CMake ****
+http://www.cmake.org/
+--> CMake 2.8.4
+
+**** Compile ****
+
+  Launch Visual Studio Command Prompt (2010)
+  cd \path\to\globalplatform
+
+  cmake .
+  ## CMake looks for PC/SC, OpenSSL and zlib ##
+
+  nmake
+
+Done!
+
+CMake Issues
+------------ 
+
+You must rebuild the build system if your build tools have changed. Otherwise 
+CMake uses the old cached values from the cache. You have to delete manually 
+the CMakeCache.txt file (and maybe also the CMakeLists directory and 
+cmake_install.cmake).
+
+If your are using Cygwin and you have installed the GNU compiler tools and the
+bin directory is on the PATH environment variable CMake will favor these tools 
+and the linking step will fail. So remove the Cygwin bin directory from the path.  
+
+------------------
+
+Testing is only supported under Linux for now. To generate the tests execute:
+
+cmake -DTESTING=ON
+make
+make tests
+
+For the unit tests a JCOP v2.2 41 card is used.
+
+------------------
+
+For more information contact the author through the mailing list at:
+
+http://sourceforge.net/projects/globalplatform/
+
