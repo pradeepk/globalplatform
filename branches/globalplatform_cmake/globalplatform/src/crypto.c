@@ -983,12 +983,8 @@ OPGP_ERROR_STATUS wrap_command(PBYTE apduCommand, DWORD apduCommandLength, PBYTE
 				goto end;
 			}
 		}
-#ifdef DEBUG
-		OPGP_log_Hex(_T("wrap_command: ICV for MAC: "), C_MAC_ICV, 8);
-#endif
-#ifdef DEBUG
-		OPGP_log_Hex(_T("wrap_command: Generated MAC: "), mac, 8);
-#endif
+		OPGP_LOG_HEX(_T("wrap_command: ICV for MAC: "), C_MAC_ICV, 8);
+		OPGP_LOG_HEX(_T("wrap_command: Generated MAC: "), mac, 8);
 
 		/* C_MAC on unmodified APDU */
 		if (secInfo->secureChannelProtocolImpl == GP211_SCP02_IMPL_i0A
@@ -1286,9 +1282,9 @@ OPGP_ERROR_STATUS GP211_check_R_MAC(PBYTE apduCommand, DWORD apduCommandLength, 
 	le = responseDataLength-2;
 	GP211_calculate_R_MAC(apduCommand, apduCommand, lc, responseData, le,
 			responseData+responseDataLength-2, secInfo, mac);
-#ifdef DEBUG
-	OPGP_log_Hex(_T("check_R_MAC: received R-MAC: "), responseData-10, responseDataLength-10);
-	OPGP_log_Hex(_T("check_R_MAC: calculated R-MAC: "), mac, 8);
+#ifdef OPGP_DEBUG
+	OPGP_LOG_HEX(_T("check_R_MAC: received R-MAC: "), responseData-10, responseDataLength-10);
+	OPGP_LOG_HEX(_T("check_R_MAC: calculated R-MAC: "), mac, 8);
 #endif
 	if (memcmp(mac, responseData+responseDataLength-10, 8)) {
 		OPGP_ERROR_CREATE_ERROR(status, GP211_ERROR_VALIDATION_R_MAC, OPGP_stringify_error(GP211_ERROR_VALIDATION_R_MAC));
@@ -1330,7 +1326,7 @@ OPGP_ERROR_STATUS read_public_rsa_key(OPGP_STRING PEMKeyFileName, char *passPhra
 	};
 	fclose(PEMKeyFile);
 	// only 3 and 65337 are supported
-	*rsaExponent = key->pkey.rsa->e->d[0];
+	*rsaExponent = (LONG)key->pkey.rsa->e->d[0];
 	memcpy(rsaModulus, key->pkey.rsa->n->d, sizeof(unsigned long)*key->pkey.rsa->n->top);
 	EVP_PKEY_free(key);
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
