@@ -1,8 +1,9 @@
 History
 =======
 
-6.1.0 - Sun, Nov 29, 2010, Karsten Ohme, François Kooman
-    CMake Build System
+6.1.0 - Tue, Mar 29, 2011, Karsten Ohme, François Kooman
+  CMake Build System
+  Changed DEBUG definition to OPGP_DEBUG to prevent name collisions
 
 6.0.0 - Sun, Jan 31, 2010, Karsten Ohme
 	Connection plugin architecture, support for other transport protocols than PC/SC
