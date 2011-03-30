@@ -7,3 +7,7 @@ gpshell (1.4.4-0ubuntuVERSION~DISTRO) DISTRO; urgency=low
   * Supporting new version of PC/SC plugin
 
  -- Launchpad PPA for GlobalPlatform <globalplatform-developers@lists.sourceforge.net>  Tue, 12 Oct 2010 21:25:00 +0100
+ 
+  * CMake Build System
+
+ -- Launchpad PPA for GlobalPlatform <globalplatform-developers@lists.sourceforge.net>  Tue, 29 Nov 2011 15:15:00 +0100
