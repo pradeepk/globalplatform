@@ -1,27 +1,37 @@
-#!/bin/bash
+#!/bin/sh
 
 UBUNTU_DISTS="dapper hardy jaunty karmic lucid maverick natty"
 
 PACKAGE=`sed -n -e 's/PROJECT(\(.*\) .*)/\1/p' CMakeLists.txt`
 VERSION=`sed -n -e 's/SET(VERSION "\(.*\)")/\1/p' CMakeLists.txt`
 
-echo "Using package name : ${PACKAGE}"
-echo "Using version      : ${VERSION}"
+if [ -f COPYING.LESSER ] ; then LICENSE=lgpl; else LICENSE=gpl; fi
 
-RELEASE_VERSION=`cat ubuntu.version`
+SOURCE_PACKAGE_NAME=`sed -n -e 's/Source: \(.*\)/\1/p' debian/control`
 
-SNAPSHOT_VERSION=$((${RELEASE_VERSION}-1))+${RELEASE_VERSION}-SNAPSHOT-`date +%F-%0k-%0M-%0S%z`
+echo "Using Package Name : ${PACKAGE}"
+echo "Using Version      : ${VERSION}"
+echo "Using License      : ${LICENSE}"
+echo "Using Ubuntu Source Package name : ${SOURCE_PACKAGE_NAME}"
 
-echo "Using Ubuntu snapshot version ${SNAPSHOT_VERSION}"
+# The Ubuntu version
+UBUNTU_VERSION=`cat ubuntu.version`
+
+# Ubuntu Snapshot version
+if [ "$1" != "release" ] ; then  
+  UBUNTU_VERSION=$((${UBUNTU_VERSION}-1))+${UBUNTU_VERSION}-SNAPSHOT-`date +%F-%0k-%0M-%0S%z`
+fi
+
+echo "Using Ubuntu Version : ${UBUNTU_VERSION}"
 
 	rm -rf ${PACKAGE}-${VERSION}
 	tar xzf ${PACKAGE}-${VERSION}.tar.gz
 	rm -f ${PACKAGE}_${VERSION}.orig.tar.gz
-	cd ${PACKAGE}-${VERSION} && dh_make -l -c lgpl -e "k_o_@users.sourceforge.net" -f ../${PACKAGE}-${VERSION}.tar.gz
-	cp ${PACKAGE}_${VERSION}.orig.tar.gz lib${PACKAGE}6_${VERSION}.orig.tar.gz
+	cd ${PACKAGE}-${VERSION} && dh_make -l -c ${LICENSE} -e "k_o_@users.sourceforge.net" -f ../${PACKAGE}-${VERSION}.tar.gz
+	cp ${PACKAGE}_${VERSION}.orig.tar.gz ${SOURCE_PACKAGE_NAME}.orig.tar.gz
 	cd ${PACKAGE}-${VERSION} && rm -rf debian
 	cd ${PACKAGE}-${VERSION} && mkdir debian
-	cd ${PACKAGE}-${VERSION} && cp ../debian/* debian/
+	cd ${PACKAGE}-${VERSION} && cp ../debian/* debian/;
 	cd ${PACKAGE}-${VERSION} && chmod 755 debian/rules
 	for d in $(UBUNTU_DISTS); \
 	do \
@@ -29,7 +39,7 @@ echo "Using Ubuntu snapshot version ${SNAPSHOT_VERSION}"
 		cp ../debian/changelog debian/; \
 		sed -e "s/DISTRO/$$d/g" debian/changelog > debian/changelog.tmp; \
 		mv debian/changelog.tmp debian/changelog; \
-		sed -e "s/VERSION/$(SNAPSHOT_VERSION)/g" debian/changelog > debian/changelog.tmp; \
+		sed -e "s/VERSION/$(UBUNTU_VERSION)/g" debian/changelog > debian/changelog.tmp; \
 		mv debian/changelog.tmp debian/changelog; \
 		# change binary:Version with Source-Version for dapper \
 		if [ $$d == 'dapper' ] ; then \
@@ -38,6 +48,7 @@ echo "Using Ubuntu snapshot version ${SNAPSHOT_VERSION}"
 		else \
 			cp ../debian/control debian/ ; \
 		fi; \
-		debuild --no-tgz-check -S; \
+		debuild -S; \
 	done
+
 
