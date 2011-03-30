@@ -89,11 +89,25 @@ http://www.cmake.org/
 
 Done!
 
+Source Packages
+---------------
+
+Execute:
+
+make/nmake package_sourse
+
+Binary Packages
+---------------
+
+Execute:
+
+make/nmake package 
+
 CMake Issues
 ------------ 
 
 You must rebuild the build system if your build tools have changed. Otherwise 
-CMake uses the old cached values from the cache. You have to delete manually 
+CMake uses outdated values. You have to delete manually 
 the CMakeCache.txt file (and maybe also the CMakeLists directory and 
 cmake_install.cmake).
 
