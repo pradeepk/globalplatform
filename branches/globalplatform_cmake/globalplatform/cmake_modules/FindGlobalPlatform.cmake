@@ -17,10 +17,10 @@ IF(PKG_CONFIG_FOUND)
 ENDIF(PKG_CONFIG_FOUND)
 
 IF(NOT GLOBALPLATFORM_FOUND)
-   # Will find GlobalPlatform headers both on Mac and Windows - also obey the fact that this must work with in GlobalPlatform sources themselves
-   FIND_PATH(GLOBALPLATFORM_INCLUDE_DIRS NAMES globalplatform/globalplatform.h PATHS "${CMAKE_HOME_DIRECTORY}/../globalplatform/src")
-   # GlobalPlatform library naming - also obey the fact that this must work with in GlobalPlatform sources themselves
-   FIND_LIBRARY(GLOBALPLATFORM_LIBRARIES NAMES globalplatform GlobalPlatform PATHS "${CMAKE_HOME_DIRECTORY}/../globalplatform/src")
+   # Will find GlobalPlatform headers both on Mac and Windows
+   FIND_PATH(GLOBALPLATFORM_INCLUDE_DIRS NAMES globalplatform/globalplatform.h)
+   # GlobalPlatform library naming
+   FIND_LIBRARY(GLOBALPLATFORM_LIBRARIES NAMES globalplatform GlobalPlatform)
 ENDIF(NOT GLOBALPLATFORM_FOUND)
 
 INCLUDE(FindPackageHandleStandardArgs)

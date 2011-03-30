@@ -1,6 +1,7 @@
 INCLUDE(FindPCSC)
 INCLUDE(FindOpenSSL)
 INCLUDE(FindZLIB)
+
 SET(SOURCES connection.c stringify.c crypto.c loadfile.c util.c debug.c globalplatform.c)
 
 SET(CMAKE_BUILD_TYPE "Release")
@@ -54,6 +55,7 @@ ENDIF(WIN32)
 # Install
 IF(WIN32)
  INSTALL(TARGETS globalplatform RUNTIME DESTINATION lib${LIB_SUFFIX})
+ INSTALL(TARGETS globalplatform ARCHIVE DESTINATION lib${LIB_SUFFIX})
 ELSE(WIN32)
  INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX})
 ENDIF(WIN32)
@@ -70,7 +72,6 @@ IF(TESTING)
     SET_TESTS_PROPERTIES(globalplatformTest PROPERTIES PASS_REGULAR_EXPRESSION "Failures: 0")
   ENDIF(CHECK_FOUND)
 ENDIF(TESTING)
-
 
 
 ADD_SUBDIRECTORY(globalplatform)
