@@ -4,8 +4,11 @@
 # CPACK_DEBIAN_PACKAGE_NAME default TOLOWER "${CPACK_PACKAGE_NAME}"
 # CPACK_DEBIAN_PACKAGE_PRIORITY - used as "Priority" in control file, default "optional"
 # CPACK_DEBIAN_PACKAGE_SECTION - used as "Section" in control file, default "devel"
+# CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
 # CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " for development files for libraries  
-# CPACK_PACKAGE_DESCRIPTION_FILE - Depends
+# CPACK_PACKAGE_DESCRIPTION_FILE - used main text in "Description" field of control file
+# CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR - used as UpstreamAuthor in copyright file (format: Name <email>), default ${CPACK_PACKAGE_CONTACT}
+# CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME  - used as UpstreamAuthorName in copyright file, default ${CPACK_PACKAGE_VENDOR}    
 #
 # CPACK_DEBIAN_PACKAGE_RECOMMENDS - used as "Recommends" field in control file
 # CPACK_DEBIAN_PACKAGE_SUGGESTS - used as "Suggests" field in control file
@@ -90,7 +93,7 @@ endforeach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
 
 file(APPEND ${DEBIAN_CONTROL} "cmake\n"
   "Standards-Version: 3.8.0\n"
-  "Homepage: ${CPACK_PACKAGE_VENDOR}\n"
+  "Homepage: ${CPACK_DEBIAN_PACKAGE_HOMEPAGE}\n"
   "\n"
   "Package: ${CPACK_DEBIAN_PACKAGE_NAME}\n"
   "Architecture: any\n"
@@ -166,6 +169,15 @@ endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 ##############################################################################
 # debian/copyright
 set(DEBIAN_COPYRIGHT ${DEBIAN_SOURCE_DIR}/debian/copyright)
+
+IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR)
+set(CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR ${CPACK_PACKAGE_CONTACT})
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR)
+
+IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME)
+set(CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME ${CPACK_PACKAGE_VENDOR})
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME)
+
 execute_process(COMMAND ${CMAKE_COMMAND} -E
   copy ${CPACK_RESOURCE_FILE_LICENSE} ${DEBIAN_COPYRIGHT}
   )
