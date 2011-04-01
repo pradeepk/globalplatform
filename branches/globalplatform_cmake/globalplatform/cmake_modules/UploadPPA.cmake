@@ -5,13 +5,15 @@
 # CPACK_DEBIAN_PACKAGE_PRIORITY - used as "Priority" in control file, default "optional"
 # CPACK_DEBIAN_PACKAGE_SECTION - used as "Section" in control file, default "devel"
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
-# CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " for development files for libraries  
+# CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " 
+# for development files for libraries. Instead of "binary:Version" "Source-Version" is used under CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
 # CPACK_PACKAGE_DESCRIPTION_FILE - used main text in "Description" field of control file
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR - used as upstream author in copyright file (format: Name <email>), default ${CPACK_PACKAGE_CONTACT}
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME - used as upstream author name in copyright file, default ${CPACK_PACKAGE_VENDOR}  
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR - used as the copyright year in copyright file, default this year
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_URL - used as upstream url in copyright file, default CPACK_DEBIAN_PACKAGE_HOMEPAGE
 # CPACK_DEBIAN_PACKAGE_LICENSE - used as license indicator for the copyright file generation, possible values gpl, lgpl, bsd, apache
+# CPACK_DEBIAN_PACKAGE_DISTRIBUTION - distribution name, default lucid
 #
 # CPACK_DEBIAN_PACKAGE_RECOMMENDS - used as "Recommends" field in control file
 # CPACK_DEBIAN_PACKAGE_SUGGESTS - used as "Suggests" field in control file
@@ -28,10 +30,11 @@
 # CPACK_COMPONENT_${COMPONENT}_DEPENDS - used for the "Depends" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 # CPACK_COMPONENT_${COMPONENT}_SECTION - used for the "Section" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 #
-# CPACK_PACKAGE_CONTACT  - used as "Maintainer" field in control and copyright file
+# CPACK_PACKAGE_CONTACT - used as "Maintainer" field in control and copyright file
 # CPACK_PACKAGE_VENDOR - used as "Homepage" in control file
 # CPACK_PACKAGE_DESCRIPTION_SUMMARY - used as first line of all "Description" fields for all packages in control file
 #
+# DPUT_HOST - used as host for dput for uploading the file to Launchpad
 #
 ##
 
@@ -39,6 +42,7 @@ find_program(DEBUILD_EXECUTABLE debuild)
 find_program(DPUT_EXECUTABLE dput)
 
 if(NOT DEBUILD_EXECUTABLE OR NOT DPUT_EXECUTABLE)
+  MESSAGE(WARNING "${DEBUILD_EXECUTABLE} or ${DPUT_EXECUTABLE} not installed.")
   return()
 endif(NOT DEBUILD_EXECUTABLE OR NOT DPUT_EXECUTABLE)
 
@@ -154,7 +158,11 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
   string(TOUPPER ${COMPONENT} UPPER_COMPONENT)
   set(DEPENDS "${CPACK_DEBIAN_PACKAGE_NAME}")
   foreach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
-    set(DEPENDS "${DEPENDS} (= \${binary:Version}), ${CPACK_DEBIAN_PACKAGE_NAME}-${DEP}")
+    IF(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUALS "dapper")
+      set(DEPENDS "${DEPENDS} (= \${Source-Version}), ${CPACK_DEBIAN_PACKAGE_NAME}-${DEP}")
+    ELSE
+      set(DEPENDS "${DEPENDS} (= \${binary:Version}), ${CPACK_DEBIAN_PACKAGE_NAME}-${DEP}")
+    ENDIF(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUALS "dapper")   
   endforeach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
   file(APPEND ${DEBIAN_CONTROL} "\n"
     "Package: ${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}\n"
@@ -207,13 +215,23 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E
   copy ${CMAKE_CURRENT_LIST_DIR}/copyright.${CPACK_DEBIAN_PACKAGE_LICENSE} ${DEBIAN_COPYRIGHT}
   )
 
-execute_process(COMMAND "sed -n -e s/<Maintainer>/${CPACK_PACKAGE_CONTACT}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-execute_process(COMMAND "sed -n -e s/<Date>/${CPACK_DEBIAN_PACKAGE_DATE}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-execute_process(COMMAND "sed -n -e s/<Year>/${OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-execute_process(COMMAND "sed -n -e s/<UpstreamURL>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-execute_process(COMMAND "sed -n -e s/<UpstreamAuthor>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-execute_process(COMMAND "sed -n -e s/<YearUpstreamCopyright>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-execute_process(COMMAND "sed -n -e s/<UpstreamAuthorName>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+FILE(READ ${DEBIAN_COPYRIGHT} COPYRIGHT_TEMP)
+STRING(REGEX REPLACE "<Maintainer>" ${CPACK_PACKAGE_CONTACT} ${COPYRIGHT_TEMP})
+STRING(REGEX REPLACE "<Date>" ${CPACK_DEBIAN_PACKAGE_DATE} ${COPYRIGHT_TEMP})
+STRING(REGEX REPLACE "<Year>" ${OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR} ${COPYRIGHT_TEMP})
+STRING(REGEX REPLACE "<UpstreamURL>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL} ${COPYRIGHT_TEMP})
+STRING(REGEX REPLACE "<UpstreamAuthor>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR} ${COPYRIGHT_TEMP})
+STRING(REGEX REPLACE "<YearUpstreamCopyright>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR} ${COPYRIGHT_TEMP})
+STRING(REGEX REPLACE "<UpstreamAuthorName>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME} ${COPYRIGHT_TEMP})     
+FILE(WRITE ${DEBIAN_COPYRIGHT} ${COPYRIGHT_TEMP})
+
+#execute_process(COMMAND "sed -e s/<Maintainer>/${CPACK_PACKAGE_CONTACT}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+#execute_process(COMMAND "sed -e s/<Date>/${CPACK_DEBIAN_PACKAGE_DATE}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+#execute_process(COMMAND "sed -e s/<Year>/${OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+#execute_process(COMMAND "sed -e s/<UpstreamURL>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+#execute_process(COMMAND "sed -e s/<UpstreamAuthor>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+#execute_process(COMMAND "sed -e s/<YearUpstreamCopyright>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+#execute_process(COMMAND "sed -e s/<UpstreamAuthorName>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
 
 ##############################################################################
 # debian/rules
@@ -272,10 +290,15 @@ file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (native)")
 
 ##############################################################################
 # debian/changelog
+
+IF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
+set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION, "lucid")
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
+
 set(DEBIAN_CHANGELOG ${DEBIAN_SOURCE_DIR}/debian/changelog)
 execute_process(COMMAND date -R  OUTPUT_VARIABLE DATE_TIME)
 file(WRITE ${DEBIAN_CHANGELOG}
-  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}) maverick; urgency=low\n\n"
+  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}) ${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}; urgency=low\n\n"
   "  * Package built with CMake\n\n"
   " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
   )
@@ -286,8 +309,7 @@ set(DEB_SOURCE_CHANGES
   ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source.changes
   )
 
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
-  COMMAND ${DEBUILD_EXECUTABLE} -S
+add_custom_target(package-ubuntu ${DEBUILD_EXECUTABLE} -S
   WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}
   )
 
