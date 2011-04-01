@@ -1,7 +1,8 @@
 ##
 # Copyright (c) 2010 Daniel Pfeifer <daniel@pfeifer-mail.de>
+# Copyright (c) 2011 Karsten Ohme <k_o_@users.sourceforge.net>
 #
-# CPACK_DEBIAN_PACKAGE_NAME default TOLOWER "${CPACK_PACKAGE_NAME}"
+# CPACK_DEBIAN_PACKAGE_NAME - used as "Source" in control file, default TOLOWER "${CPACK_PACKAGE_NAME}"
 # CPACK_DEBIAN_PACKAGE_PRIORITY - used as "Priority" in control file, default "optional"
 # CPACK_DEBIAN_PACKAGE_SECTION - used as "Section" in control file, default "devel"
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
@@ -13,7 +14,7 @@
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR - used as the copyright year in copyright file, default this year
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_URL - used as upstream url in copyright file, default CPACK_DEBIAN_PACKAGE_HOMEPAGE
 # CPACK_DEBIAN_PACKAGE_LICENSE - used as license indicator for the copyright file generation, possible values gpl, lgpl, bsd, apache
-# CPACK_DEBIAN_PACKAGE_DISTRIBUTION - distribution name, default lucid
+# CPACK_DEBIAN_PACKAGE_DISTRIBUTION - distribution name, default "maverick"
 #
 # CPACK_DEBIAN_PACKAGE_RECOMMENDS - used as "Recommends" field in control file
 # CPACK_DEBIAN_PACKAGE_SUGGESTS - used as "Suggests" field in control file
@@ -35,6 +36,14 @@
 # CPACK_PACKAGE_DESCRIPTION_SUMMARY - used as first line of all "Description" fields for all packages in control file
 #
 # DPUT_HOST - used as host for dput for uploading the file to Launchpad
+# CPACK_DEBIAN_PACKAGE_TYPE - used for determining the build type, "snapshot" or "release" is possible, default snapshot
+#
+# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-<BUILD_NUMBER_PREFIX><BUILD_NUMBER>[<DATE>]~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
+# e.g. libfoo1-1.2.0-0ubuntu12011-04-01 21:00:33+02:00~maverick 
+# "0ubuntu" stands for the first package in Ubuntu when there is no Debian package existing, the "04-01 21:00:33+02:00" specifies the creation date of this snapshot version, "maverick" is the used Ubuntu version
+# The <DATE> part is only used when building snapshots to assert unique upgradable versions. The date follows the RFC 3339 format.
+# CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX - used as a prefix for the build number, default ""
+# CPACK_DEBIAN_PACKAGE_BUILD_NUMBER - used for the build number
 #
 ##
 
@@ -292,16 +301,28 @@ file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (native)")
 # debian/changelog
 
 IF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
-set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION, "lucid")
+  set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION, "maverick")
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
+
+IF(NOT CPACK_DEBIAN_PACKAGE_TYPE)
+  set(CPACK_DEBIAN_PACKAGE_TYPE, "snapshot")
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_TYPE)
 
 set(DEBIAN_CHANGELOG ${DEBIAN_SOURCE_DIR}/debian/changelog)
 execute_process(COMMAND date -R  OUTPUT_VARIABLE DATE_TIME)
+
+
+IF(CPACK_DEBIAN_PACKAGE_TYPE STREQUALS "snapshot")
+  execute_process(COMMAND date --rfc-3339=seconds OUTPUT_VARIABLE RFC_3339_DATE_TIME)
+  set(CPACK_DEBIAN_PACKAGE_BUILD_NUMBER, ${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}${RFC_3339_DATE_TIME})
+ENDIF(CPACK_DEBIAN_PACKAGE_TYPE STREQUALS "snapshot")
+
 file(WRITE ${DEBIAN_CHANGELOG}
-  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}) ${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}; urgency=low\n\n"
+  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}) ${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}; urgency=low\n\n"
   "  * Package built with CMake\n\n"
   " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
   )
+
 
 ##############################################################################
 # debuild -S
