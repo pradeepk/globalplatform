@@ -7,8 +7,11 @@
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
 # CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " for development files for libraries  
 # CPACK_PACKAGE_DESCRIPTION_FILE - used main text in "Description" field of control file
-# CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR - used as UpstreamAuthor in copyright file (format: Name <email>), default ${CPACK_PACKAGE_CONTACT}
-# CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME  - used as UpstreamAuthorName in copyright file, default ${CPACK_PACKAGE_VENDOR}    
+# CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR - used as upstream author in copyright file (format: Name <email>), default ${CPACK_PACKAGE_CONTACT}
+# CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME - used as upstream author name in copyright file, default ${CPACK_PACKAGE_VENDOR}  
+# CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR - used as the copyright year in copyright file, default this year
+# CPACK_DEBIAN_PACKAGE_UPSTREAM_URL - used as upstream url in copyright file, default CPACK_DEBIAN_PACKAGE_HOMEPAGE
+# CPACK_DEBIAN_PACKAGE_LICENSE - used as license indicator for the copyright file generation, possible values gpl, lgpl, bsd, apache
 #
 # CPACK_DEBIAN_PACKAGE_RECOMMENDS - used as "Recommends" field in control file
 # CPACK_DEBIAN_PACKAGE_SUGGESTS - used as "Suggests" field in control file
@@ -25,7 +28,7 @@
 # CPACK_COMPONENT_${COMPONENT}_DEPENDS - used for the "Depends" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 # CPACK_COMPONENT_${COMPONENT}_SECTION - used for the "Section" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 #
-# CPACK_PACKAGE_CONTACT  - used as "Maintainer" field in control file
+# CPACK_PACKAGE_CONTACT  - used as "Maintainer" field in control and copyright file
 # CPACK_PACKAGE_VENDOR - used as "Homepage" in control file
 # CPACK_PACKAGE_DESCRIPTION_SUMMARY - used as first line of all "Description" fields for all packages in control file
 #
@@ -170,17 +173,47 @@ endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 # debian/copyright
 set(DEBIAN_COPYRIGHT ${DEBIAN_SOURCE_DIR}/debian/copyright)
 
+IF(NOT CPACK_DEBIAN_PACKAGE_LICENSE)
+  set(CPACK_DEBIAN_PACKAGE_LICENSE gpl)
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_LICENSE)
+
 IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR)
-set(CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR ${CPACK_PACKAGE_CONTACT})
+  set(CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR ${CPACK_PACKAGE_CONTACT})
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR)
 
 IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME)
-set(CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME ${CPACK_PACKAGE_VENDOR})
+  set(CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME ${CPACK_PACKAGE_VENDOR})
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME)
 
+IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_URL)
+  set(CPACK_DEBIAN_PACKAGE_UPSTREAM_URL, ${CPACK_DEBIAN_PACKAGE_HOMEPAGE})
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_URL) 
+
+IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR)
+  execute_process(COMMAND "date +%Y" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR)
+ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR) 
+
+execute_process(COMMAND "date +%Y" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR)
+
+execute_process(COMMAND "date -R" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_DATE)
+
+list(FIND "gpl;lgpl;bsd;apache" ${CPACK_DEBIAN_PACKAGE_LICENSE} CPACK_DEBIAN_PACKAGE_LICENSE_FOUND)
+
+IF(CPACK_DEBIAN_PACKAGE_LICENSE_FOUND EQUAL "-1")
+  message(FATAL_ERROR "License ${CPACK_DEBIAN_PACKAGE_LICENSE} is unknown.")
+ENDIF(CPACK_DEBIAN_PACKAGE_LICENSE_FOUND EQUAL "-1")
+
 execute_process(COMMAND ${CMAKE_COMMAND} -E
-  copy ${CPACK_RESOURCE_FILE_LICENSE} ${DEBIAN_COPYRIGHT}
+  copy ${CMAKE_CURRENT_LIST_DIR}/copyright.${CPACK_DEBIAN_PACKAGE_LICENSE} ${DEBIAN_COPYRIGHT}
   )
+
+execute_process(COMMAND "sed -n -e s/<Maintainer>/${CPACK_PACKAGE_CONTACT}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+execute_process(COMMAND "sed -n -e s/<Date>/${CPACK_DEBIAN_PACKAGE_DATE}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+execute_process(COMMAND "sed -n -e s/<Year>/${OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+execute_process(COMMAND "sed -n -e s/<UpstreamURL>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+execute_process(COMMAND "sed -n -e s/<UpstreamAuthor>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+execute_process(COMMAND "sed -n -e s/<YearUpstreamCopyright>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
+execute_process(COMMAND "sed -n -e s/<UpstreamAuthorName>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
 
 ##############################################################################
 # debian/rules

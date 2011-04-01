@@ -1,10 +1,10 @@
 This work was packaged for Debian by:
 
-    <Maintainer> on Thu, 31 Mar 2011 11:32:15 +0200
+    <Maintainer> on <Date>
 
 It was downloaded from:
 
-    <url://example.com>
+    <UpstreamURL>
 
 Upstream Author(s):
 
@@ -12,7 +12,7 @@ Upstream Author(s):
 
 Copyright:
 
-    Copyright (C) YYYY <UpstreamAuthorName>
+    Copyright (C) <YearUpstreamCopyright> <UpstreamAuthorName>
 
 License:
 
@@ -34,6 +34,6 @@ Public License version 3 can be found in `/usr/share/common-licenses/GPL-3'.
 
 The Debian packaging is:
 
-    Copyright (C) YYYY <Maintainer>
+    Copyright (C) <Year> <Maintainer>
 
 and is licensed under the GPL version 3, see above.
