@@ -6,8 +6,10 @@
 # CPACK_DEBIAN_PACKAGE_PRIORITY - used as "Priority" in control file, default "optional"
 # CPACK_DEBIAN_PACKAGE_SECTION - used as "Section" in control file, default "devel"
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
+# CPACK_DEBIAN_BUILD_DEPENDS - use in "Build-Depends" field in control file, cmake is automatically added
 # CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " 
-# for development files for libraries. Instead of "binary:Version" "Source-Version" is used under CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
+# for components. Instead of "binary:Version" "Source-Version" is used under CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
+# 
 # CPACK_PACKAGE_DESCRIPTION_FILE - used main text in "Description" field of control file
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR - used as upstream author in copyright file (format: Name <email>), default ${CPACK_PACKAGE_CONTACT}
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME - used as upstream author name in copyright file, default ${CPACK_PACKAGE_VENDOR}  
@@ -25,6 +27,7 @@
 # CPACK_DEBIAN_PACKAGE_ENHANCES - used as "Enhances" field in control file
 #
 #
+#
 # CPACK_COMPONENTS_ALL - list of additional components - used for the "Package" field in the control file for additional components of a package, e.g. for development files for a library this would be "dev"
 # CPACK_COMPONENT_${COMPONENT}_DISPLAY_NAME - used as additional short description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 # CPACK_COMPONENT_${COMPONENT}_DESCRIPTION - used as additional description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
@@ -38,12 +41,14 @@
 # DPUT_HOST - used as host for dput for uploading the file to Launchpad
 # CPACK_DEBIAN_PACKAGE_TYPE - used for determining the build type, "snapshot" or "release" is possible, default snapshot
 #
-# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-<BUILD_NUMBER_PREFIX><BUILD_NUMBER>[<DATE>]~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
-# e.g. libfoo1-1.2.0-0ubuntu12011-04-01 21:00:33+02:00~maverick 
+# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-<BUILD_NUMBER_PREFIX><BUILD_NUMBER>[-SNAPSHOT-<DATE>]~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
+# e.g. libfoo1-1.2.0-0ubuntu12011-04-02-03-17-38+0200~maverick 
 # "0ubuntu" stands for the first package in Ubuntu when there is no Debian package existing, the "04-01 21:00:33+02:00" specifies the creation date of this snapshot version, "maverick" is the used Ubuntu version
-# The <DATE> part is only used when building snapshots to assert unique upgradable versions. The date follows the RFC 3339 format.
+# The [-SNAPSHOT-<DATE>] part is only used when building snapshots to assert unique upgradable versions.
 # CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX - used as a prefix for the build number, default ""
 # CPACK_DEBIAN_PACKAGE_BUILD_NUMBER - used for the build number
+# CPACK_DEBIAN_NATIVE_PACKAGE - if set a native package is build, default not set
+#
 #
 ##
 
@@ -108,7 +113,7 @@ foreach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
 endforeach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})  
 
 file(APPEND ${DEBIAN_CONTROL} "cmake\n"
-  "Standards-Version: 3.8.0\n"
+  "Standards-Version: 3.8.4\n"
   "Homepage: ${CPACK_DEBIAN_PACKAGE_HOMEPAGE}\n"
   "\n"
   "Package: ${CPACK_DEBIAN_PACKAGE_NAME}\n"
@@ -125,10 +130,10 @@ ENDIF(CPACK_DEBIAN_PACKAGE_RECOMMENDS)
 
 # Suggests
 IF(CPACK_DEBIAN_PACKAGE_SUGGESTS)
-file(APPEND ${DEBIAN_CONTROL}
-  "Suggests: ${CPACK_DEBIAN_PACKAGE_SUGGESTS}\n"
-  )
-ENDIF(CPACK_DEBIAN_PACKAGE_RECOMMENDS)
+  file(APPEND ${DEBIAN_CONTROL}
+    "Suggests: ${CPACK_DEBIAN_PACKAGE_SUGGESTS}\n"
+    )
+ENDIF(CPACK_DEBIAN_PACKAGE_SUGGESTS)
 
 # Pre-Depends:
 IF(CPACK_DEBIAN_PACKAGE_PREDEPENDS)
@@ -166,12 +171,13 @@ file(APPEND ${DEBIAN_CONTROL}
 foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
   string(TOUPPER ${COMPONENT} UPPER_COMPONENT)
   set(DEPENDS "${CPACK_DEBIAN_PACKAGE_NAME}")
+  IF(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUAL "dapper")
+    set(DEPENDS "${DEPENDS} (= \${Source-Version})")
+  ELSE(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUAL "dapper")
+    set(DEPENDS "${DEPENDS} (= \${binary:Version})")
+  ENDIF(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUAL "dapper")   
   foreach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
-    IF(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUALS "dapper")
-      set(DEPENDS "${DEPENDS} (= \${Source-Version}), ${CPACK_DEBIAN_PACKAGE_NAME}-${DEP}")
-    ELSE
-      set(DEPENDS "${DEPENDS} (= \${binary:Version}), ${CPACK_DEBIAN_PACKAGE_NAME}-${DEP}")
-    ENDIF(CPACK_DEBIAN_PACKAGE_DISTRIBUTION STREQUALS "dapper")   
+      set(DEPENDS "${DEPENDS}, ${CPACK_DEBIAN_PACKAGE_NAME}-${DEP}")
   endforeach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
   file(APPEND ${DEBIAN_CONTROL} "\n"
     "Package: ${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}\n"
@@ -203,44 +209,42 @@ IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME)
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME)
 
 IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_URL)
-  set(CPACK_DEBIAN_PACKAGE_UPSTREAM_URL, ${CPACK_DEBIAN_PACKAGE_HOMEPAGE})
+  set(CPACK_DEBIAN_PACKAGE_UPSTREAM_URL ${CPACK_DEBIAN_PACKAGE_HOMEPAGE})
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_URL) 
 
 IF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR)
-  execute_process(COMMAND "date +%Y" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR)
+  execute_process(COMMAND date +%Y OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR)
+  STRING(REPLACE "\n" "" CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR ${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR})
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR) 
 
-execute_process(COMMAND "date +%Y" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR)
+execute_process(COMMAND date +%Y OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR)
+STRING(REPLACE "\n" "" CPACK_DEBIAN_PACKAGE_YEAR ${CPACK_DEBIAN_PACKAGE_YEAR})
 
-execute_process(COMMAND "date -R" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_DATE)
+execute_process(COMMAND date -R OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_DATE)
+STRING(REPLACE "\n" "" CPACK_DEBIAN_PACKAGE_DATE ${CPACK_DEBIAN_PACKAGE_DATE})
 
-list(FIND "gpl;lgpl;bsd;apache" ${CPACK_DEBIAN_PACKAGE_LICENSE} CPACK_DEBIAN_PACKAGE_LICENSE_FOUND)
+set(POSSIBLE_LICENSES gpl lgpl bsd apache)
+list(FIND POSSIBLE_LICENSES ${CPACK_DEBIAN_PACKAGE_LICENSE} CPACK_DEBIAN_PACKAGE_LICENSE_FOUND)
 
 IF(CPACK_DEBIAN_PACKAGE_LICENSE_FOUND EQUAL "-1")
   message(FATAL_ERROR "License ${CPACK_DEBIAN_PACKAGE_LICENSE} is unknown.")
 ENDIF(CPACK_DEBIAN_PACKAGE_LICENSE_FOUND EQUAL "-1")
 
+find_path(COPYRIGHT_FILES_DIRECTORY copyright.${CPACK_DEBIAN_PACKAGE_LICENSE} PATHS ${CMAKE_MODULE_PATH})
 execute_process(COMMAND ${CMAKE_COMMAND} -E
-  copy ${CMAKE_CURRENT_LIST_DIR}/copyright.${CPACK_DEBIAN_PACKAGE_LICENSE} ${DEBIAN_COPYRIGHT}
+  copy ${COPYRIGHT_FILES_DIRECTORY}/copyright.${CPACK_DEBIAN_PACKAGE_LICENSE} ${DEBIAN_COPYRIGHT}
   )
 
+# Here also CONFIGURE_FILE might be better
 FILE(READ ${DEBIAN_COPYRIGHT} COPYRIGHT_TEMP)
-STRING(REGEX REPLACE "<Maintainer>" ${CPACK_PACKAGE_CONTACT} ${COPYRIGHT_TEMP})
-STRING(REGEX REPLACE "<Date>" ${CPACK_DEBIAN_PACKAGE_DATE} ${COPYRIGHT_TEMP})
-STRING(REGEX REPLACE "<Year>" ${OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR} ${COPYRIGHT_TEMP})
-STRING(REGEX REPLACE "<UpstreamURL>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL} ${COPYRIGHT_TEMP})
-STRING(REGEX REPLACE "<UpstreamAuthor>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR} ${COPYRIGHT_TEMP})
-STRING(REGEX REPLACE "<YearUpstreamCopyright>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR} ${COPYRIGHT_TEMP})
-STRING(REGEX REPLACE "<UpstreamAuthorName>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME} ${COPYRIGHT_TEMP})     
+STRING(REPLACE "<Maintainer>" ${CPACK_PACKAGE_CONTACT} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})
+STRING(REPLACE "<Date>" ${CPACK_DEBIAN_PACKAGE_DATE} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})
+STRING(REPLACE "<Year>" ${CPACK_DEBIAN_PACKAGE_YEAR} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})
+STRING(REPLACE "<UpstreamURL>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})
+STRING(REPLACE "<UpstreamAuthor>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})
+STRING(REPLACE "<YearUpstreamCopyright>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})
+STRING(REPLACE "<UpstreamAuthorName>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME} COPYRIGHT_TEMP ${COPYRIGHT_TEMP})     
 FILE(WRITE ${DEBIAN_COPYRIGHT} ${COPYRIGHT_TEMP})
-
-#execute_process(COMMAND "sed -e s/<Maintainer>/${CPACK_PACKAGE_CONTACT}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-#execute_process(COMMAND "sed -e s/<Date>/${CPACK_DEBIAN_PACKAGE_DATE}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-#execute_process(COMMAND "sed -e s/<Year>/${OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-#execute_process(COMMAND "sed -e s/<UpstreamURL>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_URL}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-#execute_process(COMMAND "sed -e s/<UpstreamAuthor>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-#execute_process(COMMAND "sed -e s/<YearUpstreamCopyright>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
-#execute_process(COMMAND "sed -e s/<UpstreamAuthorName>/${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME}/g ${CMAKE_CURRENT_LIST_DIR}/copyright")
 
 ##############################################################################
 # debian/rules
@@ -295,30 +299,35 @@ file(WRITE ${DEBIAN_SOURCE_DIR}/debian/compat "5")
 
 ##############################################################################
 # debian/source/format
-file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (native)")
+IF(CPACK_DEBIAN_NATIVE_PACKAGE)
+  file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (native)")
+ELSE(CPACK_DEBIAN_NATIVE_PACKAGE)
+  file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (quilt)")
+ENDIF(CPACK_DEBIAN_NATIVE_PACKAGE)
 
 ##############################################################################
 # debian/changelog
 
 IF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
-  set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION, "maverick")
+  set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION "maverick")
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
 
 IF(NOT CPACK_DEBIAN_PACKAGE_TYPE)
-  set(CPACK_DEBIAN_PACKAGE_TYPE, "snapshot")
+  set(CPACK_DEBIAN_PACKAGE_TYPE "snapshot")
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_TYPE)
 
 set(DEBIAN_CHANGELOG ${DEBIAN_SOURCE_DIR}/debian/changelog)
 execute_process(COMMAND date -R  OUTPUT_VARIABLE DATE_TIME)
 
 
-IF(CPACK_DEBIAN_PACKAGE_TYPE STREQUALS "snapshot")
-  execute_process(COMMAND date --rfc-3339=seconds OUTPUT_VARIABLE RFC_3339_DATE_TIME)
-  set(CPACK_DEBIAN_PACKAGE_BUILD_NUMBER, ${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}${RFC_3339_DATE_TIME})
-ENDIF(CPACK_DEBIAN_PACKAGE_TYPE STREQUALS "snapshot")
+IF(CPACK_DEBIAN_PACKAGE_TYPE STREQUAL "snapshot")
+  execute_process(COMMAND date +%F-%0k-%0M-%0S%z OUTPUT_VARIABLE SNAPSHOT_DATE_TIME)
+  set(CPACK_DEBIAN_PACKAGE_BUILD_NUMBER "${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}-SNAPSHOT-${SNAPSHOT_DATE_TIME}")
+  STRING(REPLACE "\n" "" CPACK_DEBIAN_PACKAGE_BUILD_NUMBER ${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER})
+ENDIF(CPACK_DEBIAN_PACKAGE_TYPE STREQUAL "snapshot")
 
 file(WRITE ${DEBIAN_CHANGELOG}
-  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}) ${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}; urgency=low\n\n"
+  "${CPACK_DEBIAN_PACKAGE_NAME} (${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}) ${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}; urgency=low\n\n"
   "  * Package built with CMake\n\n"
   " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
   )
@@ -330,9 +339,20 @@ set(DEB_SOURCE_CHANGES
   ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source.changes
   )
 
-add_custom_target(package-ubuntu ${DEBUILD_EXECUTABLE} -S
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
+  COMMAND ${CMAKE_COMMAND} package-source
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CPACK_SOURCE_PACKAGE_FILE_NAME}.${CPACK_SOURCE_GENERATOR} ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.orig.${CPACK_SOURCE_GENERATOR}
+  COMMAND ${DEBUILD_EXECUTABLE} -S
   WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}
   )
+
+add_custom_target(package-ubuntu 
+  DEPENDS ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debian
+  )
+#add_custom_target(package-ubuntu ${DEBUILD_EXECUTABLE} -S
+#  WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}
+#  )
 
 ##############################################################################
 # dput ppa:your-lp-id/ppa <source.changes>
@@ -340,3 +360,6 @@ add_custom_target(dput ${DPUT_EXECUTABLE} ${DPUT_HOST} ${DEB_SOURCE_CHANGES}
   DEPENDS ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debian
   )
+
+# Also clean Debian directory
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${DEBIAN_SOURCE_DIR})
