@@ -43,7 +43,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_HOME_DIRECTORY}/COPYING.LESSER")
 set(CPACK_PACKAGE_VERSION_MAJOR        "${${CMAKE_PROJECT_NAME}_CURRENT}")
 set(CPACK_PACKAGE_VERSION_MINOR        "${${CMAKE_PROJECT_NAME}_REVISION}")
 set(CPACK_PACKAGE_VERSION_PATCH        "${${CMAKE_PROJECT_NAME}_AGE}")
-set(CPACK_SOURCE_IGNORE_FILES ".*~;/\\\\.svn/;/\\\\globalplatform.lib;/\\\\globalplatform.dll;/\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;/\\\\CPack*;/\\\\CMakeCache.txt;/\\\\cmake_install.*;/\\\\Makefile;/\\\\_CPack_Packages;/\\\\libglobalplatform.so;/\\\\libglobalplatform.a;/\\\\globalplatform.exp;/\\\\globalplatform.manifest;/\\\\install_manifest.txt;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES ".*~;Debian;debian;/\\\\.svn/;/\\\\globalplatform.lib;/\\\\globalplatform.dll;/\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;/\\\\CPack*;/\\\\CMakeCache.txt;/\\\\cmake_install.*;/\\\\Makefile;/\\\\_CPack_Packages;/\\\\libglobalplatform.so;/\\\\libglobalplatform.a;/\\\\globalplatform.exp;/\\\\globalplatform.manifest;/\\\\install_manifest.txt;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)
 
@@ -62,8 +62,12 @@ set(CPACK_COMPONENT_DEV_DESCRIPTION "These are the development files.")
 set(CPACK_COMPONENT_DEV_SECTION "libdevel")
 set(CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX "0ubuntu")
 set(CPACK_DEBIAN_PACKAGE_BUILD_NUMBER "1")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Launchpad PPA for GlobalPlatform <globalplatform-developers@lists.sourceforge.net>")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://launchpad.net/~k-o-/+archive/globalplatform")
+set(CPACK_DEBIAN_PACKAGE_SNAPSHOT_HOMEPAGE "https://launchpad.net/~k-o-/+archive/globalplatformsnapshots")
 set(DPUT_HOST "gpsnapshots-ppa")
-set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libpcsclite-dev (>=1.2.9), zlib1g-dev (>= 1:1.2.3), libssl-dev (>= 0.9.7e), doxygen (>=1.4), pkg-config (>=0.20-1), check (>=0.9.2)")
+set(DPUT_SNAPSHOT_HOST "gp-ppa")
+set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libpcsclite-dev (>=1.2.9), zlib1g-dev (>= 1:1.2.3), libssl-dev (>= 0.9.7e), doxygen (>=1.4), pkg-config (>=0.20-1~), check (>=0.9.2)")
 
 include(UploadPPA)
 
