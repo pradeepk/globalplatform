@@ -29,6 +29,7 @@
 #
 #
 # CPACK_COMPONENTS_ALL - list of additional components - used for the "Package" field in the control file for additional components of a package, e.g. for development files for a library this would be "dev"
+# The component must match the used components in the CMake file.
 # CPACK_COMPONENT_${COMPONENT}_DISPLAY_NAME - used as additional short description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 # CPACK_COMPONENT_${COMPONENT}_DESCRIPTION - used as additional description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
 # CPACK_COMPONENT_${COMPONENT}_DEPENDS - used for the "Depends" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
@@ -299,7 +300,8 @@ file(WRITE ${DEBIAN_RULES}
   "binary-indep: build\n"
   "\n"
   "binary-arch: build\n"
-  "	cd $(BUILDDIR); cmake -DCOMPONENT=Unspecified -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr -P cmake_install.cmake\n"
+  "	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr -P cmake_install.cmake\n"
+  "	make install\n"
   "	mkdir debian/tmp/DEBIAN\n"
   "	dh_makeshlibs\n"
   "	dpkg-gensymbols -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
@@ -313,7 +315,7 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
   set(PACKAGE ${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT})
   file(APPEND ${DEBIAN_RULES}
     "	cd $(BUILDDIR); cmake -DCOMPONENT=${COMPONENT} -DCMAKE_INSTALL_PREFIX=../${PATH}/usr -P cmake_install.cmake\n"
-    "	mkdir ${PATH}\n"
+    "	make install\n"
     "	mkdir ${PATH}/DEBIAN\n"
     "	dh_makeshlibs\n"
     "	dpkg-gensymbols -p${PACKAGE} -P${PATH}\n"
@@ -360,7 +362,7 @@ file(WRITE ${DEBIAN_CHANGELOG}
   " -- ${CPACK_DEBIAN_PACKAGE_MAINTAINER}  ${DATE_TIME}"
   )
 
-INSTALL(FILES ${CMAKE_CURRENT_BUILD_DIR}/*.so DESTINATION lib${LIB_SUFFIX})
+#INSTALL(FILES ${CMAKE_CURRENT_BUILD_DIR}/*.so DESTINATION lib${LIB_SUFFIX})
 
 ##############################################################################
 # debuild -S
