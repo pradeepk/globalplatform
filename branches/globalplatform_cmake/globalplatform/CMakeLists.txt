@@ -1,5 +1,5 @@
 PROJECT(globalplatform C)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 
 SET( ${PROJECT_NAME}_CURRENT 6 )
 SET( ${PROJECT_NAME}_REVISION 1 )
@@ -18,9 +18,15 @@ set(DOXYFILE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 set(DOXYFILE_LATEX OFF)
 include(UseDoxygen)
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/AUTHORS ${CMAKE_CURRENT_BINARY_DIR}/ChangeLog 
-              ${CMAKE_CURRENT_BINARY_DIR}/COPYING ${CMAKE_CURRENT_BINARY_DIR}/COPYING.LESSER 
-              ${CMAKE_CURRENT_BINARY_DIR}/NEWS ${CMAKE_CURRENT_BINARY_DIR}/README DESTINATION . )
+IF(UNIX)
+  set(DOCUMENTATION_DIRECTORY "share/doc/lib${PROJECT_NAME}${${PROJECT_NAME}_CURRENT}")
+ELSE(UNIX)
+  set(DOCUMENTATION_DIRECTORY "doc")
+ENDIf(UNIX)
+
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS ${CMAKE_CURRENT_SOURCE_DIR}/ChangeLog 
+              ${CMAKE_CURRENT_SOURCE_DIR}/COPYING ${CMAKE_CURRENT_SOURCE_DIR}/COPYING.LESSER 
+              ${CMAKE_CURRENT_SOURCE_DIR}/NEWS ${CMAKE_CURRENT_SOURCE_DIR}/README DESTINATION ${DOCUMENTATION_DIRECTORY} )
 
 # build a CPack driven installer package
 
@@ -43,7 +49,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_HOME_DIRECTORY}/COPYING.LESSER")
 set(CPACK_PACKAGE_VERSION_MAJOR        "${${CMAKE_PROJECT_NAME}_CURRENT}")
 set(CPACK_PACKAGE_VERSION_MINOR        "${${CMAKE_PROJECT_NAME}_REVISION}")
 set(CPACK_PACKAGE_VERSION_PATCH        "${${CMAKE_PROJECT_NAME}_AGE}")
-set(CPACK_SOURCE_IGNORE_FILES ".*~;Debian;debian;/\\\\.svn/;/\\\\globalplatform.lib;/\\\\globalplatform.dll;/\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;/\\\\CPack*;/\\\\CMakeCache.txt;/\\\\cmake_install.*;/\\\\Makefile;/\\\\_CPack_Packages;/\\\\libglobalplatform.so;/\\\\libglobalplatform.a;/\\\\globalplatform.exp;/\\\\globalplatform.manifest;/\\\\install_manifest.txt;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES "doc;.*~;Debian;debian;\\\\.svn;\\\\globalplatform.lib$;\\\\globalplatform.dll;\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;\\\\CPack*;\\\\CMakeCache.txt;\\\\cmake_install.*;\\\\Makefile;\\\\_CPack_Packages;\\\\libglobalplatform.so;\\\\libglobalplatform.a;\\\\globalplatform.exp;\\\\globalplatform.manifest;\\\\install_manifest.txt;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)
 

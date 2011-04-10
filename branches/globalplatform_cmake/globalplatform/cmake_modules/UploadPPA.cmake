@@ -301,6 +301,9 @@ file(WRITE ${DEBIAN_RULES}
   "binary-arch: build\n"
   "	cd $(BUILDDIR); cmake -DCOMPONENT=Unspecified -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr -P cmake_install.cmake\n"
   "	mkdir debian/tmp/DEBIAN\n"
+  "	dh_makeshlibs\n"
+  "	dpkg-gensymbols -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
+  "	dpkg-shlibdeps -e${CPACK_DEBIAN_PACKAGE_NAME}\n"
   "	dpkg-gencontrol -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
   "	dpkg --build debian/tmp ..\n"
   )
@@ -310,7 +313,11 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
   set(PACKAGE ${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT})
   file(APPEND ${DEBIAN_RULES}
     "	cd $(BUILDDIR); cmake -DCOMPONENT=${COMPONENT} -DCMAKE_INSTALL_PREFIX=../${PATH}/usr -P cmake_install.cmake\n"
+    "	mkdir ${PATH}\n"
     "	mkdir ${PATH}/DEBIAN\n"
+    "	dh_makeshlibs\n"
+    "	dpkg-gensymbols -p${PACKAGE} -P${PATH}\n"
+    "	dpkg-shlibdeps -e${PACKAGE}\n"
     "	dpkg-gencontrol -p${PACKAGE} -P${PATH}\n"
     "	dpkg --build ${PATH} ..\n"
     )
@@ -353,6 +360,7 @@ file(WRITE ${DEBIAN_CHANGELOG}
   " -- ${CPACK_DEBIAN_PACKAGE_MAINTAINER}  ${DATE_TIME}"
   )
 
+INSTALL(FILES ${CMAKE_CURRENT_BUILD_DIR}/*.so DESTINATION lib${LIB_SUFFIX})
 
 ##############################################################################
 # debuild -S
