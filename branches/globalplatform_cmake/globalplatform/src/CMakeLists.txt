@@ -4,7 +4,8 @@ INCLUDE(FindZLIB)
 
 SET(SOURCES connection.c stringify.c crypto.c loadfile.c util.c debug.c globalplatform.c)
 
-SET(CMAKE_BUILD_TYPE "Release")
+# TODO: if this is set, package_ubuntu does onl honor INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX}) if Release is set
+#SET(CMAKE_BUILD_TYPE "Release")
 
 # Enable debugging output
 ADD_DEFINITIONS(-DOPGP_DEBUG)
@@ -54,11 +55,12 @@ ENDIF(WIN32)
 
 # Install
 IF(WIN32)
- INSTALL(TARGETS globalplatform RUNTIME DESTINATION lib${LIB_SUFFIX} COMPONENT lib)
+ INSTALL(TARGETS globalplatform RUNTIME DESTINATION lib${LIB_SUFFIX})
  INSTALL(TARGETS globalplatform ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT dev)
 ELSE(WIN32)
- INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT lib)
+ INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX})
 ENDIF(WIN32)
+
 
 # Testing
 IF(TESTING)

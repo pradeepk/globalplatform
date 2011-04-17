@@ -301,8 +301,7 @@ file(WRITE ${DEBIAN_RULES}
   "\n"
   "binary-arch: build\n"
   "	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr -P cmake_install.cmake\n"
-  "	make install\n"
-  "	mkdir debian/tmp/DEBIAN\n"
+    "	mkdir debian/tmp/DEBIAN\n"
   "	dh_makeshlibs\n"
   "	dpkg-gensymbols -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
   "	dpkg-shlibdeps -e${CPACK_DEBIAN_PACKAGE_NAME}\n"
@@ -315,7 +314,6 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
   set(PACKAGE ${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT})
   file(APPEND ${DEBIAN_RULES}
     "	cd $(BUILDDIR); cmake -DCOMPONENT=${COMPONENT} -DCMAKE_INSTALL_PREFIX=../${PATH}/usr -P cmake_install.cmake\n"
-    "	make install\n"
     "	mkdir ${PATH}/DEBIAN\n"
     "	dh_makeshlibs\n"
     "	dpkg-gensymbols -p${PACKAGE} -P${PATH}\n"
