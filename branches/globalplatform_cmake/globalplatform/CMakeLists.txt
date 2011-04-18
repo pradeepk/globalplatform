@@ -74,6 +74,10 @@ set(CPACK_DEBIAN_PACKAGE_SNAPSHOT_HOMEPAGE "https://launchpad.net/~k-o-/+archive
 set(DPUT_HOST "gpsnapshots-ppa")
 set(DPUT_SNAPSHOT_HOST "gp-ppa")
 set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libpcsclite-dev (>=1.2.9), zlib1g-dev (>= 1:1.2.3), libssl-dev (>= 0.9.7e), doxygen (>=1.4), pkg-config (>=0.20-1~), check (>=0.9.2)")
+set(CPACK_DEBIAN_PACKAGE_INSTALL "/usr/lib/*.so;/usr/lib/*.so.*")
+set(CPACK_DEBIAN_PACKAGE_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
+set(CPACK_COMPONENT_DEV_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
+set(CPACK_COMPONENT_DEV_INSTALL "/usr/lib/pkgconfig;/usr/include")
 
 include(UploadPPA)
 

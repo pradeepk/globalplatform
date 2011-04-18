@@ -2,6 +2,20 @@
 # Copyright (c) 2010 Daniel Pfeifer <daniel@pfeifer-mail.de>
 # Copyright (c) 2011 Karsten Ohme <k_o_@users.sourceforge.net>
 #
+# This script builds an Ubuntu/Debian source package with "package_ubuntu". It assumes a working install and package_source configuration with all files in place.
+#
+# From the resulting dsc file a Debian package can be build:
+#
+# dpkg-source -x foo.dsc
+# fakeroot debian/rules binary
+#
+#
+# Known problems:
+#
+# If you set the build type SET(CMAKE_BUILD_TYPE "Release") then the cmakeinstall.cmake file does not install the binary files
+#
+#
+#
 # CPACK_DEBIAN_PACKAGE_NAME - used as "Source" in control file, default TOLOWER "${CPACK_PACKAGE_NAME}"
 # CPACK_DEBIAN_PACKAGE_PRIORITY - used as "Priority" in control file, default "optional"
 # CPACK_DEBIAN_PACKAGE_SECTION - used as "Section" in control file, default "devel"
@@ -10,6 +24,11 @@
 # CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " 
 # for components. Instead of "binary:Version" "Source-Version" is used under CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
 # 
+# CPACK_DEBIAN_PACKAGE_INSTALL - specifies which files have to be installed for the main package separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
+# e.g. "/usr/lib/*.so". * wildcards can be used
+# CPACK_DEBIAN_PACKAGE_DOCS - specifies which files have to be installed for the main package separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
+# e.g. "/usr/share/docs/${CPACK_DEBIAN_PACKAGE_NAME}-dev/README". * wildcards can be used
+#
 # CPACK_PACKAGE_DESCRIPTION_FILE - used main text in "Description" field of control file
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR - used as upstream author in copyright file (format: Name <email>), default ${CPACK_DEBIAN_PACKAGE_MAINTAINER}
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAME - used as upstream author name in copyright file, default ${CPACK_DEBIAN_PACKAGE_HOMEPAGE}  
@@ -28,12 +47,16 @@
 #
 #
 #
-# CPACK_COMPONENTS_ALL - list of additional components - used for the "Package" field in the control file for additional components of a package, e.g. for development files for a library this would be "dev"
-# The component must match the used components in the CMake file.
-# CPACK_COMPONENT_${COMPONENT}_DISPLAY_NAME - used as additional short description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
-# CPACK_COMPONENT_${COMPONENT}_DESCRIPTION - used as additional description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
-# CPACK_COMPONENT_${COMPONENT}_DEPENDS - used for the "Depends" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
-# CPACK_COMPONENT_${COMPONENT}_SECTION - used for the "Section" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. DEV
+# CPACK_COMPONENTS_ALL - list of additional components separated by ";" - used for the "Package" field in the control file for additional components of a package, e.g. for development files for a library this would be "dev"
+# The component must match the used components in the CMake file. The component is appended to ${CPACK_DEBIAN_PACKAGE_NAME} with a dash: e.g.: ${CPACK_DEBIAN_PACKAGE_NAME}-dev
+# CPACK_COMPONENT_${COMPONENT}_DISPLAY_NAME - used as additional short description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
+# CPACK_COMPONENT_${COMPONENT}_DESCRIPTION - used as additional description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
+# CPACK_COMPONENT_${COMPONENT}_DEPENDS - used for the "Depends" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
+# CPACK_COMPONENT_${COMPONENT}_SECTION - used for the "Section" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
+# CPACK_COMPONENT_${COMPONENT}_INSTALL - specifies which files have to be installed for this component separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
+# e.g. "/usr/lib/*.so". * wildcards can be used
+# CPACK_COMPONENT_${COMPONENT}_DOCS - specifies which files have to be installed for this component separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
+# e.g. "/usr/share/docs/${CPACK_DEBIAN_PACKAGE_NAME}/README". * wildcards can be used
 #
 # CPACK_DEBIAN_PACKAGE_MAINTAINER - used as "Maintainer" field in control and copyright file, default ${CPACK_PACKAGE_CONTACT}
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used as "Homepage" in control file, default ${CPACK_PACKAGE_VENDOR}
@@ -282,6 +305,37 @@ STRING(REPLACE "<UpstreamAuthorName>" ${CPACK_DEBIAN_PACKAGE_UPSTREAM_AUTHOR_NAM
 FILE(WRITE ${DEBIAN_COPYRIGHT} ${COPYRIGHT_TEMP})
 
 ##############################################################################
+# debian/${CPACK_DEBIAN_PACKAGE_NAME}.install
+set(DEBIAN_INSTALL_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}.install)
+foreach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_INSTALL})
+  file(APPEND ${DEBIAN_INSTALL_FILE} "debian/tmp${INSTALL_UNIT}\n")
+endforeach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_INSTALL})  
+
+##############################################################################
+# debian/${CPACK_DEBIAN_PACKAGE_NAME}.docs
+set(DEBIAN_DOCS_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}.docs)
+foreach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_DOCS})
+  file(APPEND ${DEBIAN_DOCS_FILE} "debian/tmp${INSTALL_UNIT}\n")
+endforeach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_DOCS})  
+
+foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
+string(TOUPPER ${COMPONENT} UPPER_COMPONENT)
+##############################################################################
+# debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.install
+set(DEBIAN_INSTALL_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.install)
+foreach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_INSTALL})
+  file(APPEND ${DEBIAN_INSTALL_FILE} "debian/tmp${INSTALL_UNIT}\n")
+endforeach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_INSTALL})  
+
+##############################################################################
+# debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.docs
+set(DEBIAN_DOCS_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.docs)
+foreach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_DOCS})
+  file(APPEND ${DEBIAN_DOCS_FILE} "debian/tmp${INSTALL_UNIT}\n")
+endforeach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_DOCS})   
+endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
+
+##############################################################################
 # debian/rules
 set(DEBIAN_RULES ${DEBIAN_SOURCE_DIR}/debian/rules)
 file(WRITE ${DEBIAN_RULES}
@@ -301,28 +355,62 @@ file(WRITE ${DEBIAN_RULES}
   "\n"
   "binary-arch: build\n"
   "	cd $(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr -P cmake_install.cmake\n"
-    "	mkdir debian/tmp/DEBIAN\n"
+  "	dh_testdir\n"
+  "	dh_testroot\n"
+  "	dh_installchangelogs\n"
+  "	dh_installdocs\n"  
+  "	dh_install\n"
+  "	dh_link\n"
+  "	dh_strip\n"
+  "	dh_compress\n"
+  "	dh_fixperms\n"
+  "	dh_listpackages\n"
   "	dh_makeshlibs\n"
-  "	dpkg-gensymbols -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
-  "	dpkg-shlibdeps -e${CPACK_DEBIAN_PACKAGE_NAME}\n"
-  "	dpkg-gencontrol -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
-  "	dpkg --build debian/tmp ..\n"
+  "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
+  "	dh_gencontrol\n"
+  "	dh_md5sums\n"
+  "	dh_builddeb\n"
   )
 
+#  "	dh_shlibdeps\n"
+#  "	mkdir debian/tmp/DEBIAN\n"
+#"	dpkg-gensymbols -plibglobalplatform\n"
+#  "	dpkg-shlibdeps -elibglobalplatform\n"
+#  "	dpkg-gencontrol -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
+#  "	dpkg --build debian/tmp ..\n"
+
+  
 foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
   set(PATH debian/tmp_${COMPONENT})
   set(PACKAGE ${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT})
   file(APPEND ${DEBIAN_RULES}
     "	cd $(BUILDDIR); cmake -DCOMPONENT=${COMPONENT} -DCMAKE_INSTALL_PREFIX=../${PATH}/usr -P cmake_install.cmake\n"
-    "	mkdir ${PATH}/DEBIAN\n"
+    "	dh_testdir\n"
+    "	dh_testroot\n"
+    "	dh_installchangelogs\n"
+    "	dh_installdocs\n"
+    "	dh_install\n"
+    "	dh_link\n"
+    "	dh_strip\n"
+    "	dh_compress\n"
+    "	dh_fixperms\n"
+    "	dh_listpackages\n"
     "	dh_makeshlibs\n"
-    "	dpkg-gensymbols -p${PACKAGE} -P${PATH}\n"
-    "	dpkg-shlibdeps -e${PACKAGE}\n"
-    "	dpkg-gencontrol -p${PACKAGE} -P${PATH}\n"
-    "	dpkg --build ${PATH} ..\n"
+    "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
+    "	dh_gencontrol\n"
+    "	dh_md5sums\n"
+    "	dh_builddeb\n"
     )
 endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 
+#    "	dh_shlibdeps\n"
+#    "	mkdir ${PATH}/DEBIAN\n"
+#  "	dh_shlibdeps -L libglobalplatform6 -l ../debian/tmp/usr/lib\n"
+#   "	dpkg-gensymbols -plibglobalplatform -P${PATH}\n"
+#   "	dpkg-shlibdeps -elibglobalplatform\n"
+#    "	dpkg-gencontrol -p${PACKAGE} -P${PATH}\n"
+#    "	dpkg --build ${PATH} ..\n"
+ 
 file(APPEND ${DEBIAN_RULES}
   "\n"
   "clean:\n"
