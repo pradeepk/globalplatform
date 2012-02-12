@@ -1,12 +1,13 @@
 ##
-# Copyright (c) 2010 Daniel Pfeifer <daniel@pfeifer-mail.de>
 # Copyright (c) 2011 Karsten Ohme <k_o_@users.sourceforge.net>
+# Based on a script from Daniel Pfeifer <daniel@pfeifer-mail.de> Copyright (c) 2010
 #
-# This script builds an Ubuntu/Debian source package with "package_ubuntu". It assumes a working install and package_source configuration with all files in place.
+# This script builds an Ubuntu/Debian source package with "make package_ubuntu". It assumes a working install and package_source configuration (CPACK_PACKAGE_* variables in CMakeLists.txt CMake configuration file) with all files in place.
 #
 # From the resulting dsc file a Debian package can be build:
 #
 # dpkg-source -x foo.dsc
+# cd <extracted directory>
 # fakeroot debian/rules binary
 #
 #
@@ -22,7 +23,7 @@
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
 # CPACK_DEBIAN_BUILD_DEPENDS - use in "Build-Depends" field in control file, cmake is automatically added
 # CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " 
-# for components. Instead of "binary:Version" "Source-Version" is used under CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
+# for components. Instead of "binary:Version" "Source-Version" is used if CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
 # 
 # CPACK_DEBIAN_PACKAGE_INSTALL - specifies which files have to be installed for the main package separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
 # e.g. "/usr/lib/*.so". * wildcards can be used
@@ -366,12 +367,12 @@ file(WRITE ${DEBIAN_RULES}
   "	dh_fixperms\n"
   "	dh_listpackages\n"
   "	dh_makeshlibs\n"
-  "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
   "	dh_gencontrol\n"
   "	dh_md5sums\n"
   "	dh_builddeb\n"
   )
 
+#  "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
 #  "	dh_shlibdeps\n"
 #  "	mkdir debian/tmp/DEBIAN\n"
 #"	dpkg-gensymbols -plibglobalplatform\n"
@@ -396,13 +397,13 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
     "	dh_fixperms\n"
     "	dh_listpackages\n"
     "	dh_makeshlibs\n"
-    "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
     "	dh_gencontrol\n"
     "	dh_md5sums\n"
     "	dh_builddeb\n"
     )
 endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 
+#    "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
 #    "	dh_shlibdeps\n"
 #    "	mkdir ${PATH}/DEBIAN\n"
 #  "	dh_shlibdeps -L libglobalplatform6 -l ../debian/tmp/usr/lib\n"
