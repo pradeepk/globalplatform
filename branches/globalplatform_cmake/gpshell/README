@@ -13,7 +13,7 @@ GPShell is a script interpreter which talks to a smart card.  It is written on t
 It uses smart card communication protocols ISO-7816-4 and OpenPlatform 2.0.1 and GlobalPlatform 2.1.1.
 It can establish a secure channel with a smart card, load, instantiate, delete, list applets on a smart card.
 
-You need also the libraries GlobalPlatform 6.0.0, zlib 1.2.3 (zlib1.dll) and OpenSSL 0.97e (libeay32.dll and ssleay32.dll) or
+You need also the libraries GlobalPlatform 6.0.0, zlib 1.2.3 (zlib1.dll) and OpenSSL >= 0.9.8e (libeay32.dll and ssleay32.dll) or
 compatible and must place them in the directory where GPShell is called or better the system directory (C:\Windows\System32 or /usr/(local/)lib usually).
 
 For MacOSX you might set

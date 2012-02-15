@@ -10,7 +10,7 @@ Requires : PC/SC Lite http://www.musclecard.com/ (for UNIXes)
 This is a library for providing access to OpenPlatform 2.0.1' and
 GlobalPlatform 2.1.1 conforming smart cards.
 
-You need also the libraries zlib 1.2.3 (zlib1.dll in Windows) and OpenSSL 0.9.7e
+You need also the libraries zlib 1.2.3 (zlib1.dll in Windows) and OpenSSL >= 0.9.8e
 (libeay32.dll and ssleay32.dll in Windows) or compatible.
 
 ------------------
