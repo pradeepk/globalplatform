@@ -1,15 +1,20 @@
 ##
-# Copyright (c) 2011 Karsten Ohme <k_o_@users.sourceforge.net>
+# Copyright (c) 2012 Karsten Ohme <k_o_@users.sourceforge.net>
 # Based on a script from Daniel Pfeifer <daniel@pfeifer-mail.de> Copyright (c) 2010
 #
-# This script builds an Ubuntu/Debian source package with "make package_ubuntu". It assumes a working install and package_source configuration (CPACK_PACKAGE_* variables in CMakeLists.txt CMake configuration file) with all files in place.
+# This script builds an Ubuntu/Debian source package with "make package_ubuntu". It also offers a convenient way to upload it by dput to Launchpad.
+#It assumes a working install and package_source configuration (CPACK_PACKAGE_* variables in CMakeLists.txt CMake configuration file) with all files in place.
+# Also a PGP key for signing the package is necessary. The key is referenced by the CPACK_DEBIAN_PACKAGE_MAINTAINER setting. For uploading the package to Launchpad this should be the Lauchpad PGP key.
+# You should also be familiar with the meanign of snapshot and release versions. See https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
+# 
 #
-# From the resulting dsc file a Debian package can be build:
+# From the resulting dsc file in the Debian directory also a Ubuntu/Debian package can be build:
 #
 # dpkg-source -x foo.dsc
-# cd <extracted directory>
+# cd <CPACK_DEBIAN_PACKAGE_NAME>
 # fakeroot debian/rules binary
 #
+# When uploading it to Launchpad with dput you must be registered there and you must have a .dput.cf in place. Follow the instructions on https://help.launchpad.net/Packaging/PPA/Uploading
 #
 # Known problems:
 #
@@ -59,7 +64,7 @@
 # CPACK_COMPONENT_${COMPONENT}_DOCS - specifies which files have to be installed for this component separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
 # e.g. "/usr/share/docs/${CPACK_DEBIAN_PACKAGE_NAME}/README". * wildcards can be used
 #
-# CPACK_DEBIAN_PACKAGE_MAINTAINER - used as "Maintainer" field in control and copyright file, default ${CPACK_PACKAGE_CONTACT}
+# CPACK_DEBIAN_PACKAGE_MAINTAINER - used as "Maintainer" field in control and copyright file, default ${CPACK_PACKAGE_CONTACT}, also used as reference for the GPG signing key
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used as "Homepage" in control file, default ${CPACK_PACKAGE_VENDOR}
 # CPACK_DEBIAN_PACKAGE_SNAPSHOT_HOMEPAGE - used as "Homepage" in control file if this is a snapshot build, default ${CPACK_PACKAGE_VENDOR}
 # CPACK_PACKAGE_DESCRIPTION_SUMMARY - used as first line of all "Description" fields for all packages in control file
@@ -68,9 +73,9 @@
 # DPUT_SNAPSHOT_HOST - used as snapshot host for dput for uploading the file to Launchpad
 # CPACK_DEBIAN_PACKAGE_TYPE - used for determining the build type, "snapshot" or "release" is possible, default snapshot
 #
-# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-<BUILD_NUMBER_PREFIX><BUILD_NUMBER>[-SNAPSHOT-<DATE>]~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
+# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-<CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX><CPACK_DEBIAN_PACKAGE_BUILD_NUMBER>[-SNAPSHOT-<DATE>]~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
 # e.g. libfoo1-1.2.0-0ubuntu12011-04-02-03-17-38+0200~maverick 
-# "0ubuntu" stands for the first package in Ubuntu when there is no Debian package existing, the "04-01 21:00:33+02:00" specifies the creation date of this snapshot version, "maverick" is the used Ubuntu version
+# "0ubuntu1" stands for the first package in Ubuntu when there is no Debian package existing, the "2011-04-02-03-17-38+0200" specifies the creation date of this snapshot version, "maverick" is the used Ubuntu series
 # The [-SNAPSHOT-<DATE>] part is only used when building snapshots to assert unique upgradable versions.
 # CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX - used as a prefix for the build number, default ""
 # CPACK_DEBIAN_PACKAGE_BUILD_NUMBER - used for the build number, default 1
@@ -372,6 +377,7 @@ file(WRITE ${DEBIAN_RULES}
   "	dh_builddeb\n"
   )
 
+# sh_libs is not resolved. Maybe OK, maybe wrong. This is a try.
 #  "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
 #  "	dh_shlibdeps\n"
 #  "	mkdir debian/tmp/DEBIAN\n"
@@ -403,6 +409,7 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
     )
 endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 
+# sh_libs is not resolved. Maybe OK, maybe wrong. This is a try.
 #    "	dpkg-shlibdeps -e./debian/tmp/usr/lib/libglobalplatform.so\n"
 #    "	dh_shlibdeps\n"
 #    "	mkdir ${PATH}/DEBIAN\n"
@@ -454,7 +461,7 @@ file(WRITE ${DEBIAN_CHANGELOG}
 ##############################################################################
 # debuild -S
 set(DEB_SOURCE_CHANGES
-  ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source.changes
+  ${CPACK_DEBIAN_PACKAGE_NAME}_${VERSION_NAME}_source.changes
   )
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
@@ -463,8 +470,8 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
   )
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
-  COMMAND make package_source  
-  COMMAND ${CMAKE_COMMAND} -E copy ${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.gz ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
+  COMMAND make -C ${CMAKE_BINARY_DIR} package_source  
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.gz ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
   COMMAND tar xzf ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz -C ${CMAKE_BINARY_DIR}/Debian/
   COMMAND cp -R ${CMAKE_BINARY_DIR}/Debian/${CPACK_SOURCE_PACKAGE_FILE_NAME}/* ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}

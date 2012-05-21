@@ -1,54 +1,27 @@
-#!/bin/sh
+#!/bin/bash
 
-UBUNTU_DISTS="dapper hardy jaunty karmic lucid maverick natty"
+UBUNTU_DISTS="dapper hardy jaunty karmic lucid maverick natty oneiric precise"
 
-PACKAGE=`sed -n -e 's/PROJECT(\(.*\) .*)/\1/p' CMakeLists.txt`
-VERSION=`sed -n -e 's/SET(VERSION "\(.*\)")/\1/p' CMakeLists.txt`
+PACKAGE=`sed -n -e 's/set(CPACK_DEBIAN_PACKAGE_NAME "\(.*\)".*)/\1/p' CMakeLists.txt`
+CURRENT=`sed -n -e 's/SET( ${PROJECT_NAME}_CURRENT \(.*\) .*)/\1/p' CMakeLists.txt`
+REVISION=`sed -n -e 's/SET( ${PROJECT_NAME}_REVISION \(.*\) .*)/\1/p' CMakeLists.txt`
+AGE=`sed -n -e 's/SET( ${PROJECT_NAME}_AGE \(.*\) .*)/\1/p' CMakeLists.txt`
+VERSION=${CURRENT}.${REVISION}.${AGE}
 
-if [ -f COPYING.LESSER ] ; then LICENSE=lgpl; else LICENSE=gpl; fi
-
-SOURCE_PACKAGE_NAME=`sed -n -e 's/Source: \(.*\)/\1/p' debian/control`
-
-echo "Using Package Name : ${PACKAGE}"
-echo "Using Version      : ${VERSION}"
-echo "Using License      : ${LICENSE}"
-echo "Using Ubuntu Source Package name : ${SOURCE_PACKAGE_NAME}"
-
-# The Ubuntu version
-UBUNTU_VERSION=`cat ubuntu.version`
-
-# Ubuntu Snapshot version
-if [ "$1" != "release" ] ; then  
-  UBUNTU_VERSION=$((${UBUNTU_VERSION}-1))+${UBUNTU_VERSION}-SNAPSHOT-`date +%F-%0k-%0M-%0S%z`
-fi
-
-echo "Using Ubuntu Version : ${UBUNTU_VERSION}"
-
-	rm -rf ${PACKAGE}-${VERSION}
-	tar xzf ${PACKAGE}-${VERSION}.tar.gz
-	rm -f ${PACKAGE}_${VERSION}.orig.tar.gz
-	cd ${PACKAGE}-${VERSION} && dh_make -l -c ${LICENSE} -e "k_o_@users.sourceforge.net" -f ../${PACKAGE}-${VERSION}.tar.gz
-	cp ${PACKAGE}_${VERSION}.orig.tar.gz ${SOURCE_PACKAGE_NAME}.orig.tar.gz
-	cd ${PACKAGE}-${VERSION} && rm -rf debian
-	cd ${PACKAGE}-${VERSION} && mkdir debian
-	cd ${PACKAGE}-${VERSION} && cp ../debian/* debian/;
-	cd ${PACKAGE}-${VERSION} && chmod 755 debian/rules
-	for d in $(UBUNTU_DISTS); \
+cd Debian
+for d in ${UBUNTU_DISTS}; \
 	do \
 		cd ${PACKAGE}-${VERSION}; \
-		cp ../debian/changelog debian/; \
-		sed -e "s/DISTRO/$$d/g" debian/changelog > debian/changelog.tmp; \
-		mv debian/changelog.tmp debian/changelog; \
-		sed -e "s/VERSION/$(UBUNTU_VERSION)/g" debian/changelog > debian/changelog.tmp; \
-		mv debian/changelog.tmp debian/changelog; \
+		sed -e "s/~.*;/~$d) $d;/g" debian/changelog > debian/changelog.tmp; \
+		cp debian/changelog.tmp debian/changelog; \
 		# change binary:Version with Source-Version for dapper \
 		if [ $$d == 'dapper' ] ; then \
 			sed -e "s/binary:Version/Source-Version/g" debian/control > debian/control.tmp; \
 			mv debian/control.tmp debian/control; \
-		else \
-			cp ../debian/control debian/ ; \
 		fi; \
 		debuild -S; \
+		cd ..
+
 	done
 
 

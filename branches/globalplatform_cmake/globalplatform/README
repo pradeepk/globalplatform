@@ -103,6 +103,52 @@ Execute:
 
 make/nmake package 
 
+Documentation
+-------------
+
+For documentation you also must have Doxygen installed.
+
+Execute:
+
+cmake .
+make/name doc
+
+Ubuntu/Debian packages
+----------------------
+
+You must also have dput, pbuilder and debhelper installed.
+
+Execute:
+
+cmake .
+make package_ubuntu
+
+The script ubuntu-package.sh iterates over all Ubuntu series and creates dsc files for Debian package creation or Launchpad uploads.
+
+---
+
+You can also upload the automatically created sources.changes to Launchpad. You must be registered there and you must have a .dput.cf in place. Follow the instructions on https://help.launchpad.net/Packaging/PPA/Uploading
+
+Execute:
+
+make dput
+
+If you have used the ubuntu-package.sh script you must manually upload the source.changes files.
+
+Execute:
+
+dput gpsnapshots-ppa libglobalplatform6_6.1.0-0ubuntu1SNAPSHOT20120520195953+0200~dapper_source.changes
+
+---
+
+You can create a Ubuntu/Debian package from a dsc file.
+
+Execute:
+
+dpkg-source -x libglobalplatform6_6.1.0-0ubuntu1SNAPSHOT20120520195953+0200~dapper.dsc
+cd libglobalplatform6-6.1.0
+fakeroot debian/rules binary
+
 CMake Issues
 ------------ 
 
