@@ -73,10 +73,14 @@
 # DPUT_SNAPSHOT_HOST - used as snapshot host for dput for uploading the file to Launchpad
 # CPACK_DEBIAN_PACKAGE_TYPE - used for determining the build type, "snapshot" or "release" is possible, default snapshot
 #
-# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-<CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX><CPACK_DEBIAN_PACKAGE_BUILD_NUMBER>[-SNAPSHOT-<DATE>]~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
-# e.g. libfoo1-1.2.0-0ubuntu12011-04-02-03-17-38+0200~maverick 
-# "0ubuntu1" stands for the first package in Ubuntu when there is no Debian package existing, the "2011-04-02-03-17-38+0200" specifies the creation date of this snapshot version, "maverick" is the used Ubuntu series
-# The [-SNAPSHOT-<DATE>] part is only used when building snapshots to assert unique upgradable versions.
+# The format of the resulting versioning scheme is the following: ${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}
+#${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION} is the Debian/Ubuntu revision. See http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version.
+# An example is libfoo1-1.2.0-0ubuntu1~maverick 
+# "0ubuntu1" stands for the first package in Ubuntu when there is no Debian package existing and "maverick" is the used Ubuntu series
+#
+# To generate always a unique code version for snapshots you must should also set ${CPACK_PACKAGE_VERSION} to a unique increasing package version number. This can be done by appending a [<currentVersion>+<nextVersion>SNAPSHOT<DATE>] part to the package version number. The package version number cannot contain hyphens because a Debian/Ubuntu revision follows. 
+# Assuming the libtool versioning scheme http://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html an example could be: "1.2.0+1SNAPSHOT20110402031738+0200", when the current version is 1.2.0 and the next version in development is 1.2.1. The date format is using a variant of the ISO date format.
+#
 # CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX - used as a prefix for the build number, default ""
 # CPACK_DEBIAN_PACKAGE_BUILD_NUMBER - used for the build number, default 1
 # CPACK_DEBIAN_NATIVE_PACKAGE - if set a native package is build, default not set
@@ -101,13 +105,6 @@ ENDIF(NOT CPACK_DEBIAN_PACKAGE_TYPE)
 IF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
   set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION "lucid")
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
-
-# add snapshot specific versioning information
-IF(CPACK_DEBIAN_PACKAGE_TYPE STREQUAL "snapshot")
-  execute_process(COMMAND date +%Y%m%d%0k%0M%0S%z OUTPUT_VARIABLE SNAPSHOT_DATE_TIME)
-  set(CPACK_DEBIAN_PACKAGE_BUILD_NUMBER "${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}SNAPSHOT${SNAPSHOT_DATE_TIME}")
-  STRING(REPLACE "\n" "" CPACK_DEBIAN_PACKAGE_BUILD_NUMBER ${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER})
-ENDIF(CPACK_DEBIAN_PACKAGE_TYPE STREQUAL "snapshot")
 
 # Set the version name
 set(VERSION_NAME "${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER_PREFIX}${CPACK_DEBIAN_PACKAGE_BUILD_NUMBER}~${CPACK_DEBIAN_PACKAGE_DISTRIBUTION}")
@@ -465,9 +462,9 @@ set(DEB_SOURCE_CHANGES
   )
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
-  COMMAND ${DEBUILD_EXECUTABLE} -S
-  WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}
-  )
+  COMMAND ${DEBUILD_EXECUTABLE} -S 
+  WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}  
+)
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
   COMMAND make -C ${CMAKE_BINARY_DIR} package_source  
