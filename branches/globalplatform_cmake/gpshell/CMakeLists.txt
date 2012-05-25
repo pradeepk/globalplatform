@@ -58,7 +58,7 @@ set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://launchpad.net/~k-o-/+archive/globalpl
 set(CPACK_DEBIAN_PACKAGE_SNAPSHOT_HOMEPAGE "https://launchpad.net/~k-o-/+archive/globalplatformsnapshots")
 set(DPUT_HOST "gp-ppa")
 set(DPUT_SNAPSHOT_HOST "gpsnapshots-ppa")
-set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libc6 (>= 2.7), libglobalplatform6, libpcsclite1 (>= 1.5.3)")
+set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libc6 (>= 2.7), libglobalplatform6-dev, libpcsclite1 (>= 1.5.3)")
 set(CPACK_DEBIAN_PACKAGE_INSTALL "/usr/lib/*.so;/usr/lib/*.so.*")
 set(CPACK_DEBIAN_PACKAGE_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
 
