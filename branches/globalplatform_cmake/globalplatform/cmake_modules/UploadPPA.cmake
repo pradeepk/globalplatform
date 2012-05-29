@@ -33,7 +33,7 @@
 # CPACK_DEBIAN_PACKAGE_SECTION - used as "Section" in control file, default "devel"
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used in "Homepage" field in control file
 # CPACK_DEBIAN_BUILD_DEPENDS - use in "Build-Depends" field in control file, cmake is automatically added
-# CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends}" and "${CPACK_PACKAGE_NAME} (= ${binary:Version}) " 
+# CPACK_DEBIAN_PACKAGE_DEPENDS - used as "Depends" field in the control file, default "${shlibs:Depends}, ${misc:Depends} ${CPACK_PACKAGE_NAME} (= ${binary:Version}) " 
 # for components. Instead of "binary:Version" "Source-Version" is used if CPACK_DEBIAN_PACKAGE_DISTRIBUTION is "dapper"  
 # 
 # CPACK_DEBIAN_PACKAGE_INSTALL - specifies which files have to be installed for the main package separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
@@ -47,7 +47,7 @@
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_COPYRIGHT_YEAR - used as the copyright year in copyright file, default this year
 # CPACK_DEBIAN_PACKAGE_UPSTREAM_URL - used as upstream url in copyright file, default CPACK_DEBIAN_PACKAGE_HOMEPAGE
 # CPACK_DEBIAN_PACKAGE_LICENSE - used as license indicator for the copyright file generation, possible values gpl, lgpl, bsd, apache
-# CPACK_DEBIAN_PACKAGE_DISTRIBUTION - distribution name, default "maverick"
+# CPACK_DEBIAN_PACKAGE_DISTRIBUTION - distribution name, default "precise"
 #
 # CPACK_DEBIAN_PACKAGE_RECOMMENDS - used as "Recommends" field in control file
 # CPACK_DEBIAN_PACKAGE_SUGGESTS - used as "Suggests" field in control file
@@ -65,12 +65,12 @@
 # CPACK_COMPONENT_${COMPONENT}_DESCRIPTION - used as additional description for the "Description" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
 # CPACK_COMPONENT_${COMPONENT}_DEPENDS - used for the "Depends" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
 # CPACK_COMPONENT_${COMPONENT}_SECTION - used for the "Section" field of additional packages. ${COMPONENT} must be in the list of CPACK_COMPONENTS_ALL, e.g. dev
-# CPACK_COMPONENT_${COMPONENT}_INSTALL - specifies which files have to be installed for this component separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
+# CPACK_COMPONENT_${COMPONENT}_INSTALL - specifies which files have to be installed for this component separated by ";". The file path must be absolute to the root directory of the installation 
 # e.g. "/usr/lib/*.so". * wildcards can be used
-# CPACK_COMPONENT_${COMPONENT}_DOCS - specifies which files have to be installed for this component separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
+# CPACK_COMPONENT_${COMPONENT}_DOCS - specifies which files have to be installed for this component separated by ";". The file path must be absolute to the root directory of the installation 
 # e.g. "/usr/share/docs/${CPACK_DEBIAN_PACKAGE_NAME}/README". * wildcards can be used
-# CPACK_DEBIAN_CUSTOM_POST_BUILD_COMMAND - A custom post build command, e.g. create documentation with something like "make doc".
-# CPACK_DEBIAN_CUSTOM_PRE_BUILD_COMMAND - A custom pre build command,.
+# CPACK_DEBIAN_PACKAGE_MANPAGES - specifies which files have to be installed as manual pages. Separated by ";".
+# CPACK_DEBIAN_CUSTOM_BUILD_COMMAND - A custom build command, e.g. create documentation with something like "make doc". The build artifact's path created somewhere in the build directory must be referenced in the CMake INSTALL command by ${CMAKE_CURRENT_BINARY_DIR} variable. E.g.: INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION ${DOCUMENTATION_DIRECTORY} COMPONENT dev OPTIONAL)
 #
 # CPACK_DEBIAN_PACKAGE_MAINTAINER - used as "Maintainer" field in control and copyright file, default ${CPACK_PACKAGE_CONTACT}, also used as reference for the GPG signing key
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used as "Homepage" in control file, default ${CPACK_PACKAGE_VENDOR}
@@ -111,7 +111,7 @@ ENDIF(NOT CPACK_DEBIAN_PACKAGE_TYPE)
 
 # set default distribution
 IF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
-  set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION "lucid")
+  set(CPACK_DEBIAN_PACKAGE_DISTRIBUTION "precise")
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_DISTRIBUTION)
 
 # Set the version name
@@ -373,9 +373,8 @@ file(WRITE ${DEBIAN_RULES}
   "build:\n"
   "	mkdir $(BUILDDIR)\n"
   "	cd $(BUILDDIR); cmake ..\n"
-  "	${CPACK_DEBIAN_CUSTOM_PRE_BUILD_COMMAND}\n"
+  "	cd $(BUILDDIR); ${CPACK_DEBIAN_CUSTOM_BUILD_COMMAND}\n"
   "	make -C $(BUILDDIR) preinstall\n"
-  "	${CPACK_DEBIAN_CUSTOM_POST_BUILD_COMMAND}\n"
   "	touch build\n"
   "\n"
   "binary: binary-indep binary-arch\n"
@@ -491,6 +490,7 @@ set(DEB_SOURCE_CHANGES
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
   COMMAND ${DEBUILD_EXECUTABLE} -S 
+DEPENDS ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
   WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}  
 )
 

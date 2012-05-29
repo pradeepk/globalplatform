@@ -1,6 +1,9 @@
 PROJECT(globalplatform C)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+# set this to snapshot so that snapshot specific version number can be set
+set(CPACK_DEBIAN_PACKAGE_TYPE	"snapshot")
+
 SET( ${PROJECT_NAME}_CURRENT 6 )
 SET( ${PROJECT_NAME}_REVISION 1 )
 SET( ${PROJECT_NAME}_AGE 0+1 )
@@ -29,7 +32,7 @@ INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS ${CMAKE_CURRENT_SOURCE_DIR}/Ch
               ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.OpenSSL
               ${CMAKE_CURRENT_SOURCE_DIR}/NEWS ${CMAKE_CURRENT_SOURCE_DIR}/README DESTINATION ${DOCUMENTATION_DIRECTORY})
 
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc DESTINATION ${DOCUMENTATION_DIRECTORY} OPTIONAL)
+INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION ${DOCUMENTATION_DIRECTORY} COMPONENT dev OPTIONAL)
 
 # build a CPack driven installer package
 
@@ -60,7 +63,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_HOME_DIRECTORY}/COPYING.LESSER")
 set(CPACK_PACKAGE_VERSION_MAJOR        "${${CMAKE_PROJECT_NAME}_CURRENT}")
 set(CPACK_PACKAGE_VERSION_MINOR        "${${CMAKE_PROJECT_NAME}_REVISION}")
 set(CPACK_PACKAGE_VERSION_PATCH        "${${CMAKE_PROJECT_NAME}_AGE}")
-set(CPACK_SOURCE_IGNORE_FILES "doc;.*~;Debian;debian;\\\\.svn;\\\\globalplatform.lib$;\\\\globalplatform.dll;\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;\\\\CPack*;\\\\CMakeCache.txt;\\\\cmake_install.*;\\\\Makefile;\\\\_CPack_Packages;\\\\libglobalplatform.so;\\\\libglobalplatform.a;\\\\globalplatform.exp;\\\\globalplatform.manifest;\\\\install_manifest.txt;\\\\.tar.gz;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES "doc;.*~;Debian;debian;\\\\.svn;\\\\globalplatform.lib$;\\\\globalplatform.dll;\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;\\\\CPack*;\\\\CMakeCache.txt;\\\\cmake_install.*;\\\\Makefile;\\\\_CPack_Packages;\\\\libglobalplatform.so;\\\\libglobalplatform.a;\\\\globalplatform.exp;\\\\globalplatform.manifest;\\\\install_manifest.txt;\\\\.tar.gz;\\\\Doxyfile$;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)
 
@@ -86,10 +89,10 @@ set(DPUT_HOST "gp-ppa")
 set(DPUT_SNAPSHOT_HOST "gpsnapshots-ppa")
 set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libpcsclite-dev (>=1.2.9), zlib1g-dev (>= 1:1.2.3), libssl-dev (>= 0.9.7e), doxygen (>=1.4), pkg-config (>=0.20-1~), check (>=0.9.2)")
 set(CPACK_DEBIAN_PACKAGE_INSTALL "/usr/lib/*.so;/usr/lib/*.so.*")
-set(CPACK_DEBIAN_PACKAGE_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
+set(CPACK_DEBIAN_PACKAGE_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/AUTHORS;/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/README;/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/COPYING*;/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/LICENSE*;/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/ChangeLog;/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/NEWS")
 set(CPACK_COMPONENT_DEV_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
-set(CPACK_DEBIAN_CUSTOM_POST_BUILD_COMMAND "make doxygen")
-set(CPACK_COMPONENT_DEV_INSTALL "/usr/lib/pkgconfig;/usr/include")
+set(CPACK_DEBIAN_CUSTOM_BUILD_COMMAND "make doxygen")
+set(CPACK_COMPONENT_DEV_INSTALL "/usr/lib/pkgconfig;/usr/include;/usr/lib/*.a")
 
 include(UploadPPA)
 
