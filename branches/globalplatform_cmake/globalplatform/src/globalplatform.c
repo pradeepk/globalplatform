@@ -1048,7 +1048,7 @@ end:
 /**
  * Puts a single card data object identified by identifier.
  * Some cards do not provide some data objects. Some possible identifiers are predefined.
- * See #GP211_GET_DATA_CPLC_WHOLE_CPLC. For details about the coding of the dataObject see the programmer's manual
+ * See GP211_GET_DATA_CPLC_WHOLE_CPLC. For details about the coding of the dataObject see the programmer's manual
  * of your card.
  * \param cardContext [in] The valid OPGP_CARD_CONTEXT returned by OPGP_establish_context()
  * \param cardInfo [in] The OPGP_CARD_INFO structure returned by OPGP_card_connect().
@@ -1094,7 +1094,7 @@ end:
 /**
  * Retrieves a single card data object from the card identified by identifier.
  * Some cards do not provide some data objects. Some possible identifiers are predefined.
- * See #GP211_GET_DATA_CPLC_WHOLE_CPLC and so on. For details about the coding of the response see the programmer's manual
+ * See GP211_GET_DATA_CPLC_WHOLE_CPLC and so on. For details about the coding of the response see the programmer's manual
  * of your card.
  * There is a convenience method get_key_information_templates() to get the key information template(s)
  * containing key set version, key index, key type and key length of the keys.
@@ -1549,13 +1549,13 @@ end:
 /**
  * It depends on the card element to retrieve if an array of GP211_APPLICATION_DATA structures
  * or an array of GP211_EXECUTABLE_MODULES_DATA structures must be passed to this function.
- * For the card element #GP211_EXECUTABLE_MODULES_DATA executableData must not
+ * For the card element GP211_EXECUTABLE_MODULES_DATA executableData must not
  * be NULL, else applData must not be NULL.
  * \param cardContext [in] The valid OPGP_CARD_CONTEXT returned by OPGP_establish_context()
  * \param cardInfo [in] The OPGP_CARD_INFO structure returned by OPGP_card_connect().
  * \param *secInfo [in, out] The pointer to the GP211_SECURITY_INFO structure returned by GP211_mutual_authentication().
  * \param cardElement [in] Identifier to retrieve data for Load Files, Applications or the Card Manager.
- * See #GP211_STATUS_APPLICATIONS and related.
+ * See GP211_STATUS_APPLICATIONS and related.
  * \param *applData [out] The GP211_APPLICATION_DATA structure.
  * \param *executableData [out] The GP211_APPLICATION_DATA structure.
  * \param dataLength [in, out] The number of GP211_APPLICATION_DATA or GP211_EXECUTABLE_MODULES_DATA passed and returned.
@@ -2155,7 +2155,7 @@ end:
  * \param executableModuleAIDLength [in] The length of the executableModuleAID buffer.
  * \param applicationAID [in] The AID of the installed application.
  * \param applicationAIDLength [in] The length of the application instance AID.
- * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See #GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
+ * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
  * \param volatileDataSpaceLimit [in] The minimum amount of RAM space that must be available.
  * \param nonVolatileDataSpaceLimit [in] The minimum amount of space for objects of the application, i.e. the data allocated in its lifetime.
  * \param installParameters [in] Applet install parameters for the install() method of the application.
@@ -2259,7 +2259,7 @@ end:
  * \param executableModuleAIDLength [in] The length of the executableModuleAID buffer.
  * \param applicationAID [in] The AID of the installed application.
  * \param applicationAIDLength [in] The length of the application instance AID.
- * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See #GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
+ * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
  * \param volatileDataSpaceLimit [in] The minimum amount of RAM space that must be available.
  * \param nonVolatileDataSpaceLimit [in] The minimum amount of space for objects of the application, i.e. the data allocated in its lifetime.
  * \param installParameters [in] Applet install parameters for the install() method of the application.
@@ -2481,7 +2481,7 @@ end:
  * \param *secInfo [in, out] The pointer to the GP211_SECURITY_INFO structure returned by GP211_mutual_authentication().
  * \param applicationAID [in] The AID of the installed application or security domain.
  * \param applicationAIDLength [in] The length of the application instance AID.
- * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See #GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
+ * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
  * \param installToken [in] The Install Token. This is a 1024 bit (=128 byte) RSA Signature.
  * \param *receiptData [out] If the deletion is performed by a security domain with delegated management privilege
  * this structure contains the according data.
@@ -2578,7 +2578,7 @@ end:
  * \param executableModuleAIDLength [in] The length of the executableModuleAID buffer.
  * \param applicationAID [in] The AID of the installed application.
  * \param applicationAIDLength [in] The length of the application instance AID.
- * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See #GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
+ * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
  * \param volatileDataSpaceLimit [in] The minimum amount of RAM space that must be available.
  * \param nonVolatileDataSpaceLimit [in] The minimum amount of space for objects of the application, i.e. the data allocated in its lifetime.
  * \param installParameters [in] Applet install parameters for the install() method of the application.
@@ -2745,7 +2745,7 @@ end:
  * \param executableModuleAIDLength [in] The length of the executableModuleAID buffer.
  * \param applicationAID [in] The AID of the installed application.
  * \param applicationAIDLength [in] The length of the application instance AID.
- * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See #GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
+ * \param applicationPrivileges [in] The application privileges. Can be an OR of multiple privileges. See GP211_APPLICATION_PRIVILEGE_SECURITY_DOMAIN.
  * \param volatileDataSpaceLimit [in] The minimum amount of RAM space that must be available.
  * \param nonVolatileDataSpaceLimit [in] The minimum amount of space for objects of the application, i.e. the data allocated in its lifetime.
  * \param installParameters [in] Applet install parameters for the install() method of the application.
@@ -3482,7 +3482,7 @@ end:
  * Data Encryption Key) and vice versa.
  * Details about the supported Secure Channel Protocol and its implementation can be
  * obtained by a call to the function get_secure_channel_protocol_details().
- * New cards usually use the VISA default key for all DES keys. See #OPGP_VISA_DEFAULT_KEY.
+ * New cards usually use the VISA default key for all DES keys. See OPGP_VISA_DEFAULT_KEY.
  * If a derivation method is used the baseKey defines the master key.
  * \param cardContext [in] The valid OPGP_CARD_CONTEXT returned by OPGP_establish_context()
  * \param cardInfo [in] The OPGP_CARD_INFO structure returned by OPGP_card_connect().
@@ -3495,9 +3495,8 @@ end:
  * mutual authentication.
  * \param secureChannelProtocol [in] The Secure Channel Protocol.
  * \param secureChannelProtocolImpl [in] The Secure Channel Protocol Implementation.
- * \param securityLevel [in] The requested security level.
- * \param derivationMethod [in] The derivation method to use for. See #OPGP_DERIVATION_METHOD_VISA2.
- * See security.h#GP211_SCP01_SECURITY_LEVEL_C_DEC_C_MAC and others.
+ * \param securityLevel [in] The requested security level. See GP211_SCP01_SECURITY_LEVEL_C_DEC_C_MAC and others.
+ * \param derivationMethod [in] The derivation method to use for. See OPGP_DERIVATION_METHOD_VISA2.
  * \param *secInfo [out] The returned GP211_SECURITY_INFO structure.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */
@@ -3865,7 +3864,7 @@ end:
  * Data Encryption Key) and vice versa.
  * Details about the supported Secure Channel Protocol and its implementation can be
  * obtained by a call to the function GP211_get_secure_channel_protocol_details().
- * New cards usually use the VISA default key for all DES keys. See #OPGP_VISA_DEFAULT_KEY.
+ * New cards usually use the VISA default key for all DES keys. See OPGP_VISA_DEFAULT_KEY.
  * The current Sequence Counter can be obtained with a call to GP211_get_sequence_counter().
  * SCP02 is implicitly set and the security level is set to C-MAC only.
  * \param AID The AID needed for the calculation of the ICV.
@@ -4153,7 +4152,7 @@ end:
  * \param cardContext [in] The valid OPGP_CARD_CONTEXT returned by OPGP_establish_context()
  * \param *cardInfo [in, out] The OPGP_CARD_INFO structure returned by OPGP_card_connect().
  * \param *secInfo [in, out] The pointer to the GP211_SECURITY_INFO structure returned by GP211_mutual_authentication().
- * \param openClose [in] Logical Channel should be opened or closed. See #GP211_MANAGE_CHANNEL_OPEN.
+ * \param openClose [in] Logical Channel should be opened or closed. See GP211_MANAGE_CHANNEL_OPEN.
  * \param channelNumberToClose [in] The Logical Channel number to close.
  * \param channelNumberOpened [out] The Logical Channel number opened.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
@@ -4408,7 +4407,7 @@ end:
 /**
  * Puts a single card data object identified by identifier.
  * Some cards do not provide some data objects. Some possible identifiers are predefined.
- * See #OP201_GET_DATA_ISSUER_BIN. For details about the coding of the dataObject see the programmer's manual
+ * See OP201_GET_DATA_ISSUER_BIN. For details about the coding of the dataObject see the programmer's manual
  * of your card.
  * \param cardContext [in] The valid OPGP_CARD_CONTEXT returned by OPGP_establish_context()
  * \param cardInfo [in] The OPGP_CARD_INFO cardInfo, structure returned by OPGP_card_connect().
@@ -4431,7 +4430,7 @@ OPGP_ERROR_STATUS OP201_put_data(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO c
 /**
  * Retrieves a single card data object from the card identified by identifier.
  * Some cards do not provide some data objects. Some possible identifiers are predefined.
- * See #OP201_GET_DATA_ISSUER_BIN and so on. For details about the coding of the response see the programmer's manual
+ * See OP201_GET_DATA_ISSUER_BIN and so on. For details about the coding of the response see the programmer's manual
  * of your card.
  * There is a convenience method get_key_information_templates() to get the key information template(s)
  * containing key set version, key index, key type and key length of the keys.
@@ -4590,7 +4589,7 @@ end:
  * this structure contains the according data.
  * Can be validated with validate_load_receipt().
  * \param receiptDataAvailable [out] 0 if no receiptData is available.
- * \param *callback [in] A pointer to a #OPGP_PROGRESS_CALLBACK defining the callback function and optional parameters for it.
+ * \param *callback [in] A pointer to a OPGP_PROGRESS_CALLBACK defining the callback function and optional parameters for it.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS OP201_load(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, OP201_SECURITY_INFO *secInfo,
@@ -4637,7 +4636,7 @@ end:
  * this structure contains the according data.
  * Can be validated with validate_load_receipt().
  * \param receiptDataAvailable [out] 0 if no receiptData is available.
- * \param *callback [in] A pointer to a #OPGP_PROGRESS_CALLBACK defining the callback function and optional parameters for it.
+ * \param *callback [in] A pointer to a OPGP_PROGRESS_CALLBACK defining the callback function and optional parameters for it.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS OP201_load_from_buffer(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, OP201_SECURITY_INFO *secInfo,
@@ -5439,7 +5438,7 @@ OPGP_ERROR_STATUS readDAPBlock(PBYTE buf, PDWORD bufLength, OP201_DAP_BLOCK dapB
  * \param keySetVersion [in] The key set version on the card to use for mutual authentication.
  * \param keyIndex [in] The key index of the encryption key in the key set version on the card to use for mutual authentication.
  * \param securityLevel [in] The requested security level.
- * \param derivationMethod [in] The derivation method to use for. See #OPGP_DERIVATION_METHOD_VISA2.
+ * \param derivationMethod [in] The derivation method to use for. See OPGP_DERIVATION_METHOD_VISA2.
  * \param *secInfo [out] The returned OP201_SECURITY_INFO structure.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
  */

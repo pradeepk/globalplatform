@@ -1,9 +1,9 @@
 PROJECT(globalplatform C)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET( ${PROJECT_NAME}_CURRENT 6 )
 SET( ${PROJECT_NAME}_REVISION 1 )
-SET( ${PROJECT_NAME}_AGE 0 )
+SET( ${PROJECT_NAME}_AGE 0+1 )
 SET(VERSION "${${CMAKE_PROJECT_NAME}_CURRENT}.${${CMAKE_PROJECT_NAME}_REVISION}.${${CMAKE_PROJECT_NAME}_AGE}")
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules/)
@@ -14,20 +14,22 @@ IF(UNIX)
     INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib${LIB_SUFFIX}/pkgconfig COMPONENT dev)
 ENDIF(UNIX)
 
-set(DOXYFILE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
-set(DOXYFILE_LATEX OFF)
-include(UseDoxygen)
-
 IF(UNIX)
   set(DOCUMENTATION_DIRECTORY "share/doc/lib${PROJECT_NAME}${${PROJECT_NAME}_CURRENT}")
 ELSE(UNIX)
   set(DOCUMENTATION_DIRECTORY "doc")
 ENDIf(UNIX)
 
+set(DOXYFILE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+set(DOXYFILE_LATEX OFF)
+include(UseDoxygen)
+
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/AUTHORS ${CMAKE_CURRENT_SOURCE_DIR}/ChangeLog 
               ${CMAKE_CURRENT_SOURCE_DIR}/COPYING ${CMAKE_CURRENT_SOURCE_DIR}/COPYING.LESSER 
               ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.OpenSSL
               ${CMAKE_CURRENT_SOURCE_DIR}/NEWS ${CMAKE_CURRENT_SOURCE_DIR}/README DESTINATION ${DOCUMENTATION_DIRECTORY})
+
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc DESTINATION ${DOCUMENTATION_DIRECTORY} OPTIONAL)
 
 # build a CPack driven installer package
 
@@ -46,11 +48,19 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY    "${CMAKE_PROJECT_NAME}-${VERSION}")
 set(CPACK_PACKAGE_VENDOR               "Karsten Ohme")
 set(CPACK_PACKAGE_CONTACT              "Karsten Ohme <k_o_@users.sourceforge.net>")
 set(CPACK_PACKAGE_VERSION              "${VERSION}")
+
+# add snapshot specific versioning information
+IF(CPACK_DEBIAN_PACKAGE_TYPE STREQUAL "snapshot")
+  execute_process(COMMAND date +%Y%m%d%0k%0M%0S%z OUTPUT_VARIABLE SNAPSHOT_DATE_TIME)
+  set(CPACK_PACKAGE_VERSION "${VERSION}SNAPSHOT${SNAPSHOT_DATE_TIME}")
+  STRING(REPLACE "\n" "" CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
+ENDIF(CPACK_DEBIAN_PACKAGE_TYPE STREQUAL "snapshot")
+
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_HOME_DIRECTORY}/COPYING.LESSER")
 set(CPACK_PACKAGE_VERSION_MAJOR        "${${CMAKE_PROJECT_NAME}_CURRENT}")
 set(CPACK_PACKAGE_VERSION_MINOR        "${${CMAKE_PROJECT_NAME}_REVISION}")
 set(CPACK_PACKAGE_VERSION_PATCH        "${${CMAKE_PROJECT_NAME}_AGE}")
-set(CPACK_SOURCE_IGNORE_FILES "doc;.*~;Debian;debian;\\\\.svn;\\\\globalplatform.lib$;\\\\globalplatform.dll;\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;\\\\CPack*;\\\\CMakeCache.txt;\\\\cmake_install.*;\\\\Makefile;\\\\_CPack_Packages;\\\\libglobalplatform.so;\\\\libglobalplatform.a;\\\\globalplatform.exp;\\\\globalplatform.manifest;\\\\install_manifest.txt;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES "doc;.*~;Debian;debian;\\\\.svn;\\\\globalplatform.lib$;\\\\globalplatform.dll;\\\\CMakeFiles;/${CPACK_SOURCE_PACKAGE_FILE_NAME}.*;/${CPACK_PACKAGE_FILE_NAME}.*;\\\\CPack*;\\\\CMakeCache.txt;\\\\cmake_install.*;\\\\Makefile;\\\\_CPack_Packages;\\\\libglobalplatform.so;\\\\libglobalplatform.a;\\\\globalplatform.exp;\\\\globalplatform.manifest;\\\\install_manifest.txt;\\\\.tar.gz;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)
 
@@ -78,6 +88,7 @@ set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libpcsclite-dev (>=1.2.9), zlib
 set(CPACK_DEBIAN_PACKAGE_INSTALL "/usr/lib/*.so;/usr/lib/*.so.*")
 set(CPACK_DEBIAN_PACKAGE_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
 set(CPACK_COMPONENT_DEV_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
+set(CPACK_DEBIAN_CUSTOM_POST_BUILD_COMMAND "make doxygen")
 set(CPACK_COMPONENT_DEV_INSTALL "/usr/lib/pkgconfig;/usr/include")
 
 include(UploadPPA)

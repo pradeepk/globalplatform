@@ -5,7 +5,13 @@
 # This script builds an Ubuntu/Debian source package with "make package_ubuntu". It also offers a convenient way to upload it by dput to Launchpad.
 #It assumes a working install and package_source configuration (CPACK_PACKAGE_* variables in CMakeLists.txt CMake configuration file) with all files in place.
 # Also a PGP key for signing the package is necessary. The key is referenced by the CPACK_DEBIAN_PACKAGE_MAINTAINER setting. For uploading the package to Launchpad this should be the Lauchpad PGP key.
-# You should also be familiar with the meanign of snapshot and release versions. See https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
+# You should also be familiar with the meaning of snapshot and release versions. See https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
+#
+# USAGE: INCLUDE IN PROJECT
+#
+#  set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+#  include(UploadPPA)
+# Add the UploadPPA.cmake file to the projects source directory.
 # 
 #
 # From the resulting dsc file in the Debian directory also a Ubuntu/Debian package can be build:
@@ -63,6 +69,8 @@
 # e.g. "/usr/lib/*.so". * wildcards can be used
 # CPACK_COMPONENT_${COMPONENT}_DOCS - specifies which files have to be installed for this component separated by ";". This is a space separated list. The file path must be absolute to the root directory of the installation 
 # e.g. "/usr/share/docs/${CPACK_DEBIAN_PACKAGE_NAME}/README". * wildcards can be used
+# CPACK_DEBIAN_CUSTOM_POST_BUILD_COMMAND - A custom post build command, e.g. create documentation with something like "make doc".
+# CPACK_DEBIAN_CUSTOM_PRE_BUILD_COMMAND - A custom pre build command,.
 #
 # CPACK_DEBIAN_PACKAGE_MAINTAINER - used as "Maintainer" field in control and copyright file, default ${CPACK_PACKAGE_CONTACT}, also used as reference for the GPG signing key
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used as "Homepage" in control file, default ${CPACK_PACKAGE_VENDOR}
@@ -321,8 +329,16 @@ foreach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_DOCS})
   file(APPEND ${DEBIAN_DOCS_FILE} "debian/tmp${INSTALL_UNIT}\n")
 endforeach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_DOCS})  
 
+##############################################################################
+# debian/${CPACK_DEBIAN_PACKAGE_NAME}.manpages
+set(DEBIAN_MANPAGES_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}.manpages)
+foreach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_MANPAGES})
+  file(APPEND ${DEBIAN_MANPAGES_FILE} "debian/tmp${INSTALL_UNIT}\n")
+endforeach(INSTALL_UNIT ${CPACK_DEBIAN_PACKAGE_MANPAGES})  
+
 foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
 string(TOUPPER ${COMPONENT} UPPER_COMPONENT)
+
 ##############################################################################
 # debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.install
 set(DEBIAN_INSTALL_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.install)
@@ -335,7 +351,15 @@ endforeach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_INSTALL})
 set(DEBIAN_DOCS_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.docs)
 foreach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_DOCS})
   file(APPEND ${DEBIAN_DOCS_FILE} "debian/tmp${INSTALL_UNIT}\n")
-endforeach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_DOCS})   
+endforeach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_DOCS})  
+
+##############################################################################
+# debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.manpages
+set(DEBIAN_MANPAGES_FILE ${DEBIAN_SOURCE_DIR}/debian/${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}.manpages)
+foreach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_MANPAGES})
+  file(APPEND ${DEBIAN_MANPAGES_FILE} "debian/tmp${INSTALL_UNIT}\n")
+endforeach(INSTALL_UNIT ${CPACK_COMPONENT_${UPPER_COMPONENT}_MANPAGES})  
+
 endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 
 ##############################################################################
@@ -349,7 +373,9 @@ file(WRITE ${DEBIAN_RULES}
   "build:\n"
   "	mkdir $(BUILDDIR)\n"
   "	cd $(BUILDDIR); cmake ..\n"
+  "	${CPACK_DEBIAN_CUSTOM_PRE_BUILD_COMMAND}\n"
   "	make -C $(BUILDDIR) preinstall\n"
+  "	${CPACK_DEBIAN_CUSTOM_POST_BUILD_COMMAND}\n"
   "	touch build\n"
   "\n"
   "binary: binary-indep binary-arch\n"
@@ -361,7 +387,8 @@ file(WRITE ${DEBIAN_RULES}
   "	dh_testdir\n"
   "	dh_testroot\n"
   "	dh_installchangelogs\n"
-  "	dh_installdocs\n"  
+  "	dh_installdocs\n" 
+  "	dh_installman\n" 
   "	dh_install\n"
   "	dh_link\n"
   "	dh_strip\n"
@@ -393,6 +420,7 @@ foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
     "	dh_testroot\n"
     "	dh_installchangelogs\n"
     "	dh_installdocs\n"
+    "	dh_installman\n" 
     "	dh_install\n"
     "	dh_link\n"
     "	dh_strip\n"
@@ -466,13 +494,22 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}
   WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}  
 )
 
+IF(${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION} STREQUAL ${CPACK_SOURCE_PACKAGE_FILE_NAME})
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
   COMMAND make -C ${CMAKE_BINARY_DIR} package_source  
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.gz ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
   COMMAND tar xzf ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz -C ${CMAKE_BINARY_DIR}/Debian/
-  COMMAND cp -R ${CMAKE_BINARY_DIR}/Debian/${CPACK_SOURCE_PACKAGE_FILE_NAME}/* ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   )
+ELSE(${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION} STREQUAL ${CPACK_SOURCE_PACKAGE_FILE_NAME})
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
+  COMMAND make -C ${CMAKE_BINARY_DIR} package_source  
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.gz ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz
+  COMMAND tar xzf ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz -C ${CMAKE_BINARY_DIR}/Debian/
+  COMMAND cp -unR ${CMAKE_BINARY_DIR}/Debian/${CPACK_SOURCE_PACKAGE_FILE_NAME}/* ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+  )
+ENDIF(${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION} STREQUAL ${CPACK_SOURCE_PACKAGE_FILE_NAME})
 
 add_custom_target(package_ubuntu 
   DEPENDS ${CMAKE_BINARY_DIR}/Debian/${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}.orig.tar.gz ${CMAKE_BINARY_DIR}/Debian/${DEB_SOURCE_CHANGES}

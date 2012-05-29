@@ -4,7 +4,7 @@ INCLUDE(FindZLIB)
 
 SET(SOURCES connection.c stringify.c crypto.c loadfile.c util.c debug.c globalplatform.c)
 
-# TODO: if this is set, package_ubuntu does onl honor INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX}) if Release is set
+# TODO: if "Release" is set, package_ubuntu does only honors INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX})
 #SET(CMAKE_BUILD_TYPE "Release")
 
 # Enable debugging output

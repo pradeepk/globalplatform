@@ -43,7 +43,7 @@
 
 
 /**
- * This method can stringify many general purpose error codes defined in #errorcodes.h and system error codes.
+ * This method can stringify many general purpose error codes defined in errorcodes.h and system error codes.
  * \param errorCode [in] The error code.
  * \return OPGP_STRING representation of the error code.
  */

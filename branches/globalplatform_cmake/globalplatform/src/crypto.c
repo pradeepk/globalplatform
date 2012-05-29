@@ -46,7 +46,7 @@
 /**
  * Calculates the encryption of a message in CBC mode for SCP02.
  * Pads the message with 0x80 and additional 0x00 until message length is a multiple of 8.
- * \param key[16] [in] A 3DES key used to encrypt.
+ * \param key [in] A 3DES key used to encrypt.
  * \param *message [in] The message to encrypt.
  * \param messageLength [in] The length of the message.
  * \param *encryption [out] The encryption.
@@ -108,10 +108,10 @@ end:
 
 /**
  * Calculates the card cryptogram for SCP01.
- * \param S_ENCSessionKey[16] [in] The S-ENC Session Key for calculating the card cryptogram.
- * \param cardChallenge[8] [in] The card challenge.
- * \param hostChallenge[8] [in] The host challenge.
- * \param cardCryptogram[8] [out] The calculated card cryptogram.
+ * \param S_ENCSessionKey [in] The S-ENC Session Key for calculating the card cryptogram.
+ * \param cardChallenge [in] The card challenge.
+ * \param hostChallenge [in] The host challenge.
+ * \param cardCryptogram [out] The calculated card cryptogram.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_card_cryptogram_SCP01(BYTE S_ENCSessionKey[16], BYTE cardChallenge[8],
@@ -134,11 +134,11 @@ end:
 
 /**
  * Calculates the card cryptogram for SCP02.
- * \param S_ENCSessionKey[16] [in] The S-ENC Session Key for calculating the card cryptogram.
- * \param sequenceCounter[2] [in] The sequence counter.
- * \param cardChallenge[6] [in] The card challenge.
- * \param hostChallenge[8] [in] The host challenge.
- * \param cardCryptogram[8] [out] The calculated card cryptogram.
+ * \param S_ENCSessionKey [in] The S-ENC Session Key for calculating the card cryptogram.
+ * \param sequenceCounter [in] The sequence counter.
+ * \param cardChallenge [in] The card challenge.
+ * \param hostChallenge [in] The host challenge.
+ * \param cardCryptogram [out] The calculated card cryptogram.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_card_cryptogram_SCP02(BYTE S_ENCSessionKey[16],
@@ -165,10 +165,10 @@ end:
 
 /**
  * Calculates the host cryptogram for SCP01.
- * \param S_ENCSessionKey[16] [in] The S-ENC Session Key for calculating the card cryptogram.
- * \param cardChallenge[8] [in] The card challenge.
- * \param hostChallenge[8] [in] The host challenge.
- * \param cardCryptogram[8] [out] The calculated host cryptogram.
+ * \param S_ENCSessionKey [in] The S-ENC Session Key for calculating the card cryptogram.
+ * \param cardChallenge [in] The card challenge.
+ * \param hostChallenge [in] The host challenge.
+ * \param hostCryptogram [out] The calculated host cryptogram.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_host_cryptogram_SCP01(BYTE S_ENCSessionKey[16],
@@ -193,11 +193,11 @@ end:
 
 /**
  * Calculates the host cryptogram for SCP02.
- * \param S_ENCSessionKey[16] [in] The S-ENC Session Key for calculating the card cryptogram.
- * \param sequenceCounter[2] [in] The sequence counter.
- * \param cardChallenge[6] [in] The card challenge.
- * \param hostChallenge[8] [in] The host challenge.
- * \param cardCryptogram[8] [out] The calculated host cryptogram.
+ * \param S_ENCSessionKey [in] The S-ENC Session Key for calculating the card cryptogram.
+ * \param sequenceCounter [in] The sequence counter.
+ * \param cardChallenge [in] The card challenge.
+ * \param hostChallenge [in] The host challenge.
+ * \param hostCryptogram [out] The calculated host cryptogram.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_host_cryptogram_SCP02(BYTE S_ENCSessionKey[16],
@@ -224,11 +224,11 @@ end:
 
 /**
  * Creates the session key for SCP01.
- * \param key[16] [in] The Secure Channel Encryption Key or Secure Channel Message
+ * \param key [in] The Secure Channel Encryption Key or Secure Channel Message
  * Authentication Code Key for calculating the corresponding session key.
- * \param cardChallenge[8] [in] The card challenge.
- * \param hostChallenge[8] [in] The host challenge.
- * \param sessionKey[8] [out] The calculated 3DES session key.
+ * \param cardChallenge [in] The card challenge.
+ * \param hostChallenge [in] The host challenge.
+ * \param sessionKey [out] The calculated 3DES session key.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS create_session_key_SCP01(BYTE key[16], BYTE cardChallenge[8],
@@ -256,11 +256,11 @@ end:
 
 /**
  * Creates the session key for SCP02.
- * \param key[16] [in] The Secure Channel Encryption Key or Secure Channel Message
+ * \param key [in] The Secure Channel Encryption Key or Secure Channel Message
  * Authentication Code Key or Data Encryption Key for calculating the corresponding session key.
- * \param constant[2] [in] The constant for the corresponding session key.
- * \param sequenceCounter[2] [in] The sequence counter.
- * \param sessionKey[8] [out] The calculated 3DES session key.
+ * \param constant [in] The constant for the corresponding session key.
+ * \param sequenceCounter [in] The sequence counter.
+ * \param sessionKey [out] The calculated 3DES session key.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS create_session_key_SCP02(BYTE key[16], BYTE constant[2],
@@ -291,7 +291,7 @@ end:
 /**
  * Calculates the encryption of a message in ECB mode with two key triple DES.
  * Pads the message with 0x80 and additional 0x00 if message length is not a multiple of 8.
- * \param key[16] [in] A 3DES key used to encrypt.
+ * \param key [in] A 3DES key used to encrypt.
  * \param *message [in] The message to encrypt.
  * \param messageLength [in] The length of the message.
  * \param *encryption [out] The encryption.
@@ -355,7 +355,7 @@ end:
 /**
  * Calculates the encryption of a message in ECB mode with single DES.
  * Pads the message with 0x80 and additional 0x00 if message length is not a multiple of 8.
- * \param key[8] [in] A DES key used to encrypt.
+ * \param key [in] A DES key used to encrypt.
  * \param *message [in] The message to encrypt.
  * \param messageLength [in] The length of the message.
  * \param *encryption [out] The encryption.
@@ -419,11 +419,11 @@ end:
 /**
  * Calculates a message authentication code.
  * Pads the message always with 0x80 and additional 0x00 until message length is a multiple of 8.
- * \param sessionKey[16] [in] A 3DES key used to sign.
+ * \param sessionKey [in] A 3DES key used to sign.
  * \param *message [in] The message to authenticate.
  * \param messageLength [in] The message length.
- * \param icv[8] [in] The initial chaining vector.
- * \param mac[8] [out] The calculated MAC.
+ * \param icv [in] The initial chaining vector.
+ * \param mac [out] The calculated MAC.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_MAC(BYTE sessionKey[16], BYTE *message, int messageLength,
@@ -477,7 +477,7 @@ end:
 /**
  * Calculates the encryption of a message in CBC mode.
  * Pads the message with 0x80 and additional 0x00 if message length is not a multiple of 8.
- * \param key[16] [in] A 3DES key used to encrypt.
+ * \param key [in] A 3DES key used to encrypt.
  * \param *message [in] The message to encrypt.
  * \param messageLength [in] The length of the message.
  * \param *encryption [out] The encryption.
@@ -605,11 +605,11 @@ end:
  * Calculates a message authentication code using the left half key of a two key 3DES key
  * and the the full key for the final operation.
  * Pads the message always with 0x80 and additional 0x00 until message length is a multiple of 8.
- * \param _3des_key[16] [in] A 3DES key used to sign.
+ * \param _3des_key [in] A 3DES key used to sign.
  * \param *message [in] The message to authenticate.
  * \param messageLength [in] The message length.
- * \param initialICV[8] [in] The initial chaining vector.
- * \param mac[8] [out] The calculated MAC.
+ * \param initialICV [in] The initial chaining vector.
+ * \param mac [out] The calculated MAC.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_MAC_des_3des(BYTE _3des_key[16], BYTE *message, int messageLength,
@@ -1384,10 +1384,10 @@ end:
 }
 
 /**
- * \param key[16] [in] A 3DES key used to sign. For DES the right half of the key is used.
+ * \param key [in] A 3DES key used to sign. For DES the right half of the key is used.
  * \param *message [in] The message to authenticate.
  * \param messageLength [in] The message length.
- * \param mac[8] [out] The calculated MAC.
+ * \param mac [out] The calculated MAC.
  * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code and error message are contained in the OPGP_ERROR_STATUS struct
  */
 OPGP_ERROR_STATUS calculate_MAC_right_des_3des(BYTE key[16], BYTE *message, int messageLength, BYTE mac[8])

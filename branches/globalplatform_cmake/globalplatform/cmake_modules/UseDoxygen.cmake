@@ -44,7 +44,7 @@
 #
 
 #
-#  Copyright (c) 2009, 2010 Tobias Rautenkranz <tobias@rautenkranz.ch>
+#  Copyright (c) 2009, 2010, 2011 Tobias Rautenkranz <tobias@rautenkranz.ch>
 #
 #  Redistribution and use is allowed according to the terms of the New
 #  BSD license.
@@ -53,7 +53,7 @@
 
 macro(usedoxygen_set_default name value type docstring)
 	if(NOT DEFINED "${name}")
-		set("${name}" "${value}" CACHE ${type} "${docstring}")
+		set("${name}" "${value}" CACHE "${type}" "${docstring}")
 	endif()
 endmacro()
 
@@ -78,7 +78,7 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 		PATH "Input files source directory")
 	usedoxygen_set_default(DOXYFILE_EXTRA_SOURCE_DIRS ""
 		STRING "Additional source files/directories separated by space")
-	set(DOXYFILE_SOURE_DIRS "\"${DOXYFILE_SOURCE_DIR}\" ${DOXYFILE_EXTRA_SOURCES}")
+	set(DOXYFILE_SOURCE_DIRS "\"${DOXYFILE_SOURCE_DIR}\" ${DOXYFILE_EXTRA_SOURCES}")
 
 	usedoxygen_set_default(DOXYFILE_LATEX YES BOOL "Generate LaTeX API documentation" OFF)
 	usedoxygen_set_default(DOXYFILE_LATEX_DIR "latex" STRING "LaTex output directory")
@@ -93,14 +93,18 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 		"${DOXYFILE_OUTPUT_DIR}/${DOXYFILE_HTML_DIR}")
 
 	add_custom_target(doxygen
-		COMMAND ${DOXYGEN_EXECUTABLE}
-			${DOXYFILE} 
+		COMMAND "${DOXYGEN_EXECUTABLE}"
+			"${DOXYFILE}" 
 		COMMENT "Writing documentation to ${DOXYFILE_OUTPUT_DIR}..."
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+	set(DOXYFILE_DOT "NO")
+	if(DOXYGEN_DOT_EXECUTABLE)
+		set(DOXYFILE_DOT "YES")
+	endif()
 
 	## LaTeX
 	set(DOXYFILE_PDFLATEX "NO")
-	set(DOXYFILE_DOT "NO")
 
 	set_property(DIRECTORY APPEND PROPERTY
 		ADDITIONAL_MAKE_CLEAN_FILES
@@ -115,13 +119,10 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 			if(PDFLATEX_COMPILER)
 				set(DOXYFILE_PDFLATEX "YES")
 			endif()
-			if(DOXYGEN_DOT_EXECUTABLE)
-				set(DOXYFILE_DOT "YES")
-			endif()
 
 			add_custom_command(TARGET doxygen
 				POST_BUILD
-				COMMAND ${DOXYFILE_MAKE}
+				COMMAND "${DOXYFILE_MAKE}"
 				COMMENT	"Running LaTeX for Doxygen documentation in ${DOXYFILE_OUTPUT_DIR}/${DOXYFILE_LATEX_DIR}..."
 				WORKING_DIRECTORY "${DOXYFILE_OUTPUT_DIR}/${DOXYFILE_LATEX_DIR}")
 		else()
@@ -132,7 +133,7 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 	endif()
 
 
-	configure_file(${DOXYFILE_IN} Doxyfile @ONLY)
+	configure_file("${DOXYFILE_IN}" "${DOXYFILE}" @ONLY)
 
 	get_target_property(DOC_TARGET doc TYPE)
 	if(NOT DOC_TARGET)

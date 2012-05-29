@@ -1,7 +1,7 @@
 History
 =======
 
-02/18/2012	1.4.5	Karsten Ohme
+05/28/2012	1.4.5	Karsten Ohme
                         CMake Build System
                         Added LGPL OpenSSL Exception
 

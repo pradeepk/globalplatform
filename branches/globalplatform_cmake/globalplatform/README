@@ -137,7 +137,7 @@ If you have used the ubuntu-package.sh script you must manually upload the sourc
 
 Execute:
 
-dput gpsnapshots-ppa libglobalplatform6_6.1.0-0ubuntu1SNAPSHOT20120520195953+0200~dapper_source.changes
+dput gpsnapshots-ppa libglobalplatform6_6.1.0-0ubuntu1SNAPSHOT20120520195953+0200~precise.changes
 
 ---
 
@@ -145,7 +145,7 @@ You can create a Ubuntu/Debian package from a dsc file.
 
 Execute:
 
-dpkg-source -x libglobalplatform6_6.1.0-0ubuntu1SNAPSHOT20120520195953+0200~dapper.dsc
+dpkg-source -x libglobalplatform6_6.1.0-0ubuntu1SNAPSHOT20120520195953+0200~precise.dsc
 cd libglobalplatform6-6.1.0
 fakeroot debian/rules binary
 
