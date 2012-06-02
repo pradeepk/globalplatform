@@ -70,7 +70,7 @@ set(CPACK_DEBIAN_PACKAGE_SNAPSHOT_HOMEPAGE "https://launchpad.net/~k-o-/+archive
 set(DPUT_HOST "gp-ppa")
 set(CPACK_DEBIAN_PACKAGE_MANPAGES "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/gpshell.1")
 set(DPUT_SNAPSHOT_HOST "gpsnapshots-ppa")
-set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libc6 (>= 2.7), libglobalplatform6-dev, libpcsclite1 (>= 1.5.3)")
+set(CPACK_DEBIAN_BUILD_DEPENDS "debhelper (>=5), libc6 (>= 2.7), libglobalplatform6-dev, libpcsclite-dev (>= 1.5.3), pkg-config (>=0.20-1~)")
 set(CPACK_DEBIAN_PACKAGE_INSTALL "/usr/bin/gpshell")
 set(CPACK_DEBIAN_PACKAGE_DOCS "/usr/share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/*")
 

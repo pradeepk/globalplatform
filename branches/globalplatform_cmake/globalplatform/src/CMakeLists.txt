@@ -39,15 +39,16 @@ IF(USE_SYSTEM_MINIZIP)
   INCLUDE_DIRECTORIES(${MINIZIP_INCLUDE_DIRS})
 ENDIF(USE_SYSTEM_MINIZIP)
 
-ADD_LIBRARY(globalplatform SHARED ${SOURCES})
 ADD_LIBRARY(globalplatformStatic STATIC ${SOURCES})
+ADD_LIBRARY(globalplatform SHARED ${SOURCES})
+
 # Under Unix shared and static libraries can have the same name
 IF(UNIX)
 SET_TARGET_PROPERTIES(globalplatformStatic PROPERTIES OUTPUT_NAME globalplatform)
 ENDIF(UNIX)
-TARGET_LINK_LIBRARIES(globalplatform ${PCSC_LIBRARIES} ${OPENSSL_LIBRARIES} ${ZLIB_LIBRARIES})
+TARGET_LINK_LIBRARIES(globalplatform globalplatformStatic ${PCSC_LIBRARIES} ${OPENSSL_LIBRARIES} ${ZLIB_LIBRARIES})
 IF(USE_SYSTEM_MINIZIP)
-  TARGET_LINK_LIBRARIES(globalplatform ${MINIZIP_LIBRARIES})
+  TARGET_LINK_LIBRARIES(globalplatform globalplatformStatic ${MINIZIP_LIBRARIES})
 ENDIF(USE_SYSTEM_MINIZIP)
 
 IF(UNIX)
@@ -60,12 +61,13 @@ ENDIF(WIN32)
 
 # Install
 IF(WIN32)
+ INSTALL(TARGETS globalplatformStatic ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT dev)
  INSTALL(TARGETS globalplatform RUNTIME DESTINATION lib${LIB_SUFFIX})
  INSTALL(TARGETS globalplatform ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT dev)
- INSTALL(TARGETS globalplatformStatic ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT dev)
 ELSE(WIN32)
- INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX})
+# Static library must be build first, otherwise under Ubuntu Karmic the static build removes the .so file of the shared library version.
  INSTALL(TARGETS globalplatformStatic ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT dev)
+ INSTALL(TARGETS globalplatform LIBRARY DESTINATION lib${LIB_SUFFIX}) 
 ENDIF(WIN32)
 
 
