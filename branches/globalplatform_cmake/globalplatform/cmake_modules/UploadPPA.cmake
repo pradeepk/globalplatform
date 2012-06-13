@@ -71,6 +71,12 @@
 # e.g. "/usr/share/docs/${CPACK_DEBIAN_PACKAGE_NAME}/README". * wildcards can be used
 # CPACK_DEBIAN_PACKAGE_MANPAGES - specifies which files have to be installed as manual pages. Separated by ";".
 # CPACK_DEBIAN_CUSTOM_BUILD_COMMAND - A custom build command, e.g. create documentation with something like "make doc". The build artifact's path created somewhere in the build directory must be referenced in the CMake INSTALL command by ${CMAKE_CURRENT_BINARY_DIR} variable. E.g.: INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION ${DOCUMENTATION_DIRECTORY} COMPONENT dev OPTIONAL)
+# The OPTIONAL keyword does not work under CMake 2.6, so you have to use a more difficult construct:
+# INSTALL(
+#CODE "FILE (GLOB_RECURSE ALL_DOCS \"${CMAKE_CURRENT_BINARY_DIR}/doc/html/*\")"
+#CODE "FILE (INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${DOCUMENTATION_DIRECTORY}/html\" TYPE FILE FILES \${ALL_DOCS})" 
+#COMPONENT dev)
+# Here the "\" before ${CMAKE_INSTALL_PREFIX} is important, so this variable is resolved at runtime first.
 #
 # CPACK_DEBIAN_PACKAGE_MAINTAINER - used as "Maintainer" field in control and copyright file, default ${CPACK_PACKAGE_CONTACT}, also used as reference for the GPG signing key
 # CPACK_DEBIAN_PACKAGE_HOMEPAGE - used as "Homepage" in control file, default ${CPACK_PACKAGE_VENDOR}
