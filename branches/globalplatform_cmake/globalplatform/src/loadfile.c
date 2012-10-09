@@ -804,6 +804,7 @@ OPGP_ERROR_STATUS read_load_file_data_block_signature(PBYTE buf, PDWORD bufLengt
 	}
 	memcpy(buf+j, loadFileDataBlockSignature.signature, loadFileDataBlockSignature.signatureLength);
 	j+=loadFileDataBlockSignature.signatureLength;
+  *bufLength = j;
 	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
 end:
 	OPGP_LOG_END(_T("read_load_file_data_block_signature"), status);
