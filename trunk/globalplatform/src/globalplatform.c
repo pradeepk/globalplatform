@@ -5537,3 +5537,121 @@ end:
 	OPGP_LOG_END(_T("calculate_install_token"), status);
 	return status;
 }
+
+/**
+ * \param cardContext [in] The valid OPGP_CARD_CONTEXT returned by OPGP_establish_context()
+ * \param cardInfo [in] The OPGP_CARD_INFO structure returned by OPGP_card_connect().
+ * \param *secInfo [in, out] The pointer to the GP211_SECURITY_INFO structure returned by GP211_mutual_authentication().
+ * \param DGI [in] The DGI where the data should be stored.
+ * \param DGILength [in] The length of the DGI.
+ * \param DATA [in] The DATA to store.
+ * \param DATALength [in] The length of the DATA.
+ * \param BlockNumberStoreData [in] The number of this storedata cmde sent after an open secure channel.
+ * \param lastCmd [in] true if it is the last store data to send.
+ * \param dgiCiphered [in] true if the data shall be ciphered (DES3_ECB with SKUdek).
+ * \param isoPadding [in] true if the data shall be iso-padded (add 0x80+00 until have 8bytes long).
+ * \return OPGP_ERROR_STATUS struct with error status OPGP_ERROR_STATUS_SUCCESS if no error occurs, otherwise error code  and error message are contained in the OPGP_ERROR_STATUS struct
+ */
+OPGP_ERROR_STATUS OPGP_store_data (OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, GP211_SECURITY_INFO *secInfo, PBYTE DGI, DWORD DGILength, PBYTE DATA, DWORD DATALength, BYTE BlockNumberStoreData, BOOL lastCmd, BOOL dgiCiphered, BOOL isoPadding) {
+	OPGP_ERROR_STATUS status;
+	DWORD recvBufferLength=256;
+	BYTE recvBuffer[256];
+	BYTE sendBuffer[256];
+	DWORD sendBufferLength=256;
+	DWORD i=0;
+	int j=0;
+	OPGP_ERROR_STATUS errorStatus;
+	BYTE dgiDataCiphered[255];
+	int dgiDataCipheredLength = 255;
+	DWORD DGIandDataLength = 0;
+
+	OPGP_LOG_START(_T("store_data"));
+
+	// CLASS
+	sendBuffer[i++] = 0x80;
+	
+	//INS
+	sendBuffer[i++] = 0xE2;
+	
+	//P1
+	if (lastCmd)
+	{
+		sendBuffer[i++] = 0x80;
+	}
+	else
+	{
+		sendBuffer[i++] = 0x00;
+	}
+	
+	//P2
+	sendBuffer[i++] = BlockNumberStoreData;
+
+	// if the DATA need an iso-padding (-isopadding = True) : add 80+00 until have 8 bytes long
+	if (isoPadding)
+	{
+		DATA[DATALength] = 0x80;
+		DATALength = DATALength + 1;
+
+		while ((((int) DATALength )% 8 ) != 0)
+		{
+			DATA[DATALength] = 0x00;
+			DATALength = DATALength +1;
+		}
+	}
+
+	// if the dgi must be ciphered (-dgiCiphered = True), cipher the DATA
+	if (dgiCiphered)
+	{
+		errorStatus = calculate_enc_ecb_two_key_triple_des(secInfo->dataEncryptionSessionKey, DATA, DATALength, dgiDataCiphered, &dgiDataCipheredLength);	
+		
+		DATALength = (DWORD)dgiDataCipheredLength;
+		memcpy(DATA, dgiDataCiphered, DATALength);
+	}
+	
+	// Lc
+	DGIandDataLength = DATALength + 1 +  DGILength;
+	sendBuffer[i++] = (BYTE)DGIandDataLength;
+	
+	//DGI
+	for (j=0; (DWORD)j<DGILength; j++) {
+		sendBuffer[i++] = DGI[j];
+	}
+	
+	// DGI data Length
+	sendBuffer[i++] = (BYTE)DATALength;
+	
+	// DGI DATA
+	memcpy(sendBuffer+i, DATA, DATALength);
+	i+=DATALength;
+	sendBufferLength = i;
+	/* NO Le for StoreData cmde */
+	//sendBuffer[i++] = 0x00;
+
+//#ifndef INSIDE_MODE
+	//if (traceEnable) {
+		//LOG_PRINT(traceFile, _T("Command --> "));
+		//for (i=0; (DWORD)i<capduLength; i++) {
+			//LOG_PRINT(traceFile, _T("%02X"), capdu[i] & 0x00FF);
+		//}
+		//LOG_PRINT(traceFile, _T("\n"));
+	//}
+//#endif
+
+
+	status = OPGP_send_APDU(cardContext, cardInfo, secInfo, sendBuffer, sendBufferLength, recvBuffer, &recvBufferLength);
+	if ( OPGP_ERROR_CHECK(status) ) {
+		goto end;
+	}
+	switch (status.errorCode) {
+		case OPGP_ISO7816_ERROR_DATA_NOT_FOUND:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_DATA_NOT_FOUND, OPGP_stringify_error(OPGP_ISO7816_ERROR_DATA_NOT_FOUND)); goto end; }
+		case OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT:
+			{ OPGP_ERROR_CREATE_ERROR(status, OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT, OPGP_stringify_error(OPGP_ISO7816_ERROR_WRONG_GLOBAL_PIN_FORMAT)); goto end; }
+	}
+	CHECK_SW_9000(recvBuffer, recvBufferLength, status);
+
+	{ OPGP_ERROR_CREATE_NO_ERROR(status); goto end; }
+end:
+	OPGP_LOG_END(_T("store_data"), status);
+	return status;
+}

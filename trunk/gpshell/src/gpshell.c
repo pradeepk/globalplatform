@@ -55,6 +55,16 @@
 #define PLATFORM_MODE_GP_211 GP_211
 #define PASSPHRASELEN 64
 #define AUTOREADER -1
+#define DATALEN 255 
+#define DGILEN 2
+
+#ifndef FALSE
+#define FALSE (0)
+#define TRUE (!FALSE)
+#endif
+
+
+
 
 /* Data Structures */
 typedef struct _OptionStr
@@ -95,6 +105,14 @@ typedef struct _OptionStr
     BYTE scpImpl;
     BYTE identifier[2];
     BYTE keyDerivation;
+    BOOL related;
+    BOOL dgiCiphered;
+    BOOL isoPadding;
+    BYTE DGI[DGILEN];
+    DWORD DGILen;
+    BYTE DATA[DATALEN];
+    DWORD DATALen;
+    BOOL LastCmd;
 } OptionStr;
 
 /* Global Variables */
@@ -107,6 +125,7 @@ static int platform_mode = OP_201;
 static int timer = 0;
 static BYTE selectedAID[AIDLEN+1];
 static DWORD selectedAIDLength = 0;
+static BYTE BlockNumberStoreData;
 
 static unsigned int GetTime()
 {
@@ -221,6 +240,12 @@ static int handleOptions(OptionStr *pOptionStr)
 	pOptionStr->identifier[0] = 0;
 	pOptionStr->identifier[1] = 0;
 	pOptionStr->keyDerivation = OPGP_DERIVATION_METHOD_NONE;
+	pOptionStr->related=FALSE;
+	pOptionStr->dgiCiphered = FALSE;
+	pOptionStr->isoPadding = FALSE;
+	pOptionStr->DATALen = 0;
+	pOptionStr->DGILen = 0;
+	pOptionStr->LastCmd = FALSE;
 
     token = strtokCheckComment(NULL);
 
@@ -707,6 +732,50 @@ static int handleOptions(OptionStr *pOptionStr)
                 goto end;
             }
         }
+        else if (_tcscmp(token, _T("-related")) == 0)
+        {
+	         pOptionStr->related=TRUE;
+		}
+		else if (_tcscmp(token, _T("-dgiciphered")) == 0)
+        {
+	         pOptionStr->dgiCiphered=TRUE;
+		}
+		else if (_tcscmp(token, _T("-isopadding")) == 0)
+        {
+	         pOptionStr->isoPadding=TRUE;
+		}
+		else if (_tcscmp(token, _T("-DATA")) == 0)
+        {
+            token = strtokCheckComment(NULL);
+            if (token == NULL)
+            {
+                _tprintf(_T("Error: option -DATA not followed by data\n"));
+                rv = EXIT_FAILURE;
+                goto end;
+            }
+            else
+            {
+                pOptionStr->DATALen = ConvertStringToByteArray(token, DATALEN, pOptionStr->DATA);
+            }
+        }
+		else if (_tcscmp(token, _T("-DGI")) == 0)
+        {
+            token = strtokCheckComment(NULL);
+            if (token == NULL)
+            {
+                _tprintf(_T("Error: option -DGI not followed by data\n"));
+                rv = EXIT_FAILURE;
+                goto end;
+            }
+            else
+            {
+                pOptionStr->DGILen = ConvertStringToByteArray(token, DGILEN, pOptionStr->DGI);
+            }
+        }
+		else if (_tcscmp(token, _T("-lastcmd")) == 0)
+        {
+	         pOptionStr->LastCmd=TRUE;
+		}
         else
         {
             // unknown option
@@ -919,6 +988,10 @@ static int handleCommands(FILE *fd)
                     rv = EXIT_FAILURE;
                     goto end;
                 }
+				else
+				{
+					BlockNumberStoreData = 0;
+				}
                 goto timer;
             }
             else if (_tcscmp(token, _T("select")) == 0)
@@ -1627,6 +1700,38 @@ static int handleCommands(FILE *fd)
             {
                 timer = 1;
                 break;
+            }
+	    else if (_tcscmp(token, _T("store_data")) == 0)
+            {
+                // select instance
+                rv = handleOptions(&optionStr);
+                if (rv != EXIT_SUCCESS)
+                {
+                    goto end;
+                }
+		if (optionStr.DGILen == 0)
+		{
+			_tprintf(_T("Error: option -DGI is not initialized\n"));
+			rv = EXIT_FAILURE;
+			goto end;
+		}
+				
+                status = OPGP_store_data (cardContext, cardInfo, (&securityInfo211),
+                                              (PBYTE)optionStr.DGI, optionStr.DGILen, (PBYTE)(optionStr.DATA), optionStr.DATALen, BlockNumberStoreData, optionStr.LastCmd, optionStr.dgiCiphered, optionStr.isoPadding);
+                if (OPGP_ERROR_CHECK(status))
+                {
+                    // SetTextColour(ERROR_TEXT);
+                    _tprintf (_T("Store_Data() returns 0x%08lX (%s)\n"),
+                              status.errorCode, status.errorMessage);
+					// print_error();
+                    //rv = EXIT_FAILURE;
+                    //goto end;
+                }
+		else
+		{
+			BlockNumberStoreData = BlockNumberStoreData + 1;
+		}
+                goto timer;
             }
             else
             {

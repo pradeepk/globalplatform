@@ -831,6 +831,9 @@ OPGP_API
 OPGP_ERROR_STATUS OPGP_EMV_CPS11_derive_keys(OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, BYTE masterKey[16],
 							BYTE S_ENC[16], BYTE S_MAC[16], BYTE DEK[16]);
 
+OPGP_API
+OPGP_ERROR_STATUS OPGP_store_data (OPGP_CARD_CONTEXT cardContext, OPGP_CARD_INFO cardInfo, GP211_SECURITY_INFO *secInfo, PBYTE DGI, DWORD DGILength, PBYTE DATA, DWORD DATALength, BYTE BlockNumberStoreData, BOOL lastCmd, BOOL dgiCiphered, BOOL isoPadding);
+
 #ifdef __cplusplus
 }
 #endif
