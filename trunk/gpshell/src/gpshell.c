@@ -49,7 +49,7 @@
 #define AIDLEN 16
 #define APDULEN 261
 #define INSTPARAMLEN 32
-#define DELIMITER _T(" \t\n,")
+#define DELIMITER _T(" \t\r\n,")
 #define DDES_KEY_LEN 16
 #define PLATFORM_MODE_OP_201 OP_201
 #define PLATFORM_MODE_GP_211 GP_211
@@ -163,50 +163,23 @@ static int ConvertStringToByteArray(TCHAR *src, int maxLength, BYTE *dest)
     return i;
 }
 
-static TCHAR *strtokCheckComment(TCHAR *buf)
-{
-    TCHAR *token;
-    TCHAR dummy[BUFLEN];
-    int avail = sizeof(dummy);
-    int size = 0, read = 0;
-
-    token = _tcstok(buf, DELIMITER);
+static TCHAR *strtokCheckComment(TCHAR *buf) {
+    TCHAR *token = _tcstok(buf, DELIMITER);
 
     if (token == NULL)
 	return NULL;
 
-    /* Check for quoted string */
-    if (token[0] == _T('"'))
-    {
-	size = _sntprintf(dummy, avail, _T("%s"), token+1);
-	avail -= size;
-	read += size;
-	token = _tcstok(buf, _T("\""));
-	if (token == NULL)
+    if (*token == _T('"')) {
+	int n = _tcslen(token);
+	if ((n <= 1) || (token[n-1] != _T('"')))
 	    return NULL;
-	if (size > 0)
-	{
-	    _sntprintf(dummy+read, avail, _T(" %s"), token);
-	}
-	dummy[sizeof(dummy)-1] = _T('\0');
 
-	/* Skip next delimiter */
-	token = _tcstok(buf, DELIMITER);
-
-	token = dummy;
-	return token;
+	token[n-1] = _T('\0');
+	return token + 1;
     }
 
-    if (_tcscmp(token, _T("//")) == 0 || _tcscmp(token, _T("#")) == 0)
-    {
-	return NULL;
-    }
-    else
-    {
-	return token;
-    }
+    return (_tcscmp(token, _T("//")) == 0 || _tcscmp(token, _T("#")) == 0) ? NULL : token;
 }
-
 
 static int handleOptions(OptionStr *pOptionStr)
 {
